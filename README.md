@@ -1,2 +1,2 @@
 # Eatr
-Eatr food sharing platform using Firebase
+Eatr food sharing platform using Firebase.
