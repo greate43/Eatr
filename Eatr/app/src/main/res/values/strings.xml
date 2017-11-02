@@ -1,7 +1,43 @@
 <resources>
     <string name="app_name">Eatr</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--
+    strings created by salman
+    -->
+
     <string name="title_activity_seller">SellerActivity</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Sell Food</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
