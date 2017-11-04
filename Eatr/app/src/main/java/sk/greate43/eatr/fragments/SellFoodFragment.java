@@ -1,14 +1,15 @@
 package sk.greate43.eatr.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.activities.AddFoodItemActivity;
 
 
 public class SellFoodFragment extends Fragment {
@@ -24,11 +25,8 @@ public class SellFoodFragment extends Fragment {
         addFoodItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                AddFoodItemFragment addFoodItemFragment=new AddFoodItemFragment();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.activity_seller_fragment_container, addFoodItemFragment)
-                        .commit();
+                Intent intent=new Intent(getActivity(), AddFoodItemActivity.class);
+                startActivity(intent);
 
             }
         });
