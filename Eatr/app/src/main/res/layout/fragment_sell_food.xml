@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context="sk.greate43.eatr.fragments.SellFoodFragment">
 
-    <!-- TODO: Update blank fragment layout -->
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fragment_sell_food_add_food_item_btn"

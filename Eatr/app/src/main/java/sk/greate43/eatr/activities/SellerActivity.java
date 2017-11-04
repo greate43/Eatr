@@ -21,9 +21,10 @@ public class SellerActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     FragmentManager fragmentManager = getSupportFragmentManager();
 
-                    SellFoodFragment sellFoodFragment=new SellFoodFragment();
+                    SellFoodFragment sellFoodFragment = new SellFoodFragment();
                     fragmentManager.beginTransaction()
                             .replace(R.id.activity_seller_fragment_container, sellFoodFragment)
+                            .addToBackStack(null)
                             .commit();
                     return true;
                 case R.id.navigation_dashboard:
@@ -39,7 +40,6 @@ public class SellerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_seller);
-
 
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
