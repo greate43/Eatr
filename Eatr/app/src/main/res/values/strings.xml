@@ -5,6 +5,21 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <!--Siddique String Resourse-->
+    <string name="Enter_Name">Name</string>
+    <string name="Enter_Email">Email</string>
+    <string name="Password">Password</string>
+    <string name="Confirm_Paswd">Confirm Password</string>
+    <string name="Register_Button">REGISTER</string>
+    <string name="Register_new_User">REGISTER NEW USER</string>
+    <string name="Register_now">Register User</string>
+    <string name="Button_Log_In">Log In</string>
+    <string name="Register_cook">Become a Cook</string>
+    <string name="Welcome_App">Welcome To Eater</string>
+    <!--Siddique String Resourse Ends-->
 </resources>
