@@ -24,9 +24,13 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +39,6 @@ import java.util.Locale;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Seller;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -52,19 +55,20 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     private static final int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION = 2222;
 
     private static final String TAG = "AddFoodItemActivity";
-    private static final int REQUEST_FINE_AND_COARSE_LOCATION_PERMISSION = 4444;
+    private static final int REQUEST_FINE_LOCATION_PERMISSION = 4444;
 
+    int PLACE_PICKER_REQUEST = 1;
 
     ImageView imgChooseImage;
     GoogleApiClient mGoogleApiClient;
-    FirebaseStorage storage;
+    StorageReference storageRef;
     private Location mLastLocation;
     private EditText etDishName;
     private EditText etCuisine;
     private EditText etExpiryTime;
     private EditText etPickLocation;
-    private DatabaseReference mDatabase;
-    private String imgUri;
+    private DatabaseReference mDatabaseReference;
+    private Uri imgUri;
     private String mCurrentPhotoPath;
 
 
@@ -76,9 +80,9 @@ public class AddFoodItemActivity extends AppCompatActivity implements
 //        Intent gpsOptionsIntent = new Intent(
 //                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 //        startActivity(gpsOptionsIntent);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
-        storage = FirebaseStorage.getInstance();
+        storageRef = FirebaseStorage.getInstance().getReference();
 
         etDishName = findViewById(R.id.activity_add_food_item_edit_text_dish_name);
         etCuisine = findViewById(R.id.activity_add_food_item_edit_text_cuisine);
@@ -183,16 +187,20 @@ public class AddFoodItemActivity extends AppCompatActivity implements
         }
         if (requestCode == GALLERY_RESULT) {
             if (data != null) {
-                imgChooseImage.setImageURI(Uri.parse(String.valueOf(data.getData())));
+                imgUri = data.getData();
+                imgChooseImage.setImageURI(Uri.parse(String.valueOf(imgUri)));
                 imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                imgUri = String.valueOf(data.getData());
+
+                Log.d(TAG, "onActivityResult: " + imgUri.getLastPathSegment());
             }
 
         } else if (requestCode == CAMERA_RESULT) {
+            imgUri = data.getData();
 
-            imgChooseImage.setImageURI(Uri.parse(String.valueOf(data.getData())));
+            imgChooseImage.setImageURI(Uri.parse(String.valueOf(imgUri)));
             imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imgUri = String.valueOf(data.getData());
+            Log.d(TAG, "onActivityResult: " + imgUri);
+
         }
     }
 
@@ -215,16 +223,14 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         int HasFineLocationPermission = ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION);
-        int HasCoarseLocationPermission = ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION);
 
-        if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED && HasCoarseLocationPermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION}, REQUEST_FINE_AND_COARSE_LOCATION_PERMISSION);
+        if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
             return;
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
-            Log.d(TAG, "onConnected: " + String.valueOf(mLastLocation.getLongitude()));
 
             Geocoder geocoder;
             List<Address> addresses = null;
@@ -240,11 +246,11 @@ public class AddFoodItemActivity extends AppCompatActivity implements
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
             String country = addresses.get(0).getCountryName();
-            String postalCode = addresses.get(0).getPostalCode();
+            //  String postalCode = addresses.get(0).getPostalCode();
             String knownName = addresses.get(0).getFeatureName(); // O
 
 
-            etPickLocation.setText(knownName+" "+city+" "+state+" "+country);
+            etPickLocation.setText(knownName + " " + city + " " + state + " " + country);
 
 
         }
@@ -261,10 +267,38 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     }
 
 
-    private void writeSellerData(String username, String dishName, String cuisine, Float expiryTime, String pickUpLocation, String imgUri) {
-        Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, imgUri);
+    private void writeSellerData(String username, final String dishName, final String cuisine, final Float expiryTime, final String pickUpLocation, Uri imgUri) {
 
-        mDatabase.child("seller").child(dishName).setValue(seller);
+
+        StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
+
+        sellerRef.putFile(imgUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        String downloadUrl;
+                        downloadUrl = taskSnapshot.getDownloadUrl().toString();
+
+                        Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, downloadUrl);
+                        mDatabaseReference.child("seller").child(dishName).setValue(seller);
+
+                        Log.d(TAG, "onSuccess: ");
+                    }
+
+
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+                        Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                    }
+                });
+
 
     }
 
@@ -302,6 +336,12 @@ public class AddFoodItemActivity extends AppCompatActivity implements
 //        Log.d(TAG, "createImageFile: mCurrentPhotoPath " + mCurrentPhotoPath);
 //        return image;
 //    }
+
+    private void pickPlace() {
+//
+//        startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+    }
+
 
     @Override
     public void onClick(View v) {
