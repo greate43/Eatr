@@ -42,14 +42,8 @@ dependencies {
 
 
 
-
-
-<<<<<<< HEAD
-
-apply plugin: 'com.google.gms.google-services'
-=======
 apply plugin: 'com.google.gms.google-services'
 repositories {
     mavenCentral()
 }
->>>>>>> master
+
