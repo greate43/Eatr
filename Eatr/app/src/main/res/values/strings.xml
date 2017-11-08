@@ -17,7 +17,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-<<<<<<< HEAD
+    <!--
+       strings created by salman
+       -->
+
 
     <!--Siddique String Resourse-->
     <string name="Enter_Name">Name</string>
@@ -31,7 +34,6 @@
     <string name="Register_cook">Become a Cook</string>
     <string name="Welcome_App">Welcome To Eater</string>
     <!--Siddique String Resourse Ends-->
-=======
     <!--
      activity add food item
      -->
@@ -40,5 +42,4 @@
     <string name="title_activity_maps">Map</string>
 
 
->>>>>>> master
 </resources>
