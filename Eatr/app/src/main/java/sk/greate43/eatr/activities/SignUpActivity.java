@@ -25,7 +25,7 @@ import sk.greate43.eatr.R;
  */
 
 public class SignUpActivity extends AppCompatActivity {
-    public static final String TAG="";
+    public static final String TAG = "";
     private EditText name;
     private EditText email;
     private EditText paswword;
@@ -33,81 +33,78 @@ public class SignUpActivity extends AppCompatActivity {
     private Button btnRegister;
     private FirebaseAuth firebaseAuth;
     private ProgressBar progressBar;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_sign_up);
-        name=findViewById(R.id.editTextName);
-        email=findViewById(R.id.editTextEmailAdress);
-        paswword=findViewById(R.id.editTextPaswd);
-        confirmPasword=findViewById(R.id.editTextConfirmPaswd);
-        btnRegister=findViewById(R.id.btnRegister);
-        progressBar=new ProgressBar(this);
+        name = findViewById(R.id.editTextName);
+        email = findViewById(R.id.editTextEmailAdress);
+        paswword = findViewById(R.id.editTextPaswd);
+        confirmPasword = findViewById(R.id.editTextConfirmPaswd);
+        btnRegister = findViewById(R.id.btnRegister);
+        progressBar = new ProgressBar(this);
 
         /////Firebase Authientication
-        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
-    public void RegisterUser(View view){
+    public void RegisterUser(View view) {
 
-        if (!isEmpty(name.getText().toString())&&!isEmpty(email.getText().toString())&&!isEmpty(paswword.getText().toString())
-                &&!isEmpty(confirmPasword.getText().toString())){
+        if (!isEmpty(name.getText().toString()) && !isEmpty(email.getText().toString()) && !isEmpty(paswword.getText().toString())
+                && !isEmpty(confirmPasword.getText().toString())) {
 
 
             ////paswword auth starts
-            if (paswordAuthentication(paswword.getText().toString(),confirmPasword.getText().toString())){
+            if (paswordAuthentication(paswword.getText().toString(), confirmPasword.getText().toString())) {
 
                 if (emailAuth(email.getText().toString())) {
                     SignUp(email.getText().toString(), paswword.getText().toString());
-                }
-                else {
+                } else {
                     Toast.makeText(this, "Invalid Email", Toast.LENGTH_SHORT).show();
                 }
-            }
-            else{
+            } else {
                 Toast.makeText(this, "Password Must Match", Toast.LENGTH_SHORT).show();
             }
             //password auth ends
-        }
-       else{
+        } else {
             Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void sendVerificationMail(){
-        FirebaseUser user=firebaseAuth.getCurrentUser();
+    public void sendVerificationMail() {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
 
-        if (user!=null){
+        if (user != null) {
             user.sendEmailVerification()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
 
-                            if (task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 Toast.makeText(SignUpActivity.this, "Verification mail is sucessfully sent check inbox", Toast.LENGTH_SHORT).show();
-                            }
-                            else{
+                            } else {
                                 Toast.makeText(SignUpActivity.this, "Check your Email and other credientials", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
         }
     }
-    public void SignUp(String email,String password){
+
+    public void SignUp(String email, String password) {
         progressBar.setVisibility(View.VISIBLE);
-        firebaseAuth.createUserWithEmailAndPassword(email,password)
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if (task.isSuccessful()){
-                            Toast.makeText(SignUpActivity.this,"Registration is sucessfull",Toast.LENGTH_LONG).show();
+                        if (task.isSuccessful()) {
+                            Toast.makeText(SignUpActivity.this, "Registration is sucessfull", Toast.LENGTH_LONG).show();
                             sendVerificationMail();
-                        //    Toast.makeText(SignUpActivity.this, "Verification mail is sent", Toast.LENGTH_SHORT).show();
+                            //    Toast.makeText(SignUpActivity.this, "Verification mail is sent", Toast.LENGTH_SHORT).show();
                             firebaseAuth.signOut();
                             returnToLoginScreen();
-                        }
-                        else {
+                        } else {
                             Toast.makeText(SignUpActivity.this, "Registration is failed", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -115,20 +112,23 @@ public class SignUpActivity extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    public void returnToLoginScreen(){
-        Intent intent=new Intent(this,MainActivity.class);
+    public void returnToLoginScreen() {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
-    public boolean isEmpty(String string){
+
+    public boolean isEmpty(String string) {
         return string.equals("");
     }
-    public boolean paswordAuthentication(String s1,String s2){
+
+    public boolean paswordAuthentication(String s1, String s2) {
         return s1.equals(s2);
     }
-    public boolean emailAuth(String email){
-        return (email.contains("@")&&email.contains(".com"))&&(email.contains("@hotmail")||email.contains("@gmail")
-                ||email.contains("@yahoo"));
+
+    public boolean emailAuth(String email) {
+        return (email.contains("@") && email.contains(".com")) && (email.contains("@hotmail") || email.contains("@gmail")
+                || email.contains("@yahoo"));
     }
 
 }
