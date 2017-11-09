@@ -22,6 +22,7 @@
     <string name="name_of_the_dish">Name of the dish</string>
     <string name="file_path">%1$s</string>
     <string name="title_activity_maps">Map</string>
+    <string name="No">No</string>
     <!--
        strings created by salman
        -->
@@ -39,7 +40,6 @@
     <string name="Register_cook">Become a Cook</string>
     <string name="Welcome_App">Welcome To Eater</string>
     <!--Siddique String Resourse Ends-->
-
 
 
 </resources>
