@@ -25,72 +25,71 @@ import sk.greate43.eatr.fragments.FragmentMainPage;
 
 
 public class MainActivity extends AppCompatActivity {
- public static String TAG="";
+    public static String TAG = "";
 
- private TextView textViewRegisterUser;
- private EditText email;
- private EditText password;
- private Button btnSignIn;
- private FirebaseAuth.AuthStateListener fireBaseAuthStateListener;
- private ProgressDialog progressDialog;
+    private TextView textViewRegisterUser;
+    private EditText email;
+    private EditText password;
+    private Button btnSignIn;
+    private FirebaseAuth.AuthStateListener fireBaseAuthStateListener;
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_sign_in);
-        textViewRegisterUser=findViewById(R.id.registerUser);
-        email=findViewById(R.id.signInEmail);
-        password=findViewById(R.id.signInPassword);
-        btnSignIn=findViewById(R.id.btnLogIn);
-        progressDialog=new ProgressDialog(this);
+        textViewRegisterUser = findViewById(R.id.registerUser);
+        email = findViewById(R.id.signInEmail);
+        password = findViewById(R.id.signInPassword);
+        btnSignIn = findViewById(R.id.btnLogIn);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Verifying user authientication...");
 
-        FragmentManager fragmentManager=getSupportFragmentManager();
-        FragmentMainPage fragmentMainPage=new FragmentMainPage();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentMainPage fragmentMainPage = new FragmentMainPage();
 
         ////////Firebase Auth State Listener
         userAuthientication();
 
     }
 
-////Sign In button
-    public void SignInUser(View view){
+    ////Sign In button
+    public void signInUser(View view) {
 
-     if (email.getText().toString()!="" || password.getText().toString() !=""){
-       FirebaseAuth.getInstance().signInWithEmailAndPassword(email.getText().toString(),password.getText().toString())
-               .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                   @Override
-                   public void onComplete(@NonNull Task<AuthResult> task) {
+        if (email.getText().toString().equals("") || password.getText().toString().equals("")) {
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
 
-                   }
-               }).addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception e) {
-               Log.d(TAG, "onFailure: user mail is not verified");
-               Toast.makeText(MainActivity.this, "Please Enter Correct Email and Password", Toast.LENGTH_SHORT).show();
-           }
-       });
-     }
-     else {
-         Toast.makeText(this, "Please Fill Both the fields", Toast.LENGTH_SHORT).show();
-     }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure: user mail is not verified");
+                    Toast.makeText(MainActivity.this, "Please Enter Correct Email and Password", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "Please Fill Both the fields", Toast.LENGTH_SHORT).show();
+        }
     }
- ///User Authientication
-    public void userAuthientication(){
+
+    ///User Authientication
+    public void userAuthientication() {
 
         Log.d(TAG, "userAuthientication: Im in user Authientication");
-        fireBaseAuthStateListener=new FirebaseAuth.AuthStateListener() {
+        fireBaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-                if (user!=null){
-                    if (user.isEmailVerified()){
-                    }
-                    else{
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    if (user.isEmailVerified()) {
+                    } else {
                         Toast.makeText(MainActivity.this, "Check your inbox..Verify your mail", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
                     }
-                }
-                else{
+                } else {
                     Log.d(TAG, "onAuthStateChanged: Are you in Else of user");
                     Toast.makeText(MainActivity.this, "Not Authienticated user No get Uid", Toast.LENGTH_SHORT).show();
                 }
@@ -102,20 +101,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-            FirebaseAuth.getInstance().addAuthStateListener(fireBaseAuthStateListener);
+        FirebaseAuth.getInstance().addAuthStateListener(fireBaseAuthStateListener);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (fireBaseAuthStateListener!=null){
+        if (fireBaseAuthStateListener != null) {
             FirebaseAuth.getInstance().removeAuthStateListener(fireBaseAuthStateListener);
         }
     }
 
     //////Another Activity
-    public void RegisterUser(View view){
-        Intent intent=new Intent(this,SignUpActivity.class);
+    public void RegisterUser(View view) {
+        Intent intent = new Intent(this, SignUpActivity.class);
         startActivity(intent);
     }
 
