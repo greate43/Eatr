@@ -14,6 +14,7 @@ public class Seller {
     public String imageUri;
 
     public Seller() {
+
     }
 
     public Seller(String dishName, String cuisine, Float expiryTime, String pickUpLocation,String imageUri) {
