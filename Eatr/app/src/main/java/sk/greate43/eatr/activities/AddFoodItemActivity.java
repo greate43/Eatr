@@ -73,6 +73,7 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     private EditText etCuisine;
     private EditText etExpiryTime;
     private EditText etPickLocation;
+    private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private Uri imgUri;
     //  private String mCurrentPhotoPath;
@@ -87,8 +88,8 @@ public class AddFoodItemActivity extends AppCompatActivity implements
         if (!checkIfGpsIsEnabled()) {
             askUserToStartGpsDialog();
         }
-
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        database = FirebaseDatabase.getInstance();
+        mDatabaseReference = database.getReference();
 
         storageRef = FirebaseStorage.getInstance().getReference();
 
@@ -307,7 +308,7 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     }
 
 
-    private void writeSellerData(String username, final String dishName, final String cuisine, final Float expiryTime, final String pickUpLocation, Uri imgUri) {
+    private void writeSellerData(final String username, final String dishName, final String cuisine, final Float expiryTime, final String pickUpLocation, Uri imgUri) {
 
 
         StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
@@ -322,9 +323,9 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                         String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
                         Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, downloadUrl);
-                        mDatabaseReference.child("seller").child(dishName).setValue(seller);
+                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
+                        finish();
 
-                        Log.d(TAG, "onSuccess: ");
                     }
 
 
@@ -334,7 +335,10 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         // ...
+                        Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, "");
+                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
                         Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                        finish();
                     }
                 });
 
