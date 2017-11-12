@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.AddFoodItemActivity;
@@ -67,6 +68,7 @@ public class SellFoodFragment extends Fragment {
         mDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 showData(dataSnapshot);
             }
 
@@ -80,26 +82,54 @@ public class SellFoodFragment extends Fragment {
     }
 
     private void showData(DataSnapshot dataSnapshot) {
+
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-           // Seller post = ds.getValue(Seller.class);
-            Log.d(TAG, "showData: "+ds);
-            Seller seller = new Seller(
-                        ds.child("greate43").child("sasa").getValue(Seller.class).getDishName(),
-                        ds.child("greate43").child("sasa").getValue(Seller.class).getCuisine(),
-                        ds.child("greate43").child("sasa").getValue(Seller.class).getExpiryTime(),
-                        ds.child("greate43").child("sasa").getValue(Seller.class).getPickUpLocation(),
-                        ds.child("greate43").child("sasa").getValue(Seller.class).getImageUri()
+            // Seller post = ds.getValue(Seller.class);
+            collectPhoneNumbers((Map<String, Object>) ds.child("greate43").getValue());
 
-                );
-
-                sellers.add(seller);
-
-
-                adaptor.notifyDataSetChanged();
         }
 
 
-    }}
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (sellers != null ){
+            sellers.clear();
+        }
+
+    }
+
+    private void collectPhoneNumbers(Map<String, Object> value) {
+        Log.d(TAG, "collectPhoneNumbers: " + value);
+
+
+        //iterate through each user, ignoring their UID
+        for (Map.Entry<String, Object> entry : value.entrySet()) {
+            //Get user map
+            Map singleUser = (Map) entry.getValue();
+            //Get phone field and append to list
+
+            Log.d(TAG, "collectPhoneNumbers: " + singleUser);
+            //  phoneNumbers.add((Long) singleUser.get("dishName"));
+
+            Seller seller = new Seller(
+                    (String) singleUser.get("dishName"),
+                    (String) singleUser.get("cuisine"),
+                    Float.parseFloat(String.valueOf(singleUser.get("expiryTime"))),
+                    String.valueOf(singleUser.get("pickUpLocation")),
+                    (String) singleUser.get("imageUri")
+            );
+
+
+            sellers.add(seller);
+            adaptor.notifyDataSetChanged();
+
+        }
+
+    }
+}
 
 
 

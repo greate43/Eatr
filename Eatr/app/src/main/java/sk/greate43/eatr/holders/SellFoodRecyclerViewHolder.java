@@ -22,11 +22,14 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "SellFoodRecyclerView";
     public TextView tvStatus;
     public ImageView imgFoodItem;
+    public TextView tvLocation;
 
     public SellFoodRecyclerViewHolder(View itemView) {
         super(itemView);
         tvStatus = itemView.findViewById(R.id.posted_food_list_status_text_view);
         imgFoodItem = itemView.findViewById(R.id.posted_food_list_food_item_image_view);
+        tvLocation = itemView.findViewById(R.id.posted_food_list_location_text_view);
+
     }
 
     public void populate(Context context, Seller seller) {
@@ -49,7 +52,8 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
                 });
 
         tvStatus.setText("Active");
-
+        tvLocation.setText(seller.getPickUpLocation());
+        Log.d(TAG, "populate: "+seller.getPickUpLocation());
     }
 
 }
