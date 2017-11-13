@@ -1,11 +1,13 @@
 package sk.greate43.eatr.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,8 +24,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -67,9 +73,10 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     private EditText etCuisine;
     private EditText etExpiryTime;
     private EditText etPickLocation;
+    private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private Uri imgUri;
-    private String mCurrentPhotoPath;
+    //  private String mCurrentPhotoPath;
 
 
     @Override
@@ -77,10 +84,12 @@ public class AddFoodItemActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_food_item);
 
-//        Intent gpsOptionsIntent = new Intent(
-//                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//        startActivity(gpsOptionsIntent);
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+
+        if (!checkIfGpsIsEnabled()) {
+            askUserToStartGpsDialog();
+        }
+        database = FirebaseDatabase.getInstance();
+        mDatabaseReference = database.getReference();
 
         storageRef = FirebaseStorage.getInstance().getReference();
 
@@ -99,7 +108,7 @@ public class AddFoodItemActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
 
-                showPictureDialog();
+                selectPictureFromGalleryOrCameraDialog();
 
             }
         });
@@ -118,7 +127,7 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     }
 
 
-    private void showPictureDialog() {
+    private void selectPictureFromGalleryOrCameraDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
         pictureDialog.setTitle("Select Action");
         String[] pictureDialogItems = {
@@ -139,6 +148,26 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                     }
                 });
         pictureDialog.show();
+    }
+
+
+    private void askUserToStartGpsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Would You Like To Turn On The Gps?");
+        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                startGpsFromSettings();
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                showToast("App Might Not be Fully Functional if Gps Is Off  ");
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 
@@ -202,6 +231,17 @@ public class AddFoodItemActivity extends AppCompatActivity implements
             Log.d(TAG, "onActivityResult: " + imgUri);
 
         }
+
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK && data != null) {
+                Place place = PlacePicker.getPlace(data, this);
+                etPickLocation.setText(place.getAddress());
+                //  String toastMsg = String.format("Place: %s", place.getAddress());
+                //showToast(toastMsg);
+            }
+        }
+
+
     }
 
 
@@ -242,7 +282,8 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                 e.printStackTrace();
             }
             assert addresses != null;
-            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            String address = addresses.get(0).getAddressLine(0);
+            // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
             String country = addresses.get(0).getCountryName();
@@ -267,7 +308,7 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     }
 
 
-    private void writeSellerData(String username, final String dishName, final String cuisine, final Float expiryTime, final String pickUpLocation, Uri imgUri) {
+    private void writeSellerData(final String username, final String dishName, final String cuisine, final Float expiryTime, final String pickUpLocation, Uri imgUri) {
 
 
         StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
@@ -279,13 +320,12 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         // Get a URL to the uploaded content
-                        String downloadUrl;
-                        downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                        String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
                         Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, downloadUrl);
-                        mDatabaseReference.child("seller").child(dishName).setValue(seller);
+                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
+                        finish();
 
-                        Log.d(TAG, "onSuccess: ");
                     }
 
 
@@ -295,7 +335,10 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         // ...
+                        Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, "");
+                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
                         Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                        finish();
                     }
                 });
 
@@ -338,8 +381,35 @@ public class AddFoodItemActivity extends AppCompatActivity implements
 //    }
 
     private void pickPlace() {
-//
-//        startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        if (!checkIfGpsIsEnabled()) {
+            askUserToStartGpsDialog();
+        } else {
+            try {
+                startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private void startGpsFromSettings() {
+
+        if (!checkIfGpsIsEnabled()) {
+            Intent gpsOptionsIntent = new Intent(
+                    android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(gpsOptionsIntent);
+        }
+    }
+
+    private boolean checkIfGpsIsEnabled() {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        assert manager != null;
+        return manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
 
@@ -347,7 +417,7 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_add_food_item_button_get_location:
-
+                pickPlace();
                 break;
             case R.id.activity_add_food_item_button_share_food:
 
