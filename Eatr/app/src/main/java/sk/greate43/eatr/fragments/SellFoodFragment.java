@@ -95,7 +95,7 @@ public class SellFoodFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        if (sellers != null ){
+        if (sellers != null) {
             sellers.clear();
         }
 
