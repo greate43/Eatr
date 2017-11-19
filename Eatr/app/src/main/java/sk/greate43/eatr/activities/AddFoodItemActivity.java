@@ -1,25 +1,31 @@
 package sk.greate43.eatr.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -69,13 +75,15 @@ public class AddFoodItemActivity extends AppCompatActivity implements
     GoogleApiClient mGoogleApiClient;
     StorageReference storageRef;
     private Location mLastLocation;
-    private EditText etDishName;
-    private EditText etCuisine;
-    private EditText etExpiryTime;
-    private EditText etPickLocation;
+    private TextInputEditText etDishName;
+    private TextInputEditText etCuisine;
+    private TextInputEditText etExpiryTime;
+    private TextInputEditText etPickLocation;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private Uri imgUri;
+    private ProgressDialog dialogUploadingImage;
+
     //  private String mCurrentPhotoPath;
 
 
@@ -88,6 +96,10 @@ public class AddFoodItemActivity extends AppCompatActivity implements
         if (!checkIfGpsIsEnabled()) {
             askUserToStartGpsDialog();
         }
+
+        dialogUploadingImage = new ProgressDialog(this);
+        dialogUploadingImage.setCanceledOnTouchOutside(false);
+
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
 
@@ -224,7 +236,10 @@ public class AddFoodItemActivity extends AppCompatActivity implements
             }
 
         } else if (requestCode == CAMERA_RESULT) {
-            imgUri = data.getData();
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            String pathOfBmp = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "title", null);
+
+            imgUri = Uri.parse(pathOfBmp);
 
             imgChooseImage.setImageURI(Uri.parse(String.valueOf(imgUri)));
             imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -262,40 +277,42 @@ public class AddFoodItemActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        int HasFineLocationPermission = ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION);
+        if (isNetworkAvailable()) {
+            int HasFineLocationPermission = ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION);
 
-        if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-
-            Geocoder geocoder;
-            List<Address> addresses = null;
-            geocoder = new Geocoder(this, Locale.getDefault());
-
-            try {
-                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
+                return;
             }
-            assert addresses != null;
-            String address = addresses.get(0).getAddressLine(0);
-            // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-            String city = addresses.get(0).getLocality();
-            String state = addresses.get(0).getAdminArea();
-            String country = addresses.get(0).getCountryName();
-            //  String postalCode = addresses.get(0).getPostalCode();
-            String knownName = addresses.get(0).getFeatureName(); // O
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            if (mLastLocation != null) {
+
+                Geocoder geocoder;
+                List<Address> addresses = null;
+                geocoder = new Geocoder(this, Locale.getDefault());
+
+                try {
+                    addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (addresses != null) {
+                    String address = addresses.get(0).getAddressLine(0);
+                    // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                    String city = addresses.get(0).getLocality();
+                    String state = addresses.get(0).getAdminArea();
+                    String country = addresses.get(0).getCountryName();
+                    //  String postalCode = addresses.get(0).getPostalCode();
+                    String knownName = addresses.get(0).getFeatureName(); // O
 
 
-            etPickLocation.setText(knownName + " " + city + " " + state + " " + country);
-
-
+                    etPickLocation.setText(knownName + " " + city + " " + state + " " + country);
+                }
+            }
         }
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -307,10 +324,17 @@ public class AddFoodItemActivity extends AppCompatActivity implements
 
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        assert connectivityManager != null;
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
     private void writeSellerData(final String username, final String dishName, final String cuisine, final Float expiryTime, final String pickUpLocation, Uri imgUri) {
-
-
+        dialogUploadingImage.setMessage("Uploading Image........");
+        dialogUploadingImage.show();
         StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
 
         sellerRef.putFile(imgUri)
@@ -324,6 +348,9 @@ public class AddFoodItemActivity extends AppCompatActivity implements
 
                         Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, downloadUrl);
                         mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
+                        if (dialogUploadingImage.isShowing()) {
+                            dialogUploadingImage.dismiss();
+                        }
                         finish();
 
                     }
@@ -338,7 +365,11 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                         Seller seller = new Seller(dishName, cuisine, expiryTime, pickUpLocation, "");
                         mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
                         Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                        if (dialogUploadingImage.isShowing()) {
+                            dialogUploadingImage.dismiss();
+                        }
                         finish();
+
                     }
                 });
 
@@ -421,13 +452,32 @@ public class AddFoodItemActivity extends AppCompatActivity implements
                 break;
             case R.id.activity_add_food_item_button_share_food:
 
-                writeSellerData("greate43"
-                        , etDishName.getText().toString()
-                        , etCuisine.getText().toString()
-                        , Float.parseFloat(etExpiryTime.getText().toString())
-                        , etPickLocation.getText().toString()
-                        , imgUri
-                );
+                if (
+                        !TextUtils.isEmpty(etDishName.getText().toString())
+                                && !TextUtils.isEmpty(etCuisine.getText().toString())
+                                && !TextUtils.isEmpty(etExpiryTime.getText().toString())
+                                && !TextUtils.isEmpty(etPickLocation.getText().toString())
+                                && imgUri != null
+                        ) {
+                    writeSellerData("greate43"
+                            , etDishName.getText().toString()
+                            , etCuisine.getText().toString()
+                            , Float.parseFloat(etExpiryTime.getText().toString())
+                            , etPickLocation.getText().toString()
+                            , imgUri
+                    );
+                } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
+                    etDishName.setError("Dish Name is Empty  ");
+                } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
+                    etDishName.setError("Cuisine Name is Empty  ");
+                } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
+                    etCuisine.setError("Dish Name is Empty  ");
+                } else if (TextUtils.isEmpty(etExpiryTime.getText().toString())) {
+                    etExpiryTime.setError("Expiry Name is Empty  ");
+                } else if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
+                    etDishName.setError("Pick Up Name is Empty  ");
+                }
+
                 break;
 
 
