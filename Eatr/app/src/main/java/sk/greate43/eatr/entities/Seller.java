@@ -20,6 +20,7 @@ public class Seller implements Serializable {
     private String imageUri;
     private Map<String, String> timeStamp;
     private String time;
+    private boolean checkIfOrderIsActive;
 
 
     public Seller() {
@@ -66,12 +67,15 @@ public class Seller implements Serializable {
         this.imageUri = imageUri;
     }
 
-    public Map<String, String> getTimeStamp() {
-        return timeStamp;
-    }
-
+    private static final String TAG = "Seller";
     public void setTimeStamp(Map<String, String> timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+
+
+    public Map<String, String> getTimeStamp() {
+        return timeStamp;
     }
 
     @Exclude

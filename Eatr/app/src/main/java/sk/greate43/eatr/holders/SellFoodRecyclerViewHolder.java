@@ -40,22 +40,23 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
     public void populate(Context context, Seller seller) {
         itemView.setTag(seller);
         Log.d(TAG, "populate: " + seller.getImageUri());
-        Picasso.with(context)
-                .load(seller.getImageUri())
-                .fit()
-                .centerCrop()
-                .into(imgFoodItem, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(TAG, "onSuccess: ");
-                    }
+        if (seller.getImageUri() != null && !seller.getImageUri().isEmpty()) {
+            Picasso.with(context)
+                    .load(seller.getImageUri())
+                    .fit()
+                    .centerCrop()
+                    .into(imgFoodItem, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "onSuccess: ");
+                        }
 
-                    @Override
-                    public void onError() {
+                        @Override
+                        public void onError() {
 
-                    }
-                });
-
+                        }
+                    });
+        }
         tvStatus.setText("Active");
         tvLocation.setText(seller.getPickUpLocation());
         tvTimeStamp.setText(DateUtils
