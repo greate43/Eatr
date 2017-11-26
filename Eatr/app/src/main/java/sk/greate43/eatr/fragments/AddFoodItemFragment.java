@@ -15,7 +15,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -49,6 +51,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import me.originqiu.library.EditTag;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Seller;
 
@@ -60,33 +63,34 @@ import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class AddFoodItemFragment extends Fragment implements
-    GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-        private static final int CAMERA_RESULT = 111;
-        private static final int GALLERY_RESULT = 222;
+    private static final int CAMERA_RESULT = 111;
+    private static final int GALLERY_RESULT = 222;
 
-        private static final int REQUEST_CAMERA_AND_WRITE_PERMISSION = 1111;
-        private static final int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION = 2222;
+    private static final int REQUEST_CAMERA_AND_WRITE_PERMISSION = 1111;
+    private static final int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION = 2222;
 
     private static final String TAG = "AddFoodItemFragment";
     private static final int REQUEST_FINE_LOCATION_PERMISSION = 4444;
 
-        int PLACE_PICKER_REQUEST = 1;
+    int PLACE_PICKER_REQUEST = 1;
 
-        ImageView imgChooseImage;
-        GoogleApiClient mGoogleApiClient;
-        StorageReference storageRef;
-        private Location mLastLocation;
-        private TextInputEditText etDishName;
-        private TextInputEditText etCuisine;
-        private TextInputEditText etExpiryTime;
-        private TextInputEditText etPickLocation;
-        private FirebaseDatabase database;
-        private DatabaseReference mDatabaseReference;
-        private Uri imgUri;
-        private ProgressDialog dialogUploadingImage;
+    ImageView imgChooseImage;
+    GoogleApiClient mGoogleApiClient;
+    StorageReference storageRef;
+    private Location mLastLocation;
+    private TextInputEditText etDishName;
+    private TextInputEditText etCuisine;
+    private EditTag etIncidentsTags;
+    private TextInputLayout tilIncidentsTags;
+    private TextInputEditText etPickLocation;
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabaseReference;
+    private Uri imgUri;
+    private ProgressDialog dialogUploadingImage;
 
-        //  private String mCurrentPhotoPath;
+    //  private String mCurrentPhotoPath;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -107,9 +111,10 @@ public class AddFoodItemFragment extends Fragment implements
 
         etDishName = view.findViewById(R.id.fragment_add_food_item_edit_text_dish_name);
         etCuisine = view.findViewById(R.id.fragment_add_food_item_edit_text_cuisine);
-        etExpiryTime =view. findViewById(R.id.fragment_add_food_item_edit_text_expiry_time);
+        etIncidentsTags = view.findViewById(R.id.fragment_add_food_item_edit_tag_ingredient_tag);
         etPickLocation = view.findViewById(R.id.fragment_add_food_item_edit_text_pick_location);
-        Button btnGetLocation = view.findViewById(R.id.fragment_add_food_item_button_get_location);
+        tilIncidentsTags=view.findViewById(R.id.fragment_add_food_item_til_ingredient_tag);
+        FloatingActionButton btnGetLocation = view.findViewById(R.id.fragment_add_food_item_button_get_location);
         Button btnShareFood = view.findViewById(R.id.fragment_add_food_item_button_share_food);
 
         btnGetLocation.setOnClickListener(this);
@@ -135,7 +140,7 @@ public class AddFoodItemFragment extends Fragment implements
                     .build();
         }
 
-    return view;
+        return view;
     }
 
     private void selectPictureFromGalleryOrCameraDialog() {
@@ -330,7 +335,7 @@ public class AddFoodItemFragment extends Fragment implements
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
-    private void writeSellerData(final String username, final String dishName, final String cuisine, final Float expiryTime, final String pickUpLocation, Uri imgUri) {
+    private void writeSellerData(final String username, final String dishName, final String cuisine, final String expiryTime, final String pickUpLocation, Uri imgUri) {
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
         StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
@@ -347,10 +352,11 @@ public class AddFoodItemFragment extends Fragment implements
                         Seller seller = new Seller();
                         seller.setCuisine(cuisine);
                         seller.setDishName(dishName);
-                        seller.setExpiryTime(expiryTime);
+                        seller.setIngredientsTags(expiryTime);
                         seller.setPickUpLocation(pickUpLocation);
                         seller.setImageUri(downloadUrl);
                         seller.setTimeStamp(ServerValue.TIMESTAMP);
+
                         mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
                         if (dialogUploadingImage.isShowing()) {
                             dialogUploadingImage.dismiss();
@@ -368,7 +374,7 @@ public class AddFoodItemFragment extends Fragment implements
                         Seller seller = new Seller();
                         seller.setCuisine(cuisine);
                         seller.setDishName(dishName);
-                        seller.setExpiryTime(expiryTime);
+                        seller.setIngredientsTags(expiryTime);
                         seller.setPickUpLocation(pickUpLocation);
                         seller.setImageUri("");
                         seller.setTimeStamp(ServerValue.TIMESTAMP);
@@ -464,14 +470,14 @@ public class AddFoodItemFragment extends Fragment implements
                 if (
                         !TextUtils.isEmpty(etDishName.getText().toString())
                                 && !TextUtils.isEmpty(etCuisine.getText().toString())
-                                && !TextUtils.isEmpty(etExpiryTime.getText().toString())
+                                && !etIncidentsTags.getTagList().isEmpty()
                                 && !TextUtils.isEmpty(etPickLocation.getText().toString())
                                 && imgUri != null
                         ) {
                     writeSellerData("greate43"
                             , etDishName.getText().toString()
                             , etCuisine.getText().toString()
-                            , Float.parseFloat(etExpiryTime.getText().toString())
+                            , etIncidentsTags.getTagList().toString()
                             , etPickLocation.getText().toString()
                             , imgUri
                     );
@@ -481,8 +487,9 @@ public class AddFoodItemFragment extends Fragment implements
                     etDishName.setError("Cuisine Name is Empty  ");
                 } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
                     etCuisine.setError("Dish Name is Empty  ");
-                } else if (TextUtils.isEmpty(etExpiryTime.getText().toString())) {
-                    etExpiryTime.setError("Expiry Name is Empty  ");
+                } else if (etIncidentsTags.getTagList().isEmpty()) {
+
+                    tilIncidentsTags.setError("There Should be at Lest 1 Tag");
                 } else if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
                     etDishName.setError("Pick Up Name is Empty  ");
                 }

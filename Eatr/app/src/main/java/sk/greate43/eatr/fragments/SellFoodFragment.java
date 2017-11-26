@@ -119,8 +119,10 @@ public class SellFoodFragment extends Fragment {
             Seller seller = new Seller();
             seller.setCuisine((String) singleUser.get("dishName"));
             seller.setDishName((String) singleUser.get("cuisine"));
-            seller.setExpiryTime(Float.parseFloat(String.valueOf(singleUser.get("expiryTime"))));
-            seller.setPickUpLocation((String) singleUser.get("imageUri"));
+            seller.setIngredientsTags(String.valueOf(singleUser.get("expiryTime")));
+            seller.setImageUri((String) singleUser.get("imageUri"));
+            seller.setPickUpLocation((String) singleUser.get("pickUpLocation"));
+            seller.setTime(singleUser.get("timeStamp").toString());
             sellers.add(seller);
             adaptor.notifyDataSetChanged();
 
