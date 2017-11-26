@@ -82,21 +82,30 @@ public class SellFoodFragment extends Fragment {
     }
 
     private void showData(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+
+        if (adaptor != null) {
+            adaptor.clear();
+        }
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             // Seller post = ds.getValue(Seller.class);
             collectSeller((Map<String, Object>) ds.child("greate43").getValue());
 
         }
+        adaptor.notifyDataSetChanged();
+
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (adaptor != null) {
-            adaptor.clear();
-        }
+//        if (adaptor != null) {
+//            adaptor.clear();
+//        }
 
 
     }
@@ -117,14 +126,13 @@ public class SellFoodFragment extends Fragment {
             Log.d(TAG, "collectSeller: " + singleUser);
 
             Seller seller = new Seller();
-            seller.setCuisine((String) singleUser.get("dishName"));
-            seller.setDishName((String) singleUser.get("cuisine"));
+            seller.setDishName((String) singleUser.get("dishName"));
+            seller.setCuisine((String) singleUser.get("cuisine"));
             seller.setIngredientsTags(String.valueOf(singleUser.get("expiryTime")));
             seller.setImageUri((String) singleUser.get("imageUri"));
             seller.setPickUpLocation((String) singleUser.get("pickUpLocation"));
             seller.setTime(singleUser.get("timeStamp").toString());
             sellers.add(seller);
-            adaptor.notifyDataSetChanged();
 
         }
 

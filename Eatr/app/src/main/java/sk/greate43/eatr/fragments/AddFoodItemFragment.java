@@ -335,7 +335,7 @@ public class AddFoodItemFragment extends Fragment implements
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
-    private void writeSellerData(final String username, final String dishName, final String cuisine, final String expiryTime, final String pickUpLocation, Uri imgUri) {
+    private void writeSellerData(final String username, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri) {
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
         StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
@@ -350,9 +350,9 @@ public class AddFoodItemFragment extends Fragment implements
                         String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
                         Seller seller = new Seller();
-                        seller.setCuisine(cuisine);
                         seller.setDishName(dishName);
-                        seller.setIngredientsTags(expiryTime);
+                        seller.setCuisine(cuisine);
+                        seller.setIngredientsTags(ingredientsTags);
                         seller.setPickUpLocation(pickUpLocation);
                         seller.setImageUri(downloadUrl);
                         seller.setTimeStamp(ServerValue.TIMESTAMP);
@@ -372,9 +372,9 @@ public class AddFoodItemFragment extends Fragment implements
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         Seller seller = new Seller();
-                        seller.setCuisine(cuisine);
                         seller.setDishName(dishName);
-                        seller.setIngredientsTags(expiryTime);
+                        seller.setCuisine(cuisine);
+                        seller.setIngredientsTags(ingredientsTags);
                         seller.setPickUpLocation(pickUpLocation);
                         seller.setImageUri("");
                         seller.setTimeStamp(ServerValue.TIMESTAMP);
