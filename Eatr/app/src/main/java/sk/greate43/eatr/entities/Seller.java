@@ -1,95 +1,70 @@
 package sk.greate43.eatr.entities;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.support.annotation.NonNull;
-
-import org.jetbrains.annotations.Contract;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by great on 11/4/2017.
  */
 
-public class Seller implements Parcelable {
+public class Seller implements Serializable {
+    private static long serialVersionUID = 1L;
 
 
-    public static final Creator<Seller> CREATOR = new Creator<Seller>() {
-        @NonNull
-        @Override
-        public Seller createFromParcel(Parcel in) {
-            return new Seller(in);
-        }
-
-        @NonNull
-        @Contract(pure = true)
-        @Override
-        public Seller[] newArray(int size) {
-            return new Seller[size];
-        }
-    };
     private String dishName;
     private String cuisine;
     private Float expiryTime;
     private String pickUpLocation;
     private String imageUri;
+    private Map<String, String> timeStamp;
 
     public Seller() {
         // Default constructor required for calls to DataSnapshot.getValue(Seller.class)
     }
 
-
-
-    public Seller(String dishName, String cuisine, Float expiryTime, String pickUpLocation, String imageUri) {
-        this.dishName = dishName;
-        this.cuisine = cuisine;
-        this.expiryTime = expiryTime;
-        this.pickUpLocation = pickUpLocation;
-        this.imageUri = imageUri;
-    }
-
-    public Seller(Parcel in) {
-        dishName = in.readString();
-        cuisine = in.readString();
-        if (in.readByte() == 0) {
-            expiryTime = null;
-        } else {
-            expiryTime = in.readFloat();
-        }
-        pickUpLocation = in.readString();
-        imageUri = in.readString();
+    public void setTimeStamp(Map<String, String> timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public String getDishName() {
         return dishName;
     }
 
+    public void setDishName(String dishName) {
+        this.dishName = dishName;
+    }
+
     public String getCuisine() {
         return cuisine;
+    }
+
+    public void setCuisine(String cuisine) {
+        this.cuisine = cuisine;
     }
 
     public Float getExpiryTime() {
         return expiryTime;
     }
 
+    public void setExpiryTime(Float expiryTime) {
+        this.expiryTime = expiryTime;
+    }
+
     public String getPickUpLocation() {
         return pickUpLocation;
+    }
+
+    public void setPickUpLocation(String pickUpLocation) {
+        this.pickUpLocation = pickUpLocation;
     }
 
     public String getImageUri() {
         return imageUri;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public void setImageUri(String imageUri) {
+        this.imageUri = imageUri;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(dishName);
-        dest.writeString(cuisine);
-        dest.writeFloat(expiryTime);
-        dest.writeString(pickUpLocation);
-        dest.writeString(imageUri);
-    }
+
 }

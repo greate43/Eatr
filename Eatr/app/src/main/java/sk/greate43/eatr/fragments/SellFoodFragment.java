@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.activities.AddFoodItemActivity;
+import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.SellFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Seller;
@@ -47,7 +47,7 @@ public class SellFoodFragment extends Fragment {
         addFoodItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AddFoodItemActivity.class);
+                Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
                 startActivity(intent);
 
             }
@@ -85,44 +85,42 @@ public class SellFoodFragment extends Fragment {
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             // Seller post = ds.getValue(Seller.class);
-            collectPhoneNumbers((Map<String, Object>) ds.child("greate43").getValue());
+            collectSeller((Map<String, Object>) ds.child("greate43").getValue());
 
         }
-
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (sellers != null) {
-            sellers.clear();
+        if (adaptor != null) {
+            adaptor.clear();
         }
+
 
     }
 
-    private void collectPhoneNumbers(Map<String, Object> value) {
-        Log.d(TAG, "collectPhoneNumbers: " + value);
+    private void collectSeller(Map<String, Object> value) {
+        Log.d(TAG, "collectSeller: " + value);
 
 
         //iterate through each user, ignoring their UID
         for (Map.Entry<String, Object> entry : value.entrySet()) {
-            //Get user map
+            //Get seller map
             Map singleUser = (Map) entry.getValue();
-            //Get phone field and append to list
+            //Get seller field and append to list
 
-            Log.d(TAG, "collectPhoneNumbers: " + singleUser);
-            //  phoneNumbers.add((Long) singleUser.get("dishName"));
-
-            Seller seller = new Seller(
-                    (String) singleUser.get("dishName"),
-                    (String) singleUser.get("cuisine"),
-                    Float.parseFloat(String.valueOf(singleUser.get("expiryTime"))),
-                    String.valueOf(singleUser.get("pickUpLocation")),
-                    (String) singleUser.get("imageUri")
-            );
+//                   ,
 
 
+            Log.d(TAG, "collectSeller: " + singleUser);
+
+            Seller seller = new Seller();
+            seller.setCuisine((String) singleUser.get("dishName"));
+            seller.setDishName((String) singleUser.get("cuisine"));
+            seller.setExpiryTime(Float.parseFloat(String.valueOf(singleUser.get("expiryTime"))));
+            seller.setPickUpLocation((String) singleUser.get("imageUri"));
             sellers.add(seller);
             adaptor.notifyDataSetChanged();
 
