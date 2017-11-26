@@ -55,4 +55,16 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
     public int getItemCount() {
         return ((sellers != null && sellers.size() != 0) ? sellers.size() : 1);
     }
+
+
+    public void clear() {
+        int size = sellers.size();
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                sellers.remove(0);
+            }
+
+           notifyItemRangeRemoved(0, size);
+        }
+    }
 }
