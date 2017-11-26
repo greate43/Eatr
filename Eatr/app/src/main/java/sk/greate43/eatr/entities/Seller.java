@@ -1,5 +1,7 @@
 package sk.greate43.eatr.entities;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -13,17 +15,15 @@ public class Seller implements Serializable {
 
     private String dishName;
     private String cuisine;
-    private Float expiryTime;
+    private String ingredientsTags;
     private String pickUpLocation;
     private String imageUri;
     private Map<String, String> timeStamp;
+    private String time;
+
 
     public Seller() {
         // Default constructor required for calls to DataSnapshot.getValue(Seller.class)
-    }
-
-    public void setTimeStamp(Map<String, String> timeStamp) {
-        this.timeStamp = timeStamp;
     }
 
     public String getDishName() {
@@ -42,12 +42,12 @@ public class Seller implements Serializable {
         this.cuisine = cuisine;
     }
 
-    public Float getExpiryTime() {
-        return expiryTime;
+    public String getIngredientsTags() {
+        return ingredientsTags;
     }
 
-    public void setExpiryTime(Float expiryTime) {
-        this.expiryTime = expiryTime;
+    public void setIngredientsTags(String ingredientsTags) {
+        this.ingredientsTags = ingredientsTags;
     }
 
     public String getPickUpLocation() {
@@ -64,6 +64,24 @@ public class Seller implements Serializable {
 
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
+    }
+
+    public Map<String, String> getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Map<String, String> timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    @Exclude
+    public String getTime() {
+        return time;
+    }
+
+    @Exclude
+    public void setTime(String time) {
+        this.time = time;
     }
 
 
