@@ -43,7 +43,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activities.AddFoodItemActivity"
+            android:name=".activities.FoodItemContainerActivity"
             android:screenOrientation="portrait" />
 
         <!--
