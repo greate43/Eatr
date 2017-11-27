@@ -1,0 +1,160 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="sk.greate43.eatr.fragments.FoodItemExpiryTimeAndPriceFragment">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/fragment_food_item_expiry_time_and_price_edit_text_price"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:hint="Price"
+            android:inputType="number"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price_servings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/fragment_food_item_expiry_time_and_price_edit_text_servings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:hint="Number Of Servings"
+            android:inputType="number"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableLeft="@drawable/ic_schedule_black_24dp"
+        android:drawableStart="@drawable/ic_schedule_black_24dp"
+        android:text="Select Expiry Time"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price_servings"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price_servings" />
+
+    <Button
+        android:id="@+id/fragment_food_item_expiry_time_and_price_button_1_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="1 Hour"
+        app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_time"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_time"
+        tools:ignore="UnknownId" />
+
+    <Button
+        android:id="@+id/fragment_food_item_expiry_time_and_price_button_4_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="4 Hour"
+        app:layout_constraintBaseline_toBaselineOf="@+id/fragment_food_item_expiry_time_and_price_button_1_hour"
+        app:layout_constraintStart_toEndOf="@+id/fragment_food_item_expiry_time_and_price_button_1_hour"
+        android:layout_marginLeft="8dp" />
+
+    <Button
+        android:id="@+id/fragment_food_item_expiry_time_and_price_button_8_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="8 Hour"
+        app:layout_constraintBaseline_toBaselineOf="@+id/fragment_food_item_expiry_time_and_price_button_4_hour"
+        app:layout_constraintStart_toEndOf="@+id/fragment_food_item_expiry_time_and_price_button_4_hour"
+        android:layout_marginLeft="8dp" />
+
+    <Button
+        android:id="@+id/fragment_food_item_expiry_time_and_price_button_16_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="16 Hour"
+        app:layout_constraintBaseline_toBaselineOf="@+id/fragment_food_item_expiry_time_and_price_button_8_hour"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/fragment_food_item_expiry_time_and_price_button_8_hour" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_food_item_expiry_time_and_price_button_16_hour"
+        app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_button_1_hour"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_button_4_hour">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/fragment_food_item_expiry_time_and_price_edit_text_custom_hours"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:hint="Or Enter Custom hr eg 24 or 72 "
+            android:inputType="number"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_results"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="68dp"
+        android:text="Expiry in 1d : 8hr"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours" />
+
+    <Button
+        android:id="@+id/fragment_food_item_expiry_time_and_price_button_show_preview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Show Preview"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
+        app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_results" />
+
+    <Button
+        android:id="@+id/fragment_food_item_expiry_time_and_price_button_post_food"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Post Food"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_button_show_preview"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_button_show_preview" />
+
+</android.support.constraint.ConstraintLayout>
