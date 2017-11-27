@@ -113,7 +113,7 @@ public class AddFoodItemFragment extends Fragment implements
         etCuisine = view.findViewById(R.id.fragment_add_food_item_edit_text_cuisine);
         etIncidentsTags = view.findViewById(R.id.fragment_add_food_item_edit_tag_ingredient_tag);
         etPickLocation = view.findViewById(R.id.fragment_add_food_item_edit_text_pick_location);
-        tilIncidentsTags=view.findViewById(R.id.fragment_add_food_item_til_ingredient_tag);
+        tilIncidentsTags = view.findViewById(R.id.fragment_add_food_item_til_ingredient_tag);
         FloatingActionButton btnGetLocation = view.findViewById(R.id.fragment_add_food_item_button_get_location);
         Button btnShareFood = view.findViewById(R.id.fragment_add_food_item_button_share_food);
 
@@ -361,7 +361,9 @@ public class AddFoodItemFragment extends Fragment implements
                         if (dialogUploadingImage.isShowing()) {
                             dialogUploadingImage.dismiss();
                         }
-                        getActivity().finish();
+
+
+
 
                     }
 
@@ -384,13 +386,15 @@ public class AddFoodItemFragment extends Fragment implements
                         if (dialogUploadingImage.isShowing()) {
                             dialogUploadingImage.dismiss();
                         }
-                        getActivity().finish();
+
+                        //  getActivity().finish();
 
                     }
                 });
 
 
     }
+
 
 //    private File createImageFile() throws IOException {
 //        // Create an image file name
