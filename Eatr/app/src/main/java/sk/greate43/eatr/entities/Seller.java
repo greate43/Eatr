@@ -1,5 +1,7 @@
 package sk.greate43.eatr.entities;
 
+import android.net.Uri;
+
 import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
@@ -22,9 +24,20 @@ public class Seller implements Serializable {
     private long expiryTime;
     private long price;
     private long numberOfServings;
+    private Uri image;
 
     public Seller() {
         // Default constructor required for calls to DataSnapshot.getValue(Seller.class)
+    }
+
+    @Exclude
+    public Uri getImage() {
+        return image;
+    }
+
+    @Exclude
+    public void setImage(Uri image) {
+        this.image = image;
     }
 
     public String getDishName() {

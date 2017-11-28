@@ -54,6 +54,7 @@ import java.util.Locale;
 import me.originqiu.library.EditTag;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.interfaces.ReplaceFragment;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
@@ -73,8 +74,8 @@ public class AddFoodItemFragment extends Fragment implements
 
     private static final String TAG = "AddFoodItemFragment";
     private static final int REQUEST_FINE_LOCATION_PERMISSION = 4444;
-
-    int PLACE_PICKER_REQUEST = 1;
+    private static final String ADD_FOOD_ITEM_FRAGMENTS = "ADD_FOOD_ITEM_FRAGMENTS";
+    private static final int PLACE_PICKER_REQUEST = 1;
 
     ImageView imgChooseImage;
     GoogleApiClient mGoogleApiClient;
@@ -89,6 +90,25 @@ public class AddFoodItemFragment extends Fragment implements
     private DatabaseReference mDatabaseReference;
     private Uri imgUri;
     private ProgressDialog dialogUploadingImage;
+    private ReplaceFragment replaceFragment;
+    private Seller seller;
+
+//    public static AddFoodItemFragment newInstance(Seller seller) {
+//        Bundle args = new Bundle();
+//        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, seller);
+//        AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
+//        addFoodItemFragment.setArguments(args);
+//        return addFoodItemFragment;
+//    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (seller != null) {
+            seller = (Seller) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
+        }
+
+    }
 
     //  private String mCurrentPhotoPath;
     @Override
@@ -138,6 +158,15 @@ public class AddFoodItemFragment extends Fragment implements
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+        }
+
+
+        if (seller != null) {
+            imgChooseImage.setImageURI(imgUri);
+            imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            etIncidentsTags.addTag(seller.getIngredientsTags());
+
+
         }
 
         return view;
@@ -310,7 +339,7 @@ public class AddFoodItemFragment extends Fragment implements
                 String knownName = addresses.get(0).getFeatureName(); // O
 
 
-                etPickLocation.setText(knownName + " " + city + " " + state + " " + country);
+                etPickLocation.setText(String.format("%s %s %s %s", knownName, city, state, country));
             }
         }
 
@@ -335,11 +364,10 @@ public class AddFoodItemFragment extends Fragment implements
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
-    private void writeSellerData(final String username, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri) {
+    private void writeSellerData(final String username, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri) {
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
         StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
-
         sellerRef.putFile(imgUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
@@ -349,12 +377,13 @@ public class AddFoodItemFragment extends Fragment implements
                         // Get a URL to the uploaded content
                         String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
-                        Seller seller = new Seller();
+                        seller = new Seller();
                         seller.setDishName(dishName);
                         seller.setCuisine(cuisine);
                         seller.setIngredientsTags(ingredientsTags);
                         seller.setPickUpLocation(pickUpLocation);
                         seller.setImageUri(downloadUrl);
+                        seller.setImage(imgUri);
                         seller.setTimeStamp(ServerValue.TIMESTAMP);
 
                         mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
@@ -362,7 +391,11 @@ public class AddFoodItemFragment extends Fragment implements
                             dialogUploadingImage.dismiss();
                         }
 
+                        if (replaceFragment != null) {
 
+
+                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(seller));
+                        }
 
 
                     }
@@ -373,7 +406,7 @@ public class AddFoodItemFragment extends Fragment implements
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
-                        Seller seller = new Seller();
+                        seller = new Seller();
                         seller.setDishName(dishName);
                         seller.setCuisine(cuisine);
                         seller.setIngredientsTags(ingredientsTags);
@@ -385,6 +418,11 @@ public class AddFoodItemFragment extends Fragment implements
                         Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
                         if (dialogUploadingImage.isShowing()) {
                             dialogUploadingImage.dismiss();
+                        }
+                        if (replaceFragment != null) {
+
+
+                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(seller));
                         }
 
                         //  getActivity().finish();
@@ -503,5 +541,27 @@ public class AddFoodItemFragment extends Fragment implements
 
         }
     }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        if (context instanceof ReplaceFragment) {
+            replaceFragment = (ReplaceFragment) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement ReplaceFragment");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        replaceFragment = null;
+
+    }
+
 
 }
