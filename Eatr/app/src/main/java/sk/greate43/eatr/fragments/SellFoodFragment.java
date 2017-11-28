@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +27,7 @@ import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.SellFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.recyclerCustomItem.SimpleTouchCallback;
 
 
 public class SellFoodFragment extends Fragment {
@@ -41,7 +44,8 @@ public class SellFoodFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sell_food, container, false);
         recyclerView = view.findViewById(R.id.fragment_sell_food_recycler_view);
-        adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity());
+        database = FirebaseDatabase.getInstance();
+        mDatabaseReference = database.getReference();
 
         FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_sell_food_add_food_item_btn);
         addFoodItem.setOnClickListener(new View.OnClickListener() {
@@ -53,6 +57,8 @@ public class SellFoodFragment extends Fragment {
             }
         });
 
+        adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity(),mDatabaseReference);
+        adaptor.setHasStableIds(true);
 
         sellers = adaptor.getSellers();
 
@@ -60,9 +66,15 @@ public class SellFoodFragment extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        database = FirebaseDatabase.getInstance();
-        mDatabaseReference = database.getReference();
+        SimpleTouchCallback simpleTouchCallback = new SimpleTouchCallback(adaptor);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+
+
+
 
 // Attach a listener to read the data at our posts reference
         mDatabaseReference.addValueEventListener(new ValueEventListener() {
