@@ -7,9 +7,8 @@
     tools:context="sk.greate43.eatr.activities.FoodItemContainerActivity">
 
 
-    <fragment
+    <FrameLayout
         android:id="@+id/activity_food_item_container_fragment"
-        android:name="sk.greate43.eatr.fragments.AddFoodItemFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
 

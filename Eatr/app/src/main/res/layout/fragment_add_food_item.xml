@@ -1,10 +1,10 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="sk.greate43.eatr.fragments.AddFoodItemFragment">
+
     <ImageView
         android:id="@+id/fragment_add_food_item_image_view_choose_image"
         android:layout_width="0dp"
@@ -46,6 +46,7 @@
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="192dp" />
     </android.support.design.widget.TextInputLayout>
+
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
@@ -124,20 +125,19 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="@+id/fragment_add_food_item_button_get_location"
         app:layout_constraintStart_toStartOf="@+id/fragment_add_food_item_til_pick_location"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_add_food_item_til_pick_location"
-        app:errorEnabled="true"
-        >
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_food_item_til_pick_location">
 
         <me.originqiu.library.EditTag
             android:id="@+id/fragment_add_food_item_edit_tag_ingredient_tag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            app:tag_layout="@layout/view_sample_tag"
             app:delete_mode_bg="@color/colorAccent"
-            app:input_layout="@layout/view_sample_input_tag"/>
+            app:input_layout="@layout/view_sample_input_tag"
+            app:tag_layout="@layout/view_sample_tag" />
 
     </android.support.design.widget.TextInputLayout>
 
