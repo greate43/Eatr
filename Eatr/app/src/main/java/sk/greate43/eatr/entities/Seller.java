@@ -1,5 +1,7 @@
 package sk.greate43.eatr.entities;
 
+import android.net.Uri;
+
 import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
@@ -8,11 +10,9 @@ import java.util.Map;
 /**
  * Created by great on 11/4/2017.
  */
-
 public class Seller implements Serializable {
+    private static final String TAG = "Seller";
     private static long serialVersionUID = 1L;
-
-
     private String dishName;
     private String cuisine;
     private String ingredientsTags;
@@ -21,10 +21,23 @@ public class Seller implements Serializable {
     private Map<String, String> timeStamp;
     private String time;
     private boolean checkIfOrderIsActive;
-
+    private long expiryTime;
+    private long price;
+    private long numberOfServings;
+    private Uri image;
 
     public Seller() {
         // Default constructor required for calls to DataSnapshot.getValue(Seller.class)
+    }
+
+    @Exclude
+    public Uri getImage() {
+        return image;
+    }
+
+    @Exclude
+    public void setImage(Uri image) {
+        this.image = image;
     }
 
     public String getDishName() {
@@ -67,15 +80,45 @@ public class Seller implements Serializable {
         this.imageUri = imageUri;
     }
 
-    private static final String TAG = "Seller";
+    public Map<String, String> getTimeStamp() {
+        return timeStamp;
+    }
+
     public void setTimeStamp(Map<String, String> timeStamp) {
         this.timeStamp = timeStamp;
     }
 
+    public boolean isCheckIfOrderIsActive() {
+        return checkIfOrderIsActive;
+    }
+
+    public void setCheckIfOrderIsActive(boolean checkIfOrderIsActive) {
+        this.checkIfOrderIsActive = checkIfOrderIsActive;
+    }
+
+    public long getExpiryTime() {
+        return expiryTime;
+    }
+
+    public void setExpiryTime(long expiryTime) {
+        this.expiryTime = expiryTime;
+    }
+
+    public long getPrice() {
+        return price;
+    }
+
+    public void setPrice(long price) {
+        this.price = price;
+    }
 
 
-    public Map<String, String> getTimeStamp() {
-        return timeStamp;
+    public long getNumberOfServings() {
+        return numberOfServings;
+    }
+
+    public void setNumberOfServings(long numberOfServings) {
+        this.numberOfServings = numberOfServings;
     }
 
     @Exclude
