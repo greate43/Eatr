@@ -28,6 +28,8 @@ import sk.greate43.eatr.interfaces.SwipeListener;
 public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRecyclerViewHolder> implements SwipeListener {
 
     private static final String TAG = "SellFoodRecyclerViewAda";
+
+
     DatabaseReference mDatabaseReference;
     private StorageReference storageReference;
     private ArrayList<Seller> sellers;
@@ -60,6 +62,7 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
             holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
 
         } else {
+
             holder.populate(sellerActivity, sellers.get(position));
         }
     }
@@ -82,27 +85,35 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
+
+    @Override
     public void onSwipe(int position) {
-        Log.d(TAG, "onSwipe: " + position);
-        Log.d(TAG, "onSwipe: " + sellers.get(position).getDishName());
-        mDatabaseReference.child("eatr").child("greate43").child(sellers.get(position).getDishName()).removeValue();
-        storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(sellers.get(position).getImageUri());
+        if (!sellers.isEmpty()) {
+            Log.d(TAG, "onSwipe: " + position);
+            Log.d(TAG, "onSwipe: " + sellers.get(position).getDishName());
+            mDatabaseReference.child("eatr").child("greate43").child(sellers.get(position).getDishName()).removeValue();
+            storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(sellers.get(position).getImageUri());
 
-        storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // File deleted successfully
-                Log.d(TAG, "onSuccess: deleted file");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                Log.d(TAG, "onFailure: did not delete file");
-            }
-        });
+            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Log.d(TAG, "onSuccess: deleted file");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "onFailure: did not delete file");
+                }
+            });
+            removeItem(position);
 
-        removeItem(position);
+        }
+
     }
 
     private void removeItem(int position) {

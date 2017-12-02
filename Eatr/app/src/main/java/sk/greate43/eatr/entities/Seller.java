@@ -88,7 +88,7 @@ public class Seller implements Serializable {
         this.timeStamp = timeStamp;
     }
 
-    public boolean isCheckIfOrderIsActive() {
+    public boolean getCheckIfOrderIsActive() {
         return checkIfOrderIsActive;
     }
 

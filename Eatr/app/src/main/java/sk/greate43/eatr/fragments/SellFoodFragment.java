@@ -57,7 +57,7 @@ public class SellFoodFragment extends Fragment {
             }
         });
 
-        adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity(),mDatabaseReference);
+        adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity(), mDatabaseReference);
         adaptor.setHasStableIds(true);
 
         sellers = adaptor.getSellers();
@@ -71,9 +71,6 @@ public class SellFoodFragment extends Fragment {
         SimpleTouchCallback simpleTouchCallback = new SimpleTouchCallback(adaptor);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-
-
-
 
 
 // Attach a listener to read the data at our posts reference
@@ -104,8 +101,9 @@ public class SellFoodFragment extends Fragment {
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             // Seller post = ds.getValue(Seller.class);
-            collectSeller((Map<String, Object>) ds.child("greate43").getValue());
-
+            if (ds.child("greate43").getValue() != null) {
+                collectSeller((Map<String, Object>) ds.child("greate43").getValue());
+            }
         }
         adaptor.notifyDataSetChanged();
 
@@ -115,9 +113,7 @@ public class SellFoodFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-//        if (adaptor != null) {
-//            adaptor.clear();
-//        }
+
 
 
     }
@@ -140,10 +136,17 @@ public class SellFoodFragment extends Fragment {
             Seller seller = new Seller();
             seller.setDishName((String) singleUser.get("dishName"));
             seller.setCuisine((String) singleUser.get("cuisine"));
-            seller.setIngredientsTags(String.valueOf(singleUser.get("expiryTime")));
+            if (singleUser.get("expiryTime")!=null) {
+                seller.setExpiryTime((long) singleUser.get("expiryTime"));
+            }
+            seller.setIngredientsTags(String.valueOf(singleUser.get("ingredientsTags")));
             seller.setImageUri((String) singleUser.get("imageUri"));
             seller.setPickUpLocation((String) singleUser.get("pickUpLocation"));
-            seller.setTime(singleUser.get("timeStamp").toString());
+            seller.setCheckIfOrderIsActive((Boolean) singleUser.get("checkIfOrderIsActive"));
+
+            if (singleUser.get("timeStamp") != null) {
+                seller.setTime(singleUser.get("timeStamp").toString());
+            }
             sellers.add(seller);
 
         }
