@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +24,8 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.util.Calendar;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Seller;
@@ -86,6 +91,34 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         btnExpiryTimeOneHour.setOnClickListener(this);
         btnPostFood.setOnClickListener(this);
 
+
+        etExpiryTime.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() != 0) {
+                    btnExpiryTimeOneHour.setSelected(false);
+                    btnExpiryTimeFourHour.setSelected(false);
+                    btnExpiryTimeEightHour.setSelected(false);
+                    btnExpiryTimeSixteenHour.setSelected(false);
+
+                    expiryTime = getTimeHrsFromNow(Integer.parseInt(String.valueOf(s)));
+                    showExpiryTime(expiryTime);
+
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         storageRef = FirebaseStorage.getInstance().getReference();
@@ -117,7 +150,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                         seller.setExpiryTime(expiryTime);
                         seller.setPrice(price);
                         seller.setNumberOfServings(numberOfServings);
-
+                        seller.setCheckIfOrderIsActive(true);
                         mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
 
 
@@ -161,7 +194,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(false);
                 btnExpiryTimeEightHour.setSelected(false);
                 btnExpiryTimeSixteenHour.setSelected(false);
-                expiryTime = 1;
+                expiryTime = getTimeHrsFromNow(1);
+
+                showExpiryTime(expiryTime);
 
                 break;
             case R.id.fragment_food_item_expiry_time_and_price_button_4_hour:
@@ -169,7 +204,8 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(true);
                 btnExpiryTimeEightHour.setSelected(false);
                 btnExpiryTimeSixteenHour.setSelected(false);
-                expiryTime = 4;
+                expiryTime = getTimeHrsFromNow(4);
+                showExpiryTime(expiryTime);
 
                 break;
             case R.id.fragment_food_item_expiry_time_and_price_button_8_hour:
@@ -177,7 +213,8 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(false);
                 btnExpiryTimeEightHour.setSelected(true);
                 btnExpiryTimeSixteenHour.setSelected(false);
-                expiryTime = 8;
+                expiryTime = getTimeHrsFromNow(8);
+                showExpiryTime(expiryTime);
 
                 break;
             case R.id.fragment_food_item_expiry_time_and_price_button_16_hour:
@@ -185,13 +222,17 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(false);
                 btnExpiryTimeEightHour.setSelected(false);
                 btnExpiryTimeSixteenHour.setSelected(true);
-                expiryTime = 16;
+                expiryTime = getTimeHrsFromNow(16);
+                showExpiryTime(expiryTime);
 
                 break;
             case R.id.fragment_food_item_expiry_time_and_price_button_show_preview:
                 break;
             case R.id.fragment_food_item_expiry_time_and_price_button_post_food:
                 if (seller != null) {
+                    if (!etExpiryTime.getText().toString().isEmpty()) {
+                        expiryTime = Long.parseLong(etExpiryTime.getText().toString());
+                    }
                     writeSellerData("greate43"
                             , seller.getDishName()
                             , seller.getCuisine()
@@ -199,15 +240,16 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                             , seller.getPickUpLocation()
                             , seller.getImage()
                             , Long.parseLong(etPrice.getText().toString())
-                            , Long.parseLong(etExpiryTime.getText().toString())
+                            , expiryTime
                             , Long.parseLong(etNumberOfServings.getText().toString()));
                 }
 
-//                FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getActivity()));
+//                FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getActivity().getApplication()));
 //
 //                Job myJob = dispatcher.newJobBuilder()
 //                        .setService(CheckOrderStatusService.class) // the JobService that will be called
 //                        .setTag(seller.getDishName())// uniquely identifies the job
+//                        .addConstraint(Constraint.ON_ANY_NETWORK)
 //                        .build();
 //
 //                dispatcher.mustSchedule(myJob);
@@ -217,4 +259,22 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         }
 
     }
+
+
+    private long getTimeHrsFromNow(int time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, time);
+        return calendar.getTime().getTime();
+
+    }
+
+    private void showExpiryTime(long time) {
+        tvExpiryResult.setText(String.format("Expires %s", DateUtils
+                .getRelativeTimeSpanString(time,
+                        System.currentTimeMillis(),
+                        DateUtils.SECOND_IN_MILLIS,
+                        0)));
+    }
+
+
 }

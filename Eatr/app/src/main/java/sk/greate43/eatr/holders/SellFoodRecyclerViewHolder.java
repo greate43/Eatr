@@ -1,6 +1,8 @@
 package sk.greate43.eatr.holders;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -37,6 +39,7 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     }
 
+    @SuppressLint("SetTextI18n")
     public void populate(Context context, Seller seller) {
         itemView.setTag(seller);
         Log.d(TAG, "populate: " + seller.getImageUri());
@@ -57,13 +60,25 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
                         }
                     });
         }
-        tvStatus.setText("Active");
+
+        if (seller.getCheckIfOrderIsActive()) {
+            tvStatus.setTextColor(Color.GREEN);
+            tvStatus.setText("Active");
+        } else if (!seller.getCheckIfOrderIsActive()){
+            tvStatus.setTextColor(Color.RED);
+            tvStatus.setText("Expired");
+
+        }
         tvLocation.setText(seller.getPickUpLocation());
-        tvTimeStamp.setText(DateUtils
-                .getRelativeTimeSpanString(Long.parseLong(seller.getTime()),
-                        System.currentTimeMillis(),
-                        DateUtils.MINUTE_IN_MILLIS,
-                        0));
+        if (seller.getTime() != null && !seller.getTime().isEmpty()) {
+            tvTimeStamp.setText(DateUtils
+                    .getRelativeTimeSpanString(Long.parseLong(seller.getTime()),
+                            System.currentTimeMillis(),
+                            DateUtils.MINUTE_IN_MILLIS,
+                            0));
+        } else {
+            tvTimeStamp.setText("");
+        }
         tvDishName.setText(seller.getDishName());
     }
 
