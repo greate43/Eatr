@@ -26,7 +26,7 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.SellFoodRecyclerViewAdaptor;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.recyclerCustomItem.SimpleTouchCallback;
 
 
@@ -34,7 +34,7 @@ public class SellFoodFragment extends Fragment {
 
     public static final String TAG = "SellFoodFragment";
     RecyclerView recyclerView;
-    ArrayList<Seller> sellers;
+    ArrayList<Food> sellers;
     SellFoodRecyclerViewAdaptor adaptor;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
@@ -100,7 +100,7 @@ public class SellFoodFragment extends Fragment {
         }
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-            // Seller post = ds.getValue(Seller.class);
+            // Food post = ds.getValue(Food.class);
             if (ds.child("greate43").getValue() != null) {
                 collectSeller((Map<String, Object>) ds.child("greate43").getValue());
             }
@@ -133,7 +133,7 @@ public class SellFoodFragment extends Fragment {
 
             Log.d(TAG, "collectSeller: " + singleUser);
 
-            Seller seller = new Seller();
+            Food seller = new Food();
             seller.setDishName((String) singleUser.get("dishName"));
             seller.setCuisine((String) singleUser.get("cuisine"));
             if (singleUser.get("expiryTime")!=null) {
