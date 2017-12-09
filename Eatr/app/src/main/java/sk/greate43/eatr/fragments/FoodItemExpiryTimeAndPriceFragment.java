@@ -28,7 +28,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.Calendar;
 
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 
 
 public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View.OnClickListener {
@@ -48,11 +48,11 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     long expiryTime;
     long numberOfServings;
     StorageReference storageRef;
-    private Seller seller;
+    private Food seller;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
 
-    public static FoodItemExpiryTimeAndPriceFragment newInstance(Seller seller) {
+    public static FoodItemExpiryTimeAndPriceFragment newInstance(Food seller) {
         Bundle args = new Bundle();
         args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, seller);
         FoodItemExpiryTimeAndPriceFragment foodItemExpiryTimeAndPriceFragment = new FoodItemExpiryTimeAndPriceFragment();
@@ -63,7 +63,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        seller = (Seller) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
+        seller = (Food) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
 
     }
 
@@ -140,7 +140,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                         // Get a URL to the uploaded content
                         String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
-                        seller = new Seller();
+                        seller = new Food();
                         seller.setDishName(dishName);
                         seller.setCuisine(cuisine);
                         seller.setIngredientsTags(ingredientsTags);
@@ -162,7 +162,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
-                        seller = new Seller();
+                        seller = new Food();
                         seller.setDishName(dishName);
                         seller.setCuisine(cuisine);
                         seller.setIngredientsTags(ingredientsTags);

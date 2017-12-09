@@ -14,7 +14,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 
 /**
  * Created by great on 11/12/2017.
@@ -40,7 +40,7 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
     }
 
     @SuppressLint("SetTextI18n")
-    public void populate(Context context, Seller seller) {
+    public void populate(Context context, Food seller) {
         itemView.setTag(seller);
         Log.d(TAG, "populate: " + seller.getImageUri());
         if (seller.getImageUri() != null && !seller.getImageUri().isEmpty()) {

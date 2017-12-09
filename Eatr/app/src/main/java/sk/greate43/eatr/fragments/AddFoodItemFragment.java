@@ -53,7 +53,7 @@ import java.util.Locale;
 
 import me.originqiu.library.EditTag;
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -91,9 +91,9 @@ public class AddFoodItemFragment extends Fragment implements
     private Uri imgUri;
     private ProgressDialog dialogUploadingImage;
     private ReplaceFragment replaceFragment;
-    private Seller seller;
+    private Food seller;
 
-//    public static AddFoodItemFragment newInstance(Seller seller) {
+//    public static AddFoodItemFragment newInstance(Food seller) {
 //        Bundle args = new Bundle();
 //        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, seller);
 //        AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
@@ -105,7 +105,7 @@ public class AddFoodItemFragment extends Fragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (seller != null) {
-            seller = (Seller) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
+            seller = (Food) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
         }
 
     }
@@ -377,7 +377,7 @@ public class AddFoodItemFragment extends Fragment implements
                         // Get a URL to the uploaded content
                         String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
-                        seller = new Seller();
+                        seller = new Food();
                         seller.setDishName(dishName);
                         seller.setCuisine(cuisine);
                         seller.setIngredientsTags(ingredientsTags);
@@ -406,7 +406,7 @@ public class AddFoodItemFragment extends Fragment implements
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
-                        seller = new Seller();
+                        seller = new Food();
                         seller.setDishName(dishName);
                         seller.setCuisine(cuisine);
                         seller.setIngredientsTags(ingredientsTags);

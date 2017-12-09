@@ -30,7 +30,7 @@ public class CheckOrderStatusService extends JobService {
                     return;
                 }
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    // Seller post = ds.getValue(Seller.class);
+                    // Food post = ds.getValue(Food.class);
                     if (ds.child("greate43").getValue() != null) {
                         collectSeller((Map<String, Object>) ds.child("greate43").getValue());
                     }

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.SellerActivity;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.holders.SellFoodRecyclerViewHolder;
 import sk.greate43.eatr.interfaces.SwipeListener;
 
@@ -32,7 +32,7 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
 
     DatabaseReference mDatabaseReference;
     private StorageReference storageReference;
-    private ArrayList<Seller> sellers;
+    private ArrayList<Food> sellers;
     private LayoutInflater inflater;
     private SellerActivity sellerActivity;
 
@@ -44,7 +44,7 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
 
     }
 
-    public ArrayList<Seller> getSellers() {
+    public ArrayList<Food> getSellers() {
         return sellers;
     }
 
