@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,14 +40,18 @@ public class SellFoodFragment extends Fragment {
     SellFoodRecyclerViewAdaptor adaptor;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sell_food, container, false);
         recyclerView = view.findViewById(R.id.fragment_sell_food_recycler_view);
+        mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
+        user = mAuth.getCurrentUser();
 
         FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_sell_food_add_food_item_btn);
         addFoodItem.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +66,7 @@ public class SellFoodFragment extends Fragment {
         adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity(), mDatabaseReference);
         adaptor.setHasStableIds(true);
 
-        sellers = adaptor.getSellers();
+        sellers = adaptor.getFoods();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -101,8 +107,8 @@ public class SellFoodFragment extends Fragment {
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             // Food post = ds.getValue(Food.class);
-            if (ds.child("greate43").getValue() != null) {
-                collectSeller((Map<String, Object>) ds.child("greate43").getValue());
+            if (ds.child(user.getUid()).getValue() != null) {
+                collectSeller((Map<String, Object>) ds.child(user.getUid()).getValue());
             }
         }
         adaptor.notifyDataSetChanged();
@@ -115,7 +121,6 @@ public class SellFoodFragment extends Fragment {
         super.onStop();
 
 
-
     }
 
     private void collectSeller(Map<String, Object> value) {
@@ -124,30 +129,30 @@ public class SellFoodFragment extends Fragment {
 
         //iterate through each user, ignoring their UID
         for (Map.Entry<String, Object> entry : value.entrySet()) {
-            //Get seller map
+            //Get food map
             Map singleUser = (Map) entry.getValue();
-            //Get seller field and append to list
+            //Get food field and append to list
 
 //                   ,
 
 
             Log.d(TAG, "collectSeller: " + singleUser);
 
-            Food seller = new Food();
-            seller.setDishName((String) singleUser.get("dishName"));
-            seller.setCuisine((String) singleUser.get("cuisine"));
-            if (singleUser.get("expiryTime")!=null) {
-                seller.setExpiryTime((long) singleUser.get("expiryTime"));
+            Food food = new Food();
+            food.setDishName((String) singleUser.get("dishName"));
+            food.setCuisine((String) singleUser.get("cuisine"));
+            if (singleUser.get("expiryTime") != null) {
+                food.setExpiryTime((long) singleUser.get("expiryTime"));
             }
-            seller.setIngredientsTags(String.valueOf(singleUser.get("ingredientsTags")));
-            seller.setImageUri((String) singleUser.get("imageUri"));
-            seller.setPickUpLocation((String) singleUser.get("pickUpLocation"));
-            seller.setCheckIfOrderIsActive((Boolean) singleUser.get("checkIfOrderIsActive"));
+            food.setIngredientsTags(String.valueOf(singleUser.get("ingredientsTags")));
+            food.setImageUri((String) singleUser.get("imageUri"));
+            food.setPickUpLocation((String) singleUser.get("pickUpLocation"));
+            food.setCheckIfOrderIsActive((Boolean) singleUser.get("checkIfOrderIsActive"));
 
             if (singleUser.get("timeStamp") != null) {
-                seller.setTime(singleUser.get("timeStamp").toString());
+                food.setTime(singleUser.get("timeStamp").toString());
             }
-            sellers.add(seller);
+            sellers.add(food);
 
         }
 

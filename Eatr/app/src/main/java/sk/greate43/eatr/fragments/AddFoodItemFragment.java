@@ -40,6 +40,8 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
@@ -87,15 +89,17 @@ public class AddFoodItemFragment extends Fragment implements
     private TextInputLayout tilIncidentsTags;
     private TextInputEditText etPickLocation;
     private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
     private DatabaseReference mDatabaseReference;
     private Uri imgUri;
     private ProgressDialog dialogUploadingImage;
     private ReplaceFragment replaceFragment;
-    private Food seller;
+    private Food food;
 
-//    public static AddFoodItemFragment newInstance(Food seller) {
+//    public static AddFoodItemFragment newInstance(Food food) {
 //        Bundle args = new Bundle();
-//        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, seller);
+//        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, food);
 //        AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
 //        addFoodItemFragment.setArguments(args);
 //        return addFoodItemFragment;
@@ -104,8 +108,8 @@ public class AddFoodItemFragment extends Fragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (seller != null) {
-            seller = (Food) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
+        if (food != null) {
+            food = (Food) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
         }
 
     }
@@ -123,11 +127,14 @@ public class AddFoodItemFragment extends Fragment implements
 
         dialogUploadingImage = new ProgressDialog(getActivity());
         dialogUploadingImage.setCanceledOnTouchOutside(false);
-
+        mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
-
+        user=mAuth.getCurrentUser();
         storageRef = FirebaseStorage.getInstance().getReference();
+
+
+        Log.d(TAG, "onCreateView: "+user.getUid());
 
         etDishName = view.findViewById(R.id.fragment_add_food_item_edit_text_dish_name);
         etCuisine = view.findViewById(R.id.fragment_add_food_item_edit_text_cuisine);
@@ -161,10 +168,10 @@ public class AddFoodItemFragment extends Fragment implements
         }
 
 
-        if (seller != null) {
+        if (food != null) {
             imgChooseImage.setImageURI(imgUri);
             imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            etIncidentsTags.addTag(seller.getIngredientsTags());
+            etIncidentsTags.addTag(food.getIngredientsTags());
 
 
         }
@@ -367,68 +374,70 @@ public class AddFoodItemFragment extends Fragment implements
     private void writeSellerData(final String username, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri) {
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
-        StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
-        sellerRef.putFile(imgUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        Log.d(TAG, "writeSellerData: "+user.getUid());
+            StorageReference sellerRef = storageRef.child("Photos").child(user.getUid()).child(imgUri.getLastPathSegment());
+            sellerRef.putFile(imgUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
 
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // Get a URL to the uploaded content
+                            String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
-                        seller = new Food();
-                        seller.setDishName(dishName);
-                        seller.setCuisine(cuisine);
-                        seller.setIngredientsTags(ingredientsTags);
-                        seller.setPickUpLocation(pickUpLocation);
-                        seller.setImageUri(downloadUrl);
-                        seller.setImage(imgUri);
-                        seller.setTimeStamp(ServerValue.TIMESTAMP);
+                            food = new Food();
+                            food.setDishName(dishName);
+                            food.setCuisine(cuisine);
+                            food.setIngredientsTags(ingredientsTags);
+                            food.setPickUpLocation(pickUpLocation);
+                            food.setImageUri(downloadUrl);
+                            food.setImage(imgUri);
+                            food.setTimeStamp(ServerValue.TIMESTAMP);
+                            Log.d(TAG, "writeSellerData: "+user.getUid());
 
-                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
-                        if (dialogUploadingImage.isShowing()) {
-                            dialogUploadingImage.dismiss();
+                            mDatabaseReference.child("Food").child(user.getUid()).child(dishName).setValue(food);
+                            if (dialogUploadingImage.isShowing()) {
+                                dialogUploadingImage.dismiss();
+                            }
+
+                            if (replaceFragment != null) {
+
+
+                                replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                            }
+
+
                         }
 
-                        if (replaceFragment != null) {
+
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle unsuccessful uploads
+                            food = new Food();
+                            food.setDishName(dishName);
+                            food.setCuisine(cuisine);
+                            food.setIngredientsTags(ingredientsTags);
+                            food.setPickUpLocation(pickUpLocation);
+                            food.setImageUri("");
+                            food.setTimeStamp(ServerValue.TIMESTAMP);
+
+                            mDatabaseReference.child("Food").child(user.getUid()).child(dishName).setValue(food);
+                            Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                            if (dialogUploadingImage.isShowing()) {
+                                dialogUploadingImage.dismiss();
+                            }
+                            if (replaceFragment != null) {
 
 
-                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(seller));
+                                replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                            }
+
+                            //  getActivity().finish();
+
                         }
-
-
-                    }
-
-
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        seller = new Food();
-                        seller.setDishName(dishName);
-                        seller.setCuisine(cuisine);
-                        seller.setIngredientsTags(ingredientsTags);
-                        seller.setPickUpLocation(pickUpLocation);
-                        seller.setImageUri("");
-                        seller.setTimeStamp(ServerValue.TIMESTAMP);
-
-                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
-                        Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
-                        if (dialogUploadingImage.isShowing()) {
-                            dialogUploadingImage.dismiss();
-                        }
-                        if (replaceFragment != null) {
-
-
-                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(seller));
-                        }
-
-                        //  getActivity().finish();
-
-                    }
-                });
+                    });
 
 
     }
