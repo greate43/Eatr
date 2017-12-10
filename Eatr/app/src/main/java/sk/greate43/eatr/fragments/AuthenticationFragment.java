@@ -39,8 +39,8 @@ public class AuthenticationFragment extends Fragment implements View.OnClickList
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_authentation, container, false);
-        Button authPhoneNo=view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
-        authPhoneNo.setOnClickListener(new View.OnClickListener() {
+        Button btnAuthPhoneNo=view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
+        btnAuthPhoneNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
              if (mListener != null){
