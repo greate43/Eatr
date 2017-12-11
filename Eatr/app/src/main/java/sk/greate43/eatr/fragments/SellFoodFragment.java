@@ -43,6 +43,12 @@ public class SellFoodFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
 
+    public static SellFoodFragment newInstance(){
+        SellFoodFragment fragment=new SellFoodFragment();
+
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

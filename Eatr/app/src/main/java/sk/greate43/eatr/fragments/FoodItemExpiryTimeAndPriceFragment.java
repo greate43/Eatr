@@ -31,6 +31,7 @@ import java.util.Calendar;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.utils.Constants;
 
 
 public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View.OnClickListener {
@@ -131,9 +132,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         return view;
     }
 
-    private void writeSellerData(final String username, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri, final long price, final long expiryTime, final long numberOfServings) {
+    private void writeSellerData(final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri, final long price, final long expiryTime, final long numberOfServings, final double longitude, final double latitude) {
 
-        StorageReference sellerRef = storageRef.child("Photos").child(user.getUid()).child(imgUri.getLastPathSegment());
+        StorageReference sellerRef = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
 
         sellerRef.putFile(imgUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -155,7 +156,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                         food.setPrice(price);
                         food.setNumberOfServings(numberOfServings);
                         food.setCheckIfOrderIsActive(true);
-                        mDatabaseReference.child("Food").child(user.getUid()).child(dishName).setValue(food);
+                        food.setLongitude(longitude);
+                        food.setLatitude(latitude);
+                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
 
 
                     }
@@ -176,7 +179,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                         food.setExpiryTime(expiryTime);
                         food.setPrice(price);
                         food.setNumberOfServings(numberOfServings);
-                        mDatabaseReference.child("Food").child(user.getUid()).child(dishName).setValue(food);
+                        food.setLongitude(longitude);
+                        food.setLatitude(latitude);
+                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
                         Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
 
 
@@ -237,15 +242,18 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                     if (!etExpiryTime.getText().toString().isEmpty()) {
                         expiryTime = Long.parseLong(etExpiryTime.getText().toString());
                     }
-                    writeSellerData("greate43"
-                            , food.getDishName()
+                    writeSellerData(
+                              food.getDishName()
                             , food.getCuisine()
                             , food.getIngredientsTags()
                             , food.getPickUpLocation()
                             , food.getImage()
                             , Long.parseLong(etPrice.getText().toString())
                             , expiryTime
-                            , Long.parseLong(etNumberOfServings.getText().toString()));
+                            , Long.parseLong(etNumberOfServings.getText().toString())
+                            ,food.getLongitude()
+                            ,food.getLatitude()
+                    );
                 }
 
 //                FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getActivity().getApplication()));

@@ -25,6 +25,9 @@ public class Food implements Serializable {
     private long price;
     private long numberOfServings;
     private Uri image;
+    private double longitude;
+    private double latitude;
+
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
@@ -120,6 +123,23 @@ public class Food implements Serializable {
     public void setNumberOfServings(long numberOfServings) {
         this.numberOfServings = numberOfServings;
     }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
 
     @Exclude
     public String getTime() {
