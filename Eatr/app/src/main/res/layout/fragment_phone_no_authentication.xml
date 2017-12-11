@@ -1,0 +1,51 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="sk.greate43.eatr.fragments.PhoneNoAuthenticationFragment">
+
+    <com.hbb20.CountryCodePicker
+        android:id="@+id/fragment_phone_no_ccp"
+        android:layout_width="146dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="32dp"
+        app:ccp_autoDetectCountry="true"
+        app:ccp_showFullName="false"
+        app:ccp_showNameCode="true"
+        app:ccp_showPhoneCode="true"
+        app:layout_constraintBottom_toBottomOf="@+id/fragment_phone_no_til_phone_no"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/fragment_phone_no_til_phone_no"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/fragment_phone_no_ccp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/fragment_phone_no_et_phone_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone No"
+            android:inputType="number" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/fragment_phone_no_authentation_button_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Next"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_phone_no_til_phone_no"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_phone_no_til_phone_no" />
+</android.support.constraint.ConstraintLayout>

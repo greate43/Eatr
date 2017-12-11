@@ -1,6 +1,8 @@
 package sk.greate43.eatr.holders;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -12,7 +14,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 
 /**
  * Created by great on 11/12/2017.
@@ -37,7 +39,8 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void populate(Context context, Seller seller) {
+    @SuppressLint("SetTextI18n")
+    public void populate(Context context, Food seller) {
         itemView.setTag(seller);
         Log.d(TAG, "populate: " + seller.getImageUri());
         if (seller.getImageUri() != null && !seller.getImageUri().isEmpty()) {
@@ -57,13 +60,25 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
                         }
                     });
         }
-        tvStatus.setText("Active");
+
+        if (seller.getCheckIfOrderIsActive()) {
+            tvStatus.setTextColor(Color.GREEN);
+            tvStatus.setText("Active");
+        } else if (!seller.getCheckIfOrderIsActive()){
+            tvStatus.setTextColor(Color.RED);
+            tvStatus.setText("Expired");
+
+        }
         tvLocation.setText(seller.getPickUpLocation());
-        tvTimeStamp.setText(DateUtils
-                .getRelativeTimeSpanString(Long.parseLong(seller.getTime()),
-                        System.currentTimeMillis(),
-                        DateUtils.MINUTE_IN_MILLIS,
-                        0));
+        if (seller.getTime() != null && !seller.getTime().isEmpty()) {
+            tvTimeStamp.setText(DateUtils
+                    .getRelativeTimeSpanString(Long.parseLong(seller.getTime()),
+                            System.currentTimeMillis(),
+                            DateUtils.MINUTE_IN_MILLIS,
+                            0));
+        } else {
+            tvTimeStamp.setText("");
+        }
         tvDishName.setText(seller.getDishName());
     }
 
