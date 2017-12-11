@@ -22,6 +22,7 @@ import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.holders.SellFoodRecyclerViewHolder;
 import sk.greate43.eatr.interfaces.SwipeListener;
+import sk.greate43.eatr.utils.Constants;
 
 /**
  * Created by great on 11/12/2017.
@@ -100,7 +101,7 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
         if (!foods.isEmpty()) {
             Log.d(TAG, "onSwipe: " + position);
             Log.d(TAG, "onSwipe: " + foods.get(position).getDishName());
-            mDatabaseReference.child("Food").child(user.getUid()).child(foods.get(position).getDishName()).removeValue();
+            mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(foods.get(position).getDishName()).removeValue();
             storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(foods.get(position).getImageUri());
 
             storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {

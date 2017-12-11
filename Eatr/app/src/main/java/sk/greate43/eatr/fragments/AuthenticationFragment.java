@@ -1,6 +1,7 @@
 package sk.greate43.eatr.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,13 +9,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
 
 
 public class AuthenticationFragment extends Fragment implements View.OnClickListener {
 
-
+    private static final String TAG = "AuthenticationFragment";
+    FirebaseAuth mAuth;
+    FirebaseUser user;
     private ReplaceFragment mListener;
 
     public AuthenticationFragment() {
@@ -38,19 +45,29 @@ public class AuthenticationFragment extends Fragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_authentation, container, false);
-        Button btnAuthPhoneNo=view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
+        View view = inflater.inflate(R.layout.fragment_authentation, container, false);
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        if (user != null) {
+            Intent intent = new Intent(getActivity(), SellerActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }
+
+        Button btnAuthPhoneNo = view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
         btnAuthPhoneNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             if (mListener != null){
-                 mListener.onFragmentReplaced(PhoneNoAuthenticationFragment.newInstance());
-             }
+
+                if (mListener != null) {
+                    mListener.onFragmentReplaced(PhoneNoAuthenticationFragment.newInstance());
+                }
+
             }
         });
         return view;
     }
-
 
 
     @Override
@@ -71,12 +88,10 @@ public class AuthenticationFragment extends Fragment implements View.OnClickList
     }
 
 
-
     @Override
     public void onClick(View v) {
 
     }
-
 
 
 }

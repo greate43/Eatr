@@ -84,7 +84,8 @@
         app:backgroundTint="@color/bg_tag"
         app:layout_constraintEnd_toEndOf="@+id/fragment_add_food_item_til_cuisine"
         app:layout_constraintTop_toBottomOf="@+id/fragment_add_food_item_til_cuisine"
-        app:rippleColor="@android:color/background_light" />
+        app:rippleColor="@android:color/background_light"
+        android:layout_marginRight="8dp" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/fragment_add_food_item_til_pick_location"

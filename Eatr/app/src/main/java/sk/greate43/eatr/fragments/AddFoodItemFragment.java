@@ -57,6 +57,7 @@ import me.originqiu.library.EditTag;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
+import sk.greate43.eatr.utils.Constants;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
@@ -96,14 +97,17 @@ public class AddFoodItemFragment extends Fragment implements
     private ProgressDialog dialogUploadingImage;
     private ReplaceFragment replaceFragment;
     private Food food;
+    private double longitude;
+    private double latitude;
 
-//    public static AddFoodItemFragment newInstance(Food food) {
+
+    public static AddFoodItemFragment newInstance() {
 //        Bundle args = new Bundle();
 //        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, food);
-//        AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
-//        addFoodItemFragment.setArguments(args);
-//        return addFoodItemFragment;
-//    }
+        AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
+        //addFoodItemFragment.setArguments(args);
+        return addFoodItemFragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -130,11 +134,13 @@ public class AddFoodItemFragment extends Fragment implements
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
-        user=mAuth.getCurrentUser();
+        user = mAuth.getCurrentUser();
+
+
         storageRef = FirebaseStorage.getInstance().getReference();
 
 
-        Log.d(TAG, "onCreateView: "+user.getUid());
+        Log.d(TAG, "onCreateView: " + user.getUid());
 
         etDishName = view.findViewById(R.id.fragment_add_food_item_edit_text_dish_name);
         etCuisine = view.findViewById(R.id.fragment_add_food_item_edit_text_cuisine);
@@ -289,7 +295,9 @@ public class AddFoodItemFragment extends Fragment implements
 
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK && data != null) {
-                Place place = PlacePicker.getPlace(data, getActivity());
+                Place place = PlacePicker.getPlace(getActivity(),data);
+                longitude = place.getLatLng().longitude;
+                latitude = place.getLatLng().latitude;
                 etPickLocation.setText(place.getAddress());
                 //  String toastMsg = String.format("Place: %s", place.getAddress());
                 //showToast(toastMsg);
@@ -332,6 +340,8 @@ public class AddFoodItemFragment extends Fragment implements
             geocoder = new Geocoder(getActivity(), Locale.getDefault());
 
             try {
+                longitude = mLastLocation.getLongitude();
+                latitude = mLastLocation.getLatitude();
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             } catch (IOException e) {
                 e.printStackTrace();
@@ -371,73 +381,77 @@ public class AddFoodItemFragment extends Fragment implements
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
-    private void writeSellerData(final String username, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri) {
+    private void writeSellerData(final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri, final double longitude, final double latitude) {
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
-        Log.d(TAG, "writeSellerData: "+user.getUid());
-            StorageReference sellerRef = storageRef.child("Photos").child(user.getUid()).child(imgUri.getLastPathSegment());
-            sellerRef.putFile(imgUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        Log.d(TAG, "writeSellerData: " + user.getUid());
+        StorageReference sellerRef = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
+        sellerRef.putFile(imgUri)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
 
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // Get a URL to the uploaded content
-                            String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // Get a URL to the uploaded content
+                        String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
-                            food = new Food();
-                            food.setDishName(dishName);
-                            food.setCuisine(cuisine);
-                            food.setIngredientsTags(ingredientsTags);
-                            food.setPickUpLocation(pickUpLocation);
-                            food.setImageUri(downloadUrl);
-                            food.setImage(imgUri);
-                            food.setTimeStamp(ServerValue.TIMESTAMP);
-                            Log.d(TAG, "writeSellerData: "+user.getUid());
+                        food = new Food();
+                        food.setDishName(dishName);
+                        food.setCuisine(cuisine);
+                        food.setIngredientsTags(ingredientsTags);
+                        food.setPickUpLocation(pickUpLocation);
+                        food.setImageUri(downloadUrl);
+                        food.setImage(imgUri);
+                        food.setLongitude(longitude);
+                        food.setLatitude(latitude);
+                        food.setTimeStamp(ServerValue.TIMESTAMP);
+                        Log.d(TAG, "writeSellerData: " + user.getUid());
 
-                            mDatabaseReference.child("Food").child(user.getUid()).child(dishName).setValue(food);
-                            if (dialogUploadingImage.isShowing()) {
-                                dialogUploadingImage.dismiss();
-                            }
+                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
+                        if (dialogUploadingImage.isShowing()) {
+                            dialogUploadingImage.dismiss();
+                        }
 
-                            if (replaceFragment != null) {
-
-
-                                replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
-                            }
+                        if (replaceFragment != null) {
 
 
+                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
                         }
 
 
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle unsuccessful uploads
-                            food = new Food();
-                            food.setDishName(dishName);
-                            food.setCuisine(cuisine);
-                            food.setIngredientsTags(ingredientsTags);
-                            food.setPickUpLocation(pickUpLocation);
-                            food.setImageUri("");
-                            food.setTimeStamp(ServerValue.TIMESTAMP);
-
-                            mDatabaseReference.child("Food").child(user.getUid()).child(dishName).setValue(food);
-                            Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
-                            if (dialogUploadingImage.isShowing()) {
-                                dialogUploadingImage.dismiss();
-                            }
-                            if (replaceFragment != null) {
+                    }
 
 
-                                replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
-                            }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        food = new Food();
+                        food.setDishName(dishName);
+                        food.setCuisine(cuisine);
+                        food.setIngredientsTags(ingredientsTags);
+                        food.setPickUpLocation(pickUpLocation);
+                        food.setImageUri("");
+                        food.setLongitude(longitude);
+                        food.setLatitude(latitude);
+                        food.setTimeStamp(ServerValue.TIMESTAMP);
 
-                            //  getActivity().finish();
-
+                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
+                        Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                        if (dialogUploadingImage.isShowing()) {
+                            dialogUploadingImage.dismiss();
                         }
-                    });
+                        if (replaceFragment != null) {
+
+
+                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                        }
+
+                        //  getActivity().finish();
+
+                    }
+                });
 
 
     }
@@ -525,13 +539,13 @@ public class AddFoodItemFragment extends Fragment implements
                                 && !TextUtils.isEmpty(etPickLocation.getText().toString())
                                 && imgUri != null
                         ) {
-                    writeSellerData("greate43"
-                            , etDishName.getText().toString()
+                    writeSellerData(etDishName.getText().toString()
                             , etCuisine.getText().toString()
                             , etIncidentsTags.getTagList().toString()
                             , etPickLocation.getText().toString()
                             , imgUri
-                    );
+                            ,longitude
+                            ,latitude);
                 } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
                     etDishName.setError("Dish Name is Empty  ");
                 } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
