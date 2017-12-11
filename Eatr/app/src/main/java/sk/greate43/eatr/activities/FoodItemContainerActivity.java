@@ -20,7 +20,7 @@ public class FoodItemContainerActivity extends AppCompatActivity implements Repl
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .add(R.id.activity_food_item_container_fragment, new AddFoodItemFragment())
+                .add(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance())
                 .commit();
 
     }

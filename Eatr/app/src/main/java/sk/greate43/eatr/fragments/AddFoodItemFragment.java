@@ -40,6 +40,8 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
@@ -53,8 +55,9 @@ import java.util.Locale;
 
 import me.originqiu.library.EditTag;
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
+import sk.greate43.eatr.utils.Constants;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.CAMERA;
@@ -87,25 +90,30 @@ public class AddFoodItemFragment extends Fragment implements
     private TextInputLayout tilIncidentsTags;
     private TextInputEditText etPickLocation;
     private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
     private DatabaseReference mDatabaseReference;
     private Uri imgUri;
     private ProgressDialog dialogUploadingImage;
     private ReplaceFragment replaceFragment;
-    private Seller seller;
+    private Food food;
+    private double longitude;
+    private double latitude;
 
-//    public static AddFoodItemFragment newInstance(Seller seller) {
+
+    public static AddFoodItemFragment newInstance() {
 //        Bundle args = new Bundle();
-//        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, seller);
-//        AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
-//        addFoodItemFragment.setArguments(args);
-//        return addFoodItemFragment;
-//    }
+//        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, food);
+        AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
+        //addFoodItemFragment.setArguments(args);
+        return addFoodItemFragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (seller != null) {
-            seller = (Seller) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
+        if (food != null) {
+            food = (Food) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
         }
 
     }
@@ -123,11 +131,16 @@ public class AddFoodItemFragment extends Fragment implements
 
         dialogUploadingImage = new ProgressDialog(getActivity());
         dialogUploadingImage.setCanceledOnTouchOutside(false);
-
+        mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
+        user = mAuth.getCurrentUser();
+
 
         storageRef = FirebaseStorage.getInstance().getReference();
+
+
+        Log.d(TAG, "onCreateView: " + user.getUid());
 
         etDishName = view.findViewById(R.id.fragment_add_food_item_edit_text_dish_name);
         etCuisine = view.findViewById(R.id.fragment_add_food_item_edit_text_cuisine);
@@ -161,10 +174,10 @@ public class AddFoodItemFragment extends Fragment implements
         }
 
 
-        if (seller != null) {
+        if (food != null) {
             imgChooseImage.setImageURI(imgUri);
             imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            etIncidentsTags.addTag(seller.getIngredientsTags());
+            etIncidentsTags.addTag(food.getIngredientsTags());
 
 
         }
@@ -282,7 +295,9 @@ public class AddFoodItemFragment extends Fragment implements
 
         if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK && data != null) {
-                Place place = PlacePicker.getPlace(data, getActivity());
+                Place place = PlacePicker.getPlace(getActivity(),data);
+                longitude = place.getLatLng().longitude;
+                latitude = place.getLatLng().latitude;
                 etPickLocation.setText(place.getAddress());
                 //  String toastMsg = String.format("Place: %s", place.getAddress());
                 //showToast(toastMsg);
@@ -325,6 +340,8 @@ public class AddFoodItemFragment extends Fragment implements
             geocoder = new Geocoder(getActivity(), Locale.getDefault());
 
             try {
+                longitude = mLastLocation.getLongitude();
+                latitude = mLastLocation.getLatitude();
                 addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             } catch (IOException e) {
                 e.printStackTrace();
@@ -364,10 +381,11 @@ public class AddFoodItemFragment extends Fragment implements
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
-    private void writeSellerData(final String username, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri) {
+    private void writeSellerData(final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri, final double longitude, final double latitude) {
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
-        StorageReference sellerRef = storageRef.child("Photos").child(dishName).child(imgUri.getLastPathSegment());
+        Log.d(TAG, "writeSellerData: " + user.getUid());
+        StorageReference sellerRef = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
         sellerRef.putFile(imgUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
@@ -377,16 +395,19 @@ public class AddFoodItemFragment extends Fragment implements
                         // Get a URL to the uploaded content
                         String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
-                        seller = new Seller();
-                        seller.setDishName(dishName);
-                        seller.setCuisine(cuisine);
-                        seller.setIngredientsTags(ingredientsTags);
-                        seller.setPickUpLocation(pickUpLocation);
-                        seller.setImageUri(downloadUrl);
-                        seller.setImage(imgUri);
-                        seller.setTimeStamp(ServerValue.TIMESTAMP);
+                        food = new Food();
+                        food.setDishName(dishName);
+                        food.setCuisine(cuisine);
+                        food.setIngredientsTags(ingredientsTags);
+                        food.setPickUpLocation(pickUpLocation);
+                        food.setImageUri(downloadUrl);
+                        food.setImage(imgUri);
+                        food.setLongitude(longitude);
+                        food.setLatitude(latitude);
+                        food.setTimeStamp(ServerValue.TIMESTAMP);
+                        Log.d(TAG, "writeSellerData: " + user.getUid());
 
-                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
+                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
                         if (dialogUploadingImage.isShowing()) {
                             dialogUploadingImage.dismiss();
                         }
@@ -394,7 +415,7 @@ public class AddFoodItemFragment extends Fragment implements
                         if (replaceFragment != null) {
 
 
-                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(seller));
+                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
                         }
 
 
@@ -406,15 +427,17 @@ public class AddFoodItemFragment extends Fragment implements
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
-                        seller = new Seller();
-                        seller.setDishName(dishName);
-                        seller.setCuisine(cuisine);
-                        seller.setIngredientsTags(ingredientsTags);
-                        seller.setPickUpLocation(pickUpLocation);
-                        seller.setImageUri("");
-                        seller.setTimeStamp(ServerValue.TIMESTAMP);
+                        food = new Food();
+                        food.setDishName(dishName);
+                        food.setCuisine(cuisine);
+                        food.setIngredientsTags(ingredientsTags);
+                        food.setPickUpLocation(pickUpLocation);
+                        food.setImageUri("");
+                        food.setLongitude(longitude);
+                        food.setLatitude(latitude);
+                        food.setTimeStamp(ServerValue.TIMESTAMP);
 
-                        mDatabaseReference.child("eatr").child(username).child(dishName).setValue(seller);
+                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
                         Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
                         if (dialogUploadingImage.isShowing()) {
                             dialogUploadingImage.dismiss();
@@ -422,7 +445,7 @@ public class AddFoodItemFragment extends Fragment implements
                         if (replaceFragment != null) {
 
 
-                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(seller));
+                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
                         }
 
                         //  getActivity().finish();
@@ -516,13 +539,13 @@ public class AddFoodItemFragment extends Fragment implements
                                 && !TextUtils.isEmpty(etPickLocation.getText().toString())
                                 && imgUri != null
                         ) {
-                    writeSellerData("greate43"
-                            , etDishName.getText().toString()
+                    writeSellerData(etDishName.getText().toString()
                             , etCuisine.getText().toString()
                             , etIncidentsTags.getTagList().toString()
                             , etPickLocation.getText().toString()
                             , imgUri
-                    );
+                            ,longitude
+                            ,latitude);
                 } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
                     etDishName.setError("Dish Name is Empty  ");
                 } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {

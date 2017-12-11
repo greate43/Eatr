@@ -10,8 +10,8 @@ import java.util.Map;
 /**
  * Created by great on 11/4/2017.
  */
-public class Seller implements Serializable {
-    private static final String TAG = "Seller";
+public class Food implements Serializable {
+    private static final String TAG = "Food";
     private static long serialVersionUID = 1L;
     private String dishName;
     private String cuisine;
@@ -25,9 +25,12 @@ public class Seller implements Serializable {
     private long price;
     private long numberOfServings;
     private Uri image;
+    private double longitude;
+    private double latitude;
 
-    public Seller() {
-        // Default constructor required for calls to DataSnapshot.getValue(Seller.class)
+
+    public Food() {
+        // Default constructor required for calls to DataSnapshot.getValue(Food.class)
     }
 
     @Exclude
@@ -88,7 +91,7 @@ public class Seller implements Serializable {
         this.timeStamp = timeStamp;
     }
 
-    public boolean isCheckIfOrderIsActive() {
+    public boolean getCheckIfOrderIsActive() {
         return checkIfOrderIsActive;
     }
 
@@ -120,6 +123,23 @@ public class Seller implements Serializable {
     public void setNumberOfServings(long numberOfServings) {
         this.numberOfServings = numberOfServings;
     }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
 
     @Exclude
     public String getTime() {

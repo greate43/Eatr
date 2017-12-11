@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +28,7 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.SellFoodRecyclerViewAdaptor;
-import sk.greate43.eatr.entities.Seller;
+import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.recyclerCustomItem.SimpleTouchCallback;
 
 
@@ -34,18 +36,28 @@ public class SellFoodFragment extends Fragment {
 
     public static final String TAG = "SellFoodFragment";
     RecyclerView recyclerView;
-    ArrayList<Seller> sellers;
+    ArrayList<Food> sellers;
     SellFoodRecyclerViewAdaptor adaptor;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+
+    public static SellFoodFragment newInstance(){
+        SellFoodFragment fragment=new SellFoodFragment();
+
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sell_food, container, false);
         recyclerView = view.findViewById(R.id.fragment_sell_food_recycler_view);
+        mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
+        user = mAuth.getCurrentUser();
 
         FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_sell_food_add_food_item_btn);
         addFoodItem.setOnClickListener(new View.OnClickListener() {
@@ -57,10 +69,10 @@ public class SellFoodFragment extends Fragment {
             }
         });
 
-        adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity(),mDatabaseReference);
+        adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity(), mDatabaseReference);
         adaptor.setHasStableIds(true);
 
-        sellers = adaptor.getSellers();
+        sellers = adaptor.getFoods();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -71,9 +83,6 @@ public class SellFoodFragment extends Fragment {
         SimpleTouchCallback simpleTouchCallback = new SimpleTouchCallback(adaptor);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-
-
-
 
 
 // Attach a listener to read the data at our posts reference
@@ -103,9 +112,10 @@ public class SellFoodFragment extends Fragment {
         }
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-            // Seller post = ds.getValue(Seller.class);
-            collectSeller((Map<String, Object>) ds.child("greate43").getValue());
-
+            // Food post = ds.getValue(Food.class);
+            if (ds.child(user.getUid()).getValue() != null) {
+                collectSeller((Map<String, Object>) ds.child(user.getUid()).getValue());
+            }
         }
         adaptor.notifyDataSetChanged();
 
@@ -115,9 +125,6 @@ public class SellFoodFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-//        if (adaptor != null) {
-//            adaptor.clear();
-//        }
 
 
     }
@@ -128,23 +135,30 @@ public class SellFoodFragment extends Fragment {
 
         //iterate through each user, ignoring their UID
         for (Map.Entry<String, Object> entry : value.entrySet()) {
-            //Get seller map
+            //Get food map
             Map singleUser = (Map) entry.getValue();
-            //Get seller field and append to list
+            //Get food field and append to list
 
 //                   ,
 
 
             Log.d(TAG, "collectSeller: " + singleUser);
 
-            Seller seller = new Seller();
-            seller.setDishName((String) singleUser.get("dishName"));
-            seller.setCuisine((String) singleUser.get("cuisine"));
-            seller.setIngredientsTags(String.valueOf(singleUser.get("expiryTime")));
-            seller.setImageUri((String) singleUser.get("imageUri"));
-            seller.setPickUpLocation((String) singleUser.get("pickUpLocation"));
-            seller.setTime(singleUser.get("timeStamp").toString());
-            sellers.add(seller);
+            Food food = new Food();
+            food.setDishName((String) singleUser.get("dishName"));
+            food.setCuisine((String) singleUser.get("cuisine"));
+            if (singleUser.get("expiryTime") != null) {
+                food.setExpiryTime((long) singleUser.get("expiryTime"));
+            }
+            food.setIngredientsTags(String.valueOf(singleUser.get("ingredientsTags")));
+            food.setImageUri((String) singleUser.get("imageUri"));
+            food.setPickUpLocation((String) singleUser.get("pickUpLocation"));
+            food.setCheckIfOrderIsActive((Boolean) singleUser.get("checkIfOrderIsActive"));
+
+            if (singleUser.get("timeStamp") != null) {
+                food.setTime(singleUser.get("timeStamp").toString());
+            }
+            sellers.add(food);
 
         }
 
