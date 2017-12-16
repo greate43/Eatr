@@ -27,10 +27,19 @@ public class Food implements Serializable {
     private Uri image;
     private double longitude;
     private double latitude;
+    private Boolean checkIfFoodIsInDraftMode;
 
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+    public Boolean getCheckIfFoodIsInDraftMode() {
+        return checkIfFoodIsInDraftMode;
+    }
+
+    public void setCheckIfFoodIsInDraftMode(Boolean checkIfFoodIsInDraftMode) {
+        this.checkIfFoodIsInDraftMode = checkIfFoodIsInDraftMode;
     }
 
     @Exclude

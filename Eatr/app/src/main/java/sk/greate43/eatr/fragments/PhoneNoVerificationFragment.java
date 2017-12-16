@@ -21,16 +21,16 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.MainActivity;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
-import sk.greate43.eatr.utils.Authenticate;
+import sk.greate43.eatr.utils.AuthenticateUsers;
 
 
-public class PhoneNoVerificationFragment extends Fragment implements Authenticate.ShowProgressBar {
+public class PhoneNoVerificationFragment extends Fragment implements AuthenticateUsers.ShowProgressBar {
     private static final String ARG_PHONE_NO = "ARG_PHONE_NO";
     private static final String TAG = "PhoneNoVerificationFrag";
     CountDownTimer remainingTimeCounter;
     private ReplaceFragment mListener;
     private String mPhoneNo;
-    private Authenticate authenticate;
+    private AuthenticateUsers authenticate;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
     private TextView tvTimer;
@@ -54,7 +54,7 @@ public class PhoneNoVerificationFragment extends Fragment implements Authenticat
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        authenticate = Authenticate.getInstance((MainActivity) getActivity(),this);
+        authenticate = AuthenticateUsers.getInstance((MainActivity) getActivity(),this);
         mCallbacks = authenticate.initializeCallback();
         if (getArguments() != null) {
             mPhoneNo = getArguments().getString(ARG_PHONE_NO);

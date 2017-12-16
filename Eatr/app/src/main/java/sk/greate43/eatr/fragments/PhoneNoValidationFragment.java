@@ -15,20 +15,20 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
 
 
-public class PhoneNoAuthenticationFragment extends Fragment implements View.OnClickListener {
+public class PhoneNoValidationFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "PhoneNoAuthenticationFr";
     private ReplaceFragment mListener;
     private TextInputEditText etPhoneNo;
     private CountryCodePicker ccp;
 
 
-    public PhoneNoAuthenticationFragment() {
+    public PhoneNoValidationFragment() {
         // Required empty public constructor
     }
 
 
-    public static PhoneNoAuthenticationFragment newInstance() {
-        PhoneNoAuthenticationFragment fragment = new PhoneNoAuthenticationFragment();
+    public static PhoneNoValidationFragment newInstance() {
+        PhoneNoValidationFragment fragment = new PhoneNoValidationFragment();
 
         return fragment;
     }

@@ -61,7 +61,7 @@ public class AuthenticationFragment extends Fragment implements View.OnClickList
             public void onClick(View v) {
 
                 if (mListener != null) {
-                    mListener.onFragmentReplaced(PhoneNoAuthenticationFragment.newInstance());
+                    mListener.onFragmentReplaced(PhoneNoValidationFragment.newInstance());
                 }
 
             }

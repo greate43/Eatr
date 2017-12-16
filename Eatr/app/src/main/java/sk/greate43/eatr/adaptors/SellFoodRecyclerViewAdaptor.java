@@ -46,8 +46,8 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
         inflater = sellerActivity.getLayoutInflater();
         foods = new ArrayList<>();
         this.mDatabaseReference = mDatabaseReference;
-        mAuth=FirebaseAuth.getInstance();
-        user=mAuth.getCurrentUser();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
 
     }
 
@@ -66,7 +66,7 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
     @Override
     public void onBindViewHolder(SellFoodRecyclerViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
-            holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
+           // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
 
         } else {
 
@@ -76,7 +76,12 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
 
     @Override
     public int getItemCount() {
-        return ((foods != null && foods.size() != 0) ? foods.size() : 1);
+        if (foods != null && !foods.isEmpty()) {
+            return foods.size();
+        } else {
+            return 0;
+        }
+
     }
 
 

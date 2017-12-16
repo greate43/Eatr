@@ -65,20 +65,16 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
-
+import static sk.greate43.eatr.utils.Constants.CAMERA_RESULT;
+import static sk.greate43.eatr.utils.Constants.GALLERY_RESULT;
+import static sk.greate43.eatr.utils.Constants.PLACE_PICKER_REQUEST;
+import static sk.greate43.eatr.utils.Constants.REQUEST_CAMERA_AND_WRITE_PERMISSION;
+import static sk.greate43.eatr.utils.Constants.REQUEST_FINE_LOCATION_PERMISSION;
+import static sk.greate43.eatr.utils.Constants.REQUEST_READ_EXTERNAL_STORAGE_PERMISSION;
 public class AddFoodItemFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    private static final int CAMERA_RESULT = 111;
-    private static final int GALLERY_RESULT = 222;
-
-    private static final int REQUEST_CAMERA_AND_WRITE_PERMISSION = 1111;
-    private static final int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION = 2222;
-
     private static final String TAG = "AddFoodItemFragment";
-    private static final int REQUEST_FINE_LOCATION_PERMISSION = 4444;
-    private static final String ADD_FOOD_ITEM_FRAGMENTS = "ADD_FOOD_ITEM_FRAGMENTS";
-    private static final int PLACE_PICKER_REQUEST = 1;
 
     ImageView imgChooseImage;
     GoogleApiClient mGoogleApiClient;
@@ -112,8 +108,8 @@ public class AddFoodItemFragment extends Fragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (food != null) {
-            food = (Food) getArguments().getSerializable(ADD_FOOD_ITEM_FRAGMENTS);
+        if (getArguments() != null) {
+            food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
         }
 
     }
@@ -404,6 +400,7 @@ public class AddFoodItemFragment extends Fragment implements
                         food.setImage(imgUri);
                         food.setLongitude(longitude);
                         food.setLatitude(latitude);
+                        food.setCheckIfFoodIsInDraftMode(true);
                         food.setTimeStamp(ServerValue.TIMESTAMP);
                         Log.d(TAG, "writeSellerData: " + user.getUid());
 
@@ -435,6 +432,7 @@ public class AddFoodItemFragment extends Fragment implements
                         food.setImageUri("");
                         food.setLongitude(longitude);
                         food.setLatitude(latitude);
+                        food.setCheckIfFoodIsInDraftMode(true);
                         food.setTimeStamp(ServerValue.TIMESTAMP);
 
                         mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);

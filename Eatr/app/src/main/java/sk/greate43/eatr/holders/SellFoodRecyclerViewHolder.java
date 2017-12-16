@@ -40,12 +40,12 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
     }
 
     @SuppressLint("SetTextI18n")
-    public void populate(Context context, Food seller) {
-        itemView.setTag(seller);
-        Log.d(TAG, "populate: " + seller.getImageUri());
-        if (seller.getImageUri() != null && !seller.getImageUri().isEmpty()) {
+    public void populate(Context context, Food food) {
+        itemView.setTag(food);
+        Log.d(TAG, "populate: " + food.getImageUri());
+        if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
             Picasso.with(context)
-                    .load(seller.getImageUri())
+                    .load(food.getImageUri())
                     .fit()
                     .centerCrop()
                     .into(imgFoodItem, new Callback() {
@@ -61,25 +61,28 @@ public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
                     });
         }
 
-        if (seller.getCheckIfOrderIsActive()) {
+        if (food.getCheckIfFoodIsInDraftMode()) {
+            tvStatus.setTextColor(Color.GRAY);
+            tvStatus.setText("Draft");
+        } else if (food.getCheckIfOrderIsActive()) {
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!seller.getCheckIfOrderIsActive()){
+        } else if (!food.getCheckIfOrderIsActive()) {
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
         }
-        tvLocation.setText(seller.getPickUpLocation());
-        if (seller.getTime() != null && !seller.getTime().isEmpty()) {
+        tvLocation.setText(food.getPickUpLocation());
+        if (food.getTime() != null && !food.getTime().isEmpty()) {
             tvTimeStamp.setText(DateUtils
-                    .getRelativeTimeSpanString(Long.parseLong(seller.getTime()),
+                    .getRelativeTimeSpanString(Long.parseLong(food.getTime()),
                             System.currentTimeMillis(),
                             DateUtils.MINUTE_IN_MILLIS,
                             0));
         } else {
             tvTimeStamp.setText("");
         }
-        tvDishName.setText(seller.getDishName());
+        tvDishName.setText(food.getDishName());
     }
 
 }
