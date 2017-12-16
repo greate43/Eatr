@@ -27,23 +27,23 @@ import sk.greate43.eatr.activities.SellerActivity;
  * Created by great on 12/11/2017.
  */
 
-public class Authenticate {
-    private static final String TAG = "Authenticate";
-    private static final Authenticate ourInstance = new Authenticate();
+public class AuthenticateUsers {
+    private static final String TAG = "AuthenticateUsers";
+    private static final AuthenticateUsers ourInstance = new AuthenticateUsers();
     private String mVerificationId;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private FirebaseAuth mAuth;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private static MainActivity activity;
     private static ShowProgressBar showProgressBar;
-    private Authenticate() {
+    private AuthenticateUsers() {
         mAuth = FirebaseAuth.getInstance();
     }
 
 
 
     @Contract(pure = true)
-    public static Authenticate getInstance(MainActivity mainActivity,ShowProgressBar showProgress) {
+    public static AuthenticateUsers getInstance(MainActivity mainActivity, ShowProgressBar showProgress) {
         showProgressBar = showProgress;
         activity = mainActivity;
         return ourInstance;

@@ -30,6 +30,7 @@ import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.SellFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.recyclerCustomItem.SimpleTouchCallback;
+import sk.greate43.eatr.utils.Constants;
 
 
 public class SellFoodFragment extends Fragment {
@@ -145,18 +146,18 @@ public class SellFoodFragment extends Fragment {
             Log.d(TAG, "collectSeller: " + singleUser);
 
             Food food = new Food();
-            food.setDishName((String) singleUser.get("dishName"));
-            food.setCuisine((String) singleUser.get("cuisine"));
-            if (singleUser.get("expiryTime") != null) {
-                food.setExpiryTime((long) singleUser.get("expiryTime"));
+            food.setDishName((String) singleUser.get(Constants.DISH_NAME));
+            food.setCuisine((String) singleUser.get(Constants.CUISINE));
+            if (singleUser.get(Constants.EXPIRY_TIME) != null) {
+                food.setExpiryTime((long) singleUser.get(Constants.EXPIRY_TIME));
             }
-            food.setIngredientsTags(String.valueOf(singleUser.get("ingredientsTags")));
-            food.setImageUri((String) singleUser.get("imageUri"));
-            food.setPickUpLocation((String) singleUser.get("pickUpLocation"));
-            food.setCheckIfOrderIsActive((Boolean) singleUser.get("checkIfOrderIsActive"));
-
-            if (singleUser.get("timeStamp") != null) {
-                food.setTime(singleUser.get("timeStamp").toString());
+            food.setIngredientsTags(String.valueOf(singleUser.get(Constants.INCIDENT_TAGS)));
+            food.setImageUri((String) singleUser.get(Constants.IMAGE_URI));
+            food.setPickUpLocation((String) singleUser.get(Constants.PICK_UP_LOCATION));
+            food.setCheckIfOrderIsActive((Boolean) singleUser.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
+            food.setCheckIfFoodIsInDraftMode((Boolean)singleUser.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+            if (singleUser.get(Constants.TIME_STAMP) != null) {
+                food.setTime(singleUser.get(Constants.TIME_STAMP).toString());
             }
             sellers.add(food);
 

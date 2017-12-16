@@ -7,4 +7,51 @@ package sk.greate43.eatr.utils;
 public interface Constants {
     String FOOD = "Food";
     String PHOTOS = "Photos";
+    String TIME_STAMP = "timeStamp";
+
+
+    /**
+     * {@link sk.greate43.eatr.entities.Food}
+     */    String DISH_NAME = "dishName";
+    String CUISINE = "cuisine";
+    String EXPIRY_TIME = "expiryTime";
+    String INCIDENT_TAGS = "ingredientsTags";
+    String IMAGE_URI = "imageUri";
+    String PICK_UP_LOCATION = "pickUpLocation";
+    String CHECK_IF_ORDER_IS_ACTIVE = "checkIfOrderIsActive";
+    String CHECK_IF_FOOD_IS_IN_DRAFT_MODE = "checkIfFoodIsInDraftMode";
+
+    //Food Constants
+
+
+
+    /**
+     * {@link sk.greate43.eatr.fragments.AddFoodItemFragment}
+     *
+     */
+     String ARGS_FOOD = "ARGS_FOOD";
+
+    // Add Food Fragment
+
+
+    /**
+     * {@link sk.greate43.eatr.fragments.FoodItemExpiryTimeAndPriceFragment}
+     *
+     */
+
+    //FoodItemExpiryTimeAndPriceFragment
+
+
+    // Permission and Requests Constants
+    int CAMERA_RESULT = 111;
+    int GALLERY_RESULT = 222;
+
+    int REQUEST_CAMERA_AND_WRITE_PERMISSION = 1111;
+    int REQUEST_READ_EXTERNAL_STORAGE_PERMISSION = 2222;
+
+    int REQUEST_FINE_LOCATION_PERMISSION = 4444;
+    int PLACE_PICKER_REQUEST = 1;
+    // Permission and Requests Constants
+
+
 }

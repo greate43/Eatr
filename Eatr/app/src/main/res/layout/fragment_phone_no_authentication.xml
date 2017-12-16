@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="sk.greate43.eatr.fragments.PhoneNoAuthenticationFragment">
+    tools:context="sk.greate43.eatr.fragments.PhoneNoValidationFragment">
 
     <com.hbb20.CountryCodePicker
         android:id="@+id/fragment_phone_no_ccp"
