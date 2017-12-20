@@ -149,7 +149,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         return view;
     }
 
-    private void writeSellerData(final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri, final long price, final long expiryTime, final String numberOfServings, final double longitude, final double latitude) {
+    private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri, final long price, final long expiryTime, final String numberOfServings, final double longitude, final double latitude) {
 
         StorageReference sellerRef = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
 
@@ -163,6 +163,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                         String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
 
                         food = new Food();
+                        food.setPushId(pushId);
                         food.setDishName(dishName);
                         food.setCuisine(cuisine);
                         food.setIngredientsTags(ingredientsTags);
@@ -177,7 +178,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
                         food.setLongitude(longitude);
                         food.setLatitude(latitude);
-                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
+                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
 
 
                     }
@@ -189,7 +190,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         food = new Food();
-                        food.setDishName(dishName);
+                        food.setDishName(pushId);
                         food.setCuisine(cuisine);
                         food.setIngredientsTags(ingredientsTags);
                         food.setPickUpLocation(pickUpLocation);
@@ -266,6 +267,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 if (replaceFragment != null){
 
                     showPreview(
+                            food.getPushId(),
                             food.getDishName(),
                             food.getCuisine(),
                             food.getIngredientsTags(),
@@ -292,7 +294,8 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                         expiryTime = Long.parseLong(etExpiryTime.getText().toString());
                     }
                     writeSellerData(
-                            food.getDishName()
+                            food.getPushId()
+                            , food.getDishName()
                             , food.getCuisine()
                             , food.getIngredientsTags()
                             , food.getPickUpLocation()
@@ -321,9 +324,10 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
     }
 
-    private void showPreview(String dishName, String cuisine, String ingredientsTags, String pickUpLocation, String imageUri, Map<String, String> timestamp, long expiryTime, String price, String noOfServings, double longitude, double latitude,Uri imgUri) {
+    private void showPreview(String pushId,String dishName, String cuisine, String ingredientsTags, String pickUpLocation, String imageUri, Map<String, String> timestamp, long expiryTime, String price, String noOfServings, double longitude, double latitude,Uri imgUri) {
 
         food = new Food();
+        food.setPushId(pushId);
         food.setDishName(dishName);
         food.setCuisine(cuisine);
         food.setIngredientsTags(ingredientsTags);

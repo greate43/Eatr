@@ -146,6 +146,7 @@ public class SellFoodFragment extends Fragment {
             Log.d(TAG, "collectSeller: " + singleUser);
 
             Food food = new Food();
+            food.setPushId((String) singleUser.get(Constants.PUSH_ID));
             food.setDishName((String) singleUser.get(Constants.DISH_NAME));
             food.setCuisine((String) singleUser.get(Constants.CUISINE));
             if (singleUser.get(Constants.EXPIRY_TIME) != null) {

@@ -105,8 +105,8 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
     public void onSwipe(int position) {
         if (!foods.isEmpty()) {
             Log.d(TAG, "onSwipe: " + position);
-            Log.d(TAG, "onSwipe: " + foods.get(position).getDishName());
-            mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(foods.get(position).getDishName()).removeValue();
+            Log.d(TAG, "onSwipe: " + foods.get(position).getPushId());
+            mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(foods.get(position).getPushId()).removeValue();
             storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(foods.get(position).getImageUri());
 
             storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
