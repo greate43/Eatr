@@ -12,7 +12,9 @@ public interface Constants {
 
     /**
      * {@link sk.greate43.eatr.entities.Food}
-     */    String DISH_NAME = "dishName";
+     */
+    String PUSH_ID = "pushId";
+    String DISH_NAME = "dishName";
     String CUISINE = "cuisine";
     String EXPIRY_TIME = "expiryTime";
     String INCIDENT_TAGS = "ingredientsTags";

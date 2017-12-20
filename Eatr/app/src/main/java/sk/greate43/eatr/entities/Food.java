@@ -28,7 +28,7 @@ public class Food implements Serializable {
     private double longitude;
     private double latitude;
     private Boolean checkIfFoodIsInDraftMode;
-
+    private String pushId;
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
@@ -40,6 +40,14 @@ public class Food implements Serializable {
 
     public void setCheckIfFoodIsInDraftMode(Boolean checkIfFoodIsInDraftMode) {
         this.checkIfFoodIsInDraftMode = checkIfFoodIsInDraftMode;
+    }
+
+    public String getPushId() {
+        return pushId;
+    }
+
+    public void setPushId(String pushId) {
+        this.pushId = pushId;
     }
 
     @Exclude
