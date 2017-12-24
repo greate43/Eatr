@@ -19,31 +19,32 @@
     <string name="todo">TODO</string>
 
     <!--
-        activity add food item
+        fragment add food item start
         -->
     <string name="name_of_the_dish">Name of the dish</string>
     <string name="file_path">%1$s</string>
     <string name="title_activity_maps">Map</string>
     <string name="No">No</string>
+
+    <!--
+        fragment add food item end
+        -->
+
+    <!--fragment profile start-->
+
+    <string name="user_type_prompt">Choose a User Type</string>
+
+    <string-array name="user_type_arrays">
+        <item>Buyer</item>
+        <item>Seller</item>
+
+    </string-array>
+    <!--fragment profile end-->
+
+
     <!--
        strings created by salman
        -->
-
-
-    <!--Siddique String Resourse-->
-    <string name="Enter_Name">Name</string>
-    <string name="Enter_Email">Email</string>
-    <string name="Password">Password</string>
-    <string name="Confirm_Paswd">Confirm Password</string>
-    <string name="Register_Button">REGISTER</string>
-    <string name="Register_new_User">REGISTER NEW USER</string>
-    <string name="Register_now">Register User</string>
-    <string name="Button_Log_In">Log In</string>
-    <string name="Register_cook">Become a Cook</string>
-    <string name="Welcome_App">Welcome To Eater</string>
-    <string name="Mobile_No">Enter Mobile No</string>
-    <string name="btn_send">Send</string>
-    <!--Siddique String Resourse Ends-->
 
 
 </resources>

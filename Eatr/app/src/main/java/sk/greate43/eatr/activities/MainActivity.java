@@ -1,3 +1,6 @@
+/**
+ * Activities Package
+ */
 package sk.greate43.eatr.activities;
 
 import android.os.Bundle;

@@ -2,7 +2,9 @@ package sk.greate43.eatr.utils;
 
 /**
  * Created by great on 12/10/2017.
+ * Constants class for holding constant
  */
+
 
 public interface Constants {
     String FOOD = "Food";
@@ -26,12 +28,10 @@ public interface Constants {
     //Food Constants
 
 
-
     /**
      * {@link sk.greate43.eatr.fragments.AddFoodItemFragment}
-     *
      */
-     String ARGS_FOOD = "ARGS_FOOD";
+    String ARGS_FOOD = "ARGS_FOOD";
 
     // Add Food Fragment
 
@@ -42,6 +42,15 @@ public interface Constants {
      */
 
     //FoodItemExpiryTimeAndPriceFragment
+
+    /**
+     * {@link sk.greate43.eatr.entities.Profile}
+     */
+    String PROFILE = "Profile";
+    String ARGS_PROFILE = "ARGS_PROFILE";
+    String TYPE_SELLER = "SELLER";
+    String TYPE_BUYER = "BUYER";
+    // profile
 
 
     // Permission and Requests Constants
