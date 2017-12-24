@@ -27,8 +27,9 @@ import java.util.Map;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
-import sk.greate43.eatr.adaptors.SellFoodRecyclerViewAdaptor;
+import sk.greate43.eatr.adaptors.PostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.recyclerCustomItem.SimpleTouchCallback;
 import sk.greate43.eatr.utils.Constants;
 
@@ -38,14 +39,16 @@ public class SellFoodFragment extends Fragment {
     public static final String TAG = "SellFoodFragment";
     RecyclerView recyclerView;
     ArrayList<Food> sellers;
-    SellFoodRecyclerViewAdaptor adaptor;
+    ArrayList<Profile> profiles;
+    PostedFoodRecyclerViewAdaptor adaptor;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
 
-    public static SellFoodFragment newInstance(){
-        SellFoodFragment fragment=new SellFoodFragment();
+
+    public static SellFoodFragment newInstance() {
+        SellFoodFragment fragment = new SellFoodFragment();
 
         return fragment;
     }
@@ -70,7 +73,7 @@ public class SellFoodFragment extends Fragment {
             }
         });
 
-        adaptor = new SellFoodRecyclerViewAdaptor((SellerActivity) getActivity(), mDatabaseReference);
+        adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), mDatabaseReference);
         adaptor.setHasStableIds(true);
 
         sellers = adaptor.getFoods();
@@ -84,10 +87,10 @@ public class SellFoodFragment extends Fragment {
         SimpleTouchCallback simpleTouchCallback = new SimpleTouchCallback(adaptor);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+        database.goOnline();
 
 
-// Attach a listener to read the data at our posts reference
-        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).orderByChild(Constants.TIME_STAMP).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -100,8 +103,14 @@ public class SellFoodFragment extends Fragment {
             }
         });
 
+
+
         return view;
     }
+
+
+
+
 
     private void showData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
@@ -113,15 +122,15 @@ public class SellFoodFragment extends Fragment {
         }
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-            // Food post = ds.getValue(Food.class);
-            if (ds.child(user.getUid()).getValue() != null) {
-                collectSeller((Map<String, Object>) ds.child(user.getUid()).getValue());
+            if (ds.getValue() != null) {
+                collectSeller((Map<String, Object>) ds.getValue());
             }
         }
         adaptor.notifyDataSetChanged();
 
 
     }
+
 
     @Override
     public void onStop() {
@@ -134,35 +143,35 @@ public class SellFoodFragment extends Fragment {
         Log.d(TAG, "collectSeller: " + value);
 
 
-        //iterate through each user, ignoring their UID
-        for (Map.Entry<String, Object> entry : value.entrySet()) {
-            //Get food map
-            Map singleUser = (Map) entry.getValue();
-            //Get food field and append to list
-
-//                   ,
-
-
-            Log.d(TAG, "collectSeller: " + singleUser);
-
-            Food food = new Food();
-            food.setPushId((String) singleUser.get(Constants.PUSH_ID));
-            food.setDishName((String) singleUser.get(Constants.DISH_NAME));
-            food.setCuisine((String) singleUser.get(Constants.CUISINE));
-            if (singleUser.get(Constants.EXPIRY_TIME) != null) {
-                food.setExpiryTime((long) singleUser.get(Constants.EXPIRY_TIME));
-            }
-            food.setIngredientsTags(String.valueOf(singleUser.get(Constants.INCIDENT_TAGS)));
-            food.setImageUri((String) singleUser.get(Constants.IMAGE_URI));
-            food.setPickUpLocation((String) singleUser.get(Constants.PICK_UP_LOCATION));
-            food.setCheckIfOrderIsActive((Boolean) singleUser.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
-            food.setCheckIfFoodIsInDraftMode((Boolean)singleUser.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-            if (singleUser.get(Constants.TIME_STAMP) != null) {
-                food.setTime(singleUser.get(Constants.TIME_STAMP).toString());
-            }
-            sellers.add(food);
-
+//        //iterate through each user, ignoring their UID
+//        for (Map.Entry<String, Object> entry : value.entrySet()) {
+//            //Get food map
+//            Map singleUser = (Map) entry.getValue();
+//            //Get food field and append to list
+//
+////                   ,
+//
+//
+//            Log.d(TAG, "collectSeller: " + singleUser);
+//
+        Food food = new Food();
+        food.setPushId((String) value.get(Constants.PUSH_ID));
+        food.setDishName((String) value.get(Constants.DISH_NAME));
+        food.setCuisine((String) value.get(Constants.CUISINE));
+        if (value.get(Constants.EXPIRY_TIME) != null) {
+            food.setExpiryTime((long) value.get(Constants.EXPIRY_TIME));
         }
+        food.setIngredientsTags(String.valueOf(value.get(Constants.INCIDENT_TAGS)));
+        food.setImageUri((String) value.get(Constants.IMAGE_URI));
+        food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
+        food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
+        food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+        if (value.get(Constants.TIME_STAMP) != null) {
+            food.setTime(value.get(Constants.TIME_STAMP).toString());
+        }
+        sellers.add(food);
+//
+//        }
 
     }
 }

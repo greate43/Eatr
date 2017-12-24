@@ -5,12 +5,11 @@ admin.initializeApp(functions.config().firebase)
 const ref = admin.database().ref()
 var food
   exports.checkIfTheOrderHasExpired = functions.https.onRequest((req, res) => {
+
   ref.child('Food').once('value').then(function(snapshot) {
      const currentTime = new Date().getTime()
 
      food = snapshot.val()
-     
-    
 
     const when = food.expiryTime
     const now = food.timeStamp
@@ -19,16 +18,15 @@ var food
       }
 
 
-    // res.status(200).send(food);
     }).catch(error => {
        
     this.errorMessage = 'Error - ' + error.message
-    res.status(500).send('error');
+    res.status(450).send('error')
 
   })
 
 
-  res.status(500).send(food);
+  res.status(500).send('ok')
 
 })
 

@@ -20,16 +20,16 @@ import sk.greate43.eatr.entities.Food;
  * Created by great on 11/12/2017.
  */
 
-public class SellFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
+public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder {
 
     private static final String TAG = "SellFoodRecyclerView";
-    public ImageView imgFoodItem;
+    private ImageView imgFoodItem;
     private TextView tvStatus;
     private TextView tvLocation;
     private TextView tvDishName;
     private TextView tvTimeStamp;
 
-    public SellFoodRecyclerViewHolder(View itemView) {
+    public PostedFoodRecyclerViewHolder(View itemView) {
         super(itemView);
         tvStatus = itemView.findViewById(R.id.posted_food_list_status_text_view);
         imgFoodItem = itemView.findViewById(R.id.posted_food_list_food_item_image_view);

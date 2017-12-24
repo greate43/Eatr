@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Food;
-import sk.greate43.eatr.holders.SellFoodRecyclerViewHolder;
+import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
 import sk.greate43.eatr.interfaces.SwipeListener;
 import sk.greate43.eatr.utils.Constants;
 
@@ -28,7 +28,7 @@ import sk.greate43.eatr.utils.Constants;
  * Created by great on 11/12/2017.
  */
 
-public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRecyclerViewHolder> implements SwipeListener {
+public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder> implements SwipeListener {
 
     private static final String TAG = "SellFoodRecyclerViewAda";
 
@@ -41,7 +41,7 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
     private LayoutInflater inflater;
     private SellerActivity sellerActivity;
 
-    public SellFoodRecyclerViewAdaptor(SellerActivity sellerActivity, DatabaseReference mDatabaseReference) {
+    public PostedFoodRecyclerViewAdaptor(SellerActivity sellerActivity, DatabaseReference mDatabaseReference) {
         this.sellerActivity = sellerActivity;
         inflater = sellerActivity.getLayoutInflater();
         foods = new ArrayList<>();
@@ -56,15 +56,15 @@ public class SellFoodRecyclerViewAdaptor extends RecyclerView.Adapter<SellFoodRe
     }
 
     @Override
-    public SellFoodRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PostedFoodRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.posted_food_list, parent, false);
 
 
-        return new SellFoodRecyclerViewHolder(view);
+        return new PostedFoodRecyclerViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(SellFoodRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(PostedFoodRecyclerViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
            // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
 
