@@ -78,7 +78,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_food_item_expiry_time_and_price, container, false);
@@ -126,7 +126,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                     try {
                         expiryTime = getTimeHrsFromNow(Integer.parseInt(String.valueOf(s)));
 
-                    }catch (NumberFormatException ignored){
+                    } catch (NumberFormatException ignored) {
 
                     }
                     showExpiryTime(expiryTime);
@@ -264,7 +264,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 break;
             case R.id.fragment_food_item_expiry_time_and_price_button_show_preview:
 
-                if (replaceFragment != null){
+                if (replaceFragment != null) {
 
                     showPreview(
                             food.getPushId(),
@@ -282,8 +282,6 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                             food.getImage()
                     );
                     replaceFragment.onFragmentReplaced(ShowPreviewFragment.newInstance(food));
-
-
 
 
                 }
@@ -318,13 +316,15 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 //
 //                dispatcher.mustSchedule(myJob);
 
-                getActivity().finish();
+                if (getActivity() != null) {
+                    getActivity().finish();
+                }
                 break;
         }
 
     }
 
-    private void showPreview(String pushId,String dishName, String cuisine, String ingredientsTags, String pickUpLocation, String imageUri, Map<String, String> timestamp, long expiryTime, String price, String noOfServings, double longitude, double latitude,Uri imgUri) {
+    private void showPreview(String pushId, String dishName, String cuisine, String ingredientsTags, String pickUpLocation, String imageUri, Map<String, String> timestamp, long expiryTime, String price, String noOfServings, double longitude, double latitude, Uri imgUri) {
 
         food = new Food();
         food.setPushId(pushId);
@@ -359,6 +359,18 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                         System.currentTimeMillis(),
                         DateUtils.SECOND_IN_MILLIS,
                         0)));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        database.goOnline();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        database.goOffline();
     }
 
     @Override

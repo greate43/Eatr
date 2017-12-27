@@ -83,6 +83,8 @@ public class PhoneNoVerificationFragment extends Fragment {
             mPhoneNo = getArguments().getString(ARG_PHONE_NO);
             Log.d(TAG, "onCreate: " + mPhoneNo);
         }
+        initializeCallback();
+
     }
 
     @Override
@@ -110,7 +112,6 @@ public class PhoneNoVerificationFragment extends Fragment {
             }
         });
 
-        initializeCallback();
         verificationCode(mPhoneNo, mCallbacks);
 
 
@@ -313,6 +314,7 @@ public class PhoneNoVerificationFragment extends Fragment {
      */
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         showProgressDialog();
+        assert getActivity() != null;
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
@@ -326,8 +328,8 @@ public class PhoneNoVerificationFragment extends Fragment {
                             databaseReference.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                                     showData(dataSnapshot, user.getUid());
+
                                 }
 
                                 @Override
@@ -343,14 +345,25 @@ public class PhoneNoVerificationFragment extends Fragment {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The verification code entered was invalid
-                                Toast.makeText(getActivity().getApplicationContext(), "The verification code entered was invalid", Toast.LENGTH_SHORT).show();
-
+                                if (getActivity() != null) {
+                                    Toast.makeText(getActivity().getApplicationContext(), "The verification code entered was invalid", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
                         hideProgressDialog();
                     }
                 });
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     private void showData(DataSnapshot dataSnapshot, String uid) {
@@ -363,35 +376,45 @@ public class PhoneNoVerificationFragment extends Fragment {
 
             return;
         }
-        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-            Profile profile = ds.child(uid).getValue(Profile.class);
+        if (dataSnapshot.exists()) {
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                Profile profile = ds.child(uid).getValue(Profile.class);
 
-            if (profile != null && profile.getUserId() != null) {
+                if (profile != null && profile.getUserId() != null) {
 
-                Log.d(TAG, "showData: 2 " + profile.getUserType());
+                    Log.d(TAG, "showData: 2 " + profile.getUserType());
 
 
-                String userType = String.valueOf(profile.getUserType());
-                if (userType != null) {
+                    String userType = String.valueOf(profile.getUserType());
+                    if (userType != null) {
 
-                    if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
-                        Intent intent = new Intent(getActivity(), SellerActivity.class);
-                        getActivity().startActivity(intent);
-                        getActivity().finish();
-                    } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
-                        Intent intent = new Intent(getActivity(), BuyerActivity.class);
-                        getActivity().startActivity(intent);
-                        getActivity().finish();
+                        if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
+                            if (getActivity() != null) {
+
+                                Intent intent = new Intent(getActivity(), SellerActivity.class);
+                                getActivity().startActivity(intent);
+                                getActivity().finish();
+                            }
+                        } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+                            if (getActivity() != null) {
+
+                                Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                                getActivity().startActivity(intent);
+                                getActivity().finish();
+                            }
+                        }
+
+                    }
+                } else {
+                    if (mListener != null) {
+                        mListener.onFragmentReplaced(ProfileFragment.newInstance());
                     }
 
                 }
-            } else {
-                Log.d(TAG, "showData: "+profile.getUserType());
-                if (mListener != null) {
-                    mListener.onFragmentReplaced(ProfileFragment.newInstance());
-                }
-
             }
+        } else {
+            Log.d(TAG, "onDataChange: dont exisit ");
+
         }
     }
 
