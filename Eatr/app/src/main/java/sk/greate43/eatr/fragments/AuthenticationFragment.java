@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,7 +59,7 @@ public class AuthenticationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_authentation, container, false);
@@ -70,17 +71,19 @@ public class AuthenticationFragment extends Fragment {
         databaseReference = database.getReference();
         showProgressDialog();
         hideAllUiWidgets();
-
         if (user != null) {
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
+
                     showData(dataSnapshot, user.getUid());
+
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+                    hideProgressDialog();
                     System.out.println("The read failed: " + databaseError.getCode());
                 }
             });
@@ -110,45 +113,74 @@ public class AuthenticationFragment extends Fragment {
 
     private void showData(DataSnapshot dataSnapshot, String uid) {
         if (dataSnapshot.getValue() == null) {
+
             if (mListener != null) {
                 mListener.onFragmentReplaced(ProfileFragment.newInstance());
             }
-            hideProgressDialog();
             Log.d(TAG, "showData: no value at all in database");
+
+            hideProgressDialog();
             return;
         }
-        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-            Profile profile = ds.child(uid).getValue(Profile.class);
-
-            if (profile != null && profile.getUserId() != null) {
-
-                Log.d(TAG, "showData: 2 " + profile.getUserType());
+        if (dataSnapshot.exists()) {
 
 
-                String userType = String.valueOf(profile.getUserType());
-                if (userType != null) {
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                Profile profile = ds.child(uid).getValue(Profile.class);
 
-                    if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
-                        Intent intent = new Intent(getActivity(), SellerActivity.class);
-                        getActivity().startActivity(intent);
-                        getActivity().finish();
+                if ((profile != null ? profile.getUserId() : null) != null) {
+                    Log.d(TAG, "showData: 2 " + profile.getUserType());
 
-                    } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
-                        Intent intent = new Intent(getActivity(), BuyerActivity.class);
-                        getActivity().startActivity(intent);
-                        getActivity().finish();
+
+                    String userType = String.valueOf(profile.getUserType());
+                    if (userType != null) {
+
+                        if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
+
+                            if (getActivity() != null) {
+                                Intent intent = new Intent(getActivity(), SellerActivity.class);
+                                getActivity().startActivity(intent);
+                                getActivity().finish();
+                            }
+                            hideProgressDialog();
+
+                        } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+
+                            if (getActivity() != null) {
+                                Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                                getActivity().startActivity(intent);
+                                getActivity().finish();
+                            }
+                            hideProgressDialog();
+
+                        }
+
                     }
-                    database.goOffline();
+                } else {
+                    if (mListener != null) {
+                        mListener.onFragmentReplaced(ProfileFragment.newInstance());
+                    }
+                    hideProgressDialog();
+
 
                 }
-            } else {
-                if (mListener != null) {
-                    mListener.onFragmentReplaced(ProfileFragment.newInstance());
-                }
-
             }
+        } else {
+            Log.d(TAG, "onDataChange: dont exist ");
+
         }
         hideProgressDialog();
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @Override

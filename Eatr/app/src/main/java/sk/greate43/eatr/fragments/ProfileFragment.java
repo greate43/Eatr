@@ -34,6 +34,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.utils.Constants;
@@ -155,7 +156,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType) {
-            showProgressDialog();
+        showProgressDialog();
         final StorageReference profileRef = storageRef.child(Constants.PHOTOS).child(userId).child(Constants.PROFILE).child(imgUri.getLastPathSegment());
 
         profileRef.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -175,12 +176,18 @@ public class ProfileFragment extends Fragment {
                 mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
 
                 if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
-                    Intent intent = new Intent(getActivity(), SellerActivity.class);
-                    getActivity().startActivity(intent);
-                    getActivity().finish();
+                    if (getActivity() != null) {
+                        Intent intent = new Intent(getActivity(), SellerActivity.class);
+                        getActivity().startActivity(intent);
+                        getActivity().finish();
+                    }
 
                 } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
-
+                    if (getActivity() != null) {
+                        Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                        getActivity().startActivity(intent);
+                        getActivity().finish();
+                    }
                 }
                 hideProgressDialog();
 
@@ -205,6 +212,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void selectPictureFromGalleryOrCameraDialog() {
+        assert getActivity() != null;
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(getActivity());
         pictureDialog.setTitle("Select Action");
         String[] pictureDialogItems = {
@@ -229,6 +237,7 @@ public class ProfileFragment extends Fragment {
 
 
     public void choosePhotoFromGallery() {
+        assert getActivity() != null;
         int HasReadPermission = ContextCompat.checkSelfPermission(getActivity(), READ_EXTERNAL_STORAGE);
         if (HasReadPermission != PackageManager.PERMISSION_GRANTED) {
 
@@ -245,7 +254,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void takePhotoFromCamera() {
-
+        assert getActivity() != null;
         int HasCameraPermission = ContextCompat.checkSelfPermission(getActivity(), CAMERA);
         int HasWriteExternalStoragePermPermission = ContextCompat.checkSelfPermission(getActivity(), WRITE_EXTERNAL_STORAGE);
 
@@ -261,6 +270,15 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(intent, CAMERA_RESULT);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -282,6 +300,7 @@ public class ProfileFragment extends Fragment {
 
         } else if (requestCode == CAMERA_RESULT) {
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            assert getActivity() != null;
             String pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
 
             imgUri = Uri.parse(pathOfBmp);

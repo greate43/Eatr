@@ -2,6 +2,7 @@ package sk.greate43.eatr.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_phone_no_authentication, container, false);
         etPhoneNo = view.findViewById(R.id.fragment_phone_no_et_phone_no);

@@ -2,6 +2,7 @@ package sk.greate43.eatr.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,7 +30,6 @@ import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.PostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
-import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.recyclerCustomItem.SimpleTouchCallback;
 import sk.greate43.eatr.utils.Constants;
 
@@ -39,7 +39,7 @@ public class SellFoodFragment extends Fragment {
     public static final String TAG = "SellFoodFragment";
     RecyclerView recyclerView;
     ArrayList<Food> sellers;
-    ArrayList<Profile> profiles;
+   // ArrayList<Profile> profiles;
     PostedFoodRecyclerViewAdaptor adaptor;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
@@ -54,7 +54,7 @@ public class SellFoodFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sell_food, container, false);
         recyclerView = view.findViewById(R.id.fragment_sell_food_recycler_view);
@@ -87,7 +87,6 @@ public class SellFoodFragment extends Fragment {
         SimpleTouchCallback simpleTouchCallback = new SimpleTouchCallback(adaptor);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        database.goOnline();
 
 
         mDatabaseReference.child(Constants.FOOD).child(user.getUid()).orderByChild(Constants.TIME_STAMP).addValueEventListener(new ValueEventListener() {
@@ -123,6 +122,8 @@ public class SellFoodFragment extends Fragment {
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             if (ds.getValue() != null) {
+
+
                 collectSeller((Map<String, Object>) ds.getValue());
             }
         }
@@ -133,12 +134,14 @@ public class SellFoodFragment extends Fragment {
 
 
     @Override
-    public void onStop() {
-        super.onStop();
-
-
+    public void onStart() {
+        super.onStart();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
     private void collectSeller(Map<String, Object> value) {
         Log.d(TAG, "collectSeller: " + value);
 
