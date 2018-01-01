@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -291,19 +292,27 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                     if (!etExpiryTime.getText().toString().isEmpty()) {
                         expiryTime = Long.parseLong(etExpiryTime.getText().toString());
                     }
-                    writeSellerData(
-                            food.getPushId()
-                            , food.getDishName()
-                            , food.getCuisine()
-                            , food.getIngredientsTags()
-                            , food.getPickUpLocation()
-                            , food.getImage()
-                            , Long.parseLong(etPrice.getText().toString())
-                            , expiryTime
-                            , etNumberOfServings.getText().toString()
-                            , food.getLongitude()
-                            , food.getLatitude()
-                    );
+                    if (
+                            !TextUtils.isEmpty(etNumberOfServings.getText())
+                                    && !TextUtils.isEmpty(etPrice.getText())) {
+                        writeSellerData(
+                                food.getPushId()
+                                , food.getDishName()
+                                , food.getCuisine()
+                                , food.getIngredientsTags()
+                                , food.getPickUpLocation()
+                                , food.getImage()
+                                , Long.parseLong(etPrice.getText().toString())
+                                , expiryTime
+                                , etNumberOfServings.getText().toString()
+                                , food.getLongitude()
+                                , food.getLatitude()
+                        );
+                    }else if(TextUtils.isEmpty(etNumberOfServings.getText())){
+                        etNumberOfServings.setError("Number of Servings is Empty ");
+                    }else if(TextUtils.isEmpty(etPrice.getText())){
+                        etPrice.setError("Price is Empty ");
+                    }
                 }
 
 //                FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(getActivity().getApplication()));
