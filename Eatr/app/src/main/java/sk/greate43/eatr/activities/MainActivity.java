@@ -1,3 +1,6 @@
+/**
+ * Activities Package
+ */
 package sk.greate43.eatr.activities;
 
 import android.os.Bundle;
@@ -31,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements ReplaceFragment{
         fragmentManager.beginTransaction()
                 .replace(R.id.actvivity_main_frame_layout_fragment_container, fragment)
                 .addToBackStack(null)
-                .commit();
+                .commitAllowingStateLoss();
     }
+
+
 }

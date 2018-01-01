@@ -1,28 +1,45 @@
 package sk.greate43.eatr.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
+import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
+import sk.greate43.eatr.utils.Constants;
 
 
-public class AuthenticationFragment extends Fragment implements View.OnClickListener {
+public class AuthenticationFragment extends Fragment {
 
     private static final String TAG = "AuthenticationFragment";
     FirebaseAuth mAuth;
     FirebaseUser user;
     private ReplaceFragment mListener;
+    private FirebaseDatabase database;
+    private DatabaseReference databaseReference;
+    private Button btnAuthPhoneNo;
+    private ImageView imgAppLogo;
+    private ProgressDialog mProgressDialog;
 
     public AuthenticationFragment() {
         // Required empty public constructor
@@ -42,26 +59,46 @@ public class AuthenticationFragment extends Fragment implements View.OnClickList
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_authentation, container, false);
-
+        btnAuthPhoneNo = view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
+        imgAppLogo = view.findViewById(R.id.fragment_authemtation_app_logo);
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        database = FirebaseDatabase.getInstance();
+        databaseReference = database.getReference();
+        showProgressDialog();
+        hideAllUiWidgets();
         if (user != null) {
-            Intent intent = new Intent(getActivity(), SellerActivity.class);
-            startActivity(intent);
-            getActivity().finish();
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                    showData(dataSnapshot, user.getUid());
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    hideProgressDialog();
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
+            });
+        } else {
+            hideProgressDialog();
+            showAllUiWidgets();
         }
 
-        Button btnAuthPhoneNo = view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
+
         btnAuthPhoneNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if (mListener != null) {
-                    mListener.onFragmentReplaced(PhoneNoAuthenticationFragment.newInstance());
+                    mListener.onFragmentReplaced(PhoneNoValidationFragment.newInstance());
                 }
 
             }
@@ -69,6 +106,82 @@ public class AuthenticationFragment extends Fragment implements View.OnClickList
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    private void showData(DataSnapshot dataSnapshot, String uid) {
+        if (dataSnapshot.getValue() == null) {
+
+            if (mListener != null) {
+                mListener.onFragmentReplaced(ProfileFragment.newInstance());
+            }
+            Log.d(TAG, "showData: no value at all in database");
+
+            hideProgressDialog();
+            return;
+        }
+        if (dataSnapshot.exists()) {
+
+
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                Profile profile = ds.child(uid).getValue(Profile.class);
+
+                if ((profile != null ? profile.getUserId() : null) != null) {
+                    Log.d(TAG, "showData: 2 " + profile.getUserType());
+
+
+                    String userType = String.valueOf(profile.getUserType());
+                    if (userType != null) {
+
+                        if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
+
+                            if (getActivity() != null) {
+                                Intent intent = new Intent(getActivity(), SellerActivity.class);
+                                getActivity().startActivity(intent);
+                                getActivity().finish();
+                            }
+                            hideProgressDialog();
+
+                        } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+
+                            if (getActivity() != null) {
+                                Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                                getActivity().startActivity(intent);
+                                getActivity().finish();
+                            }
+                            hideProgressDialog();
+
+                        }
+
+                    }
+                } else {
+                    if (mListener != null) {
+                        mListener.onFragmentReplaced(ProfileFragment.newInstance());
+                    }
+                    hideProgressDialog();
+
+
+                }
+            }
+        } else {
+            Log.d(TAG, "onDataChange: dont exist ");
+
+        }
+        hideProgressDialog();
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -87,10 +200,29 @@ public class AuthenticationFragment extends Fragment implements View.OnClickList
         mListener = null;
     }
 
+    private void hideAllUiWidgets() {
+        imgAppLogo.setVisibility(View.GONE);
+        btnAuthPhoneNo.setVisibility(View.GONE);
+    }
 
-    @Override
-    public void onClick(View v) {
+    private void showAllUiWidgets() {
+        imgAppLogo.setVisibility(View.VISIBLE);
+        btnAuthPhoneNo.setVisibility(View.VISIBLE);
+    }
 
+    public void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage("Loading...");
+        }
+        mProgressDialog.show();
+    }
+
+    public void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
 

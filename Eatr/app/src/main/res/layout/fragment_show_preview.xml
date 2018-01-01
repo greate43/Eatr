@@ -1,0 +1,169 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="sk.greate43.eatr.fragments.ShowPreviewFragment">
+
+
+    <ImageView
+        android:id="@+id/fragment_show_preview_image_view_food_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/bg_sample_tag"
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_lbl_food_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Food Name :"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_food_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/fragment_show_preview_text_view_lbl_food_name"
+        app:layout_constraintStart_toEndOf="@+id/fragment_show_preview_text_view_lbl_food_name"
+        tools:text="Good Food" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_lbl_cuisine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Cuisine :"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_lbl_food_name"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_lbl_food_name" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_cusine"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_food_name"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_food_name"
+        tools:text="Russion" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_lbl_pick_up_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Location :"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_lbl_cuisine"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_lbl_cuisine" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_pick_up_location"
+        android:layout_width="213dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="8dp"
+        android:textAlignment="viewStart"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_cusine"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_cusine"
+        tools:text="Sir syed Colony " />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_lbl_expiry_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Expiry Time :"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_lbl_pick_up_location"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_lbl_pick_up_location" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_expiry_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_pick_up_location"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_pick_up_location"
+        tools:text="In 2 hrs" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_lbl_no_of_servings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="No Of Servings :"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_lbl_expiry_time"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_lbl_expiry_time" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_no_of_servings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_expiry_time"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_expiry_time"
+        tools:text="2" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_lbl_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Price :"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_lbl_no_of_servings"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_lbl_no_of_servings" />
+
+    <TextView
+        android:id="@+id/fragment_show_preview_text_view_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="2 PKR"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_show_preview_text_view_no_of_servings"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_show_preview_text_view_no_of_servings" />
+
+    <Button
+        android:id="@+id/fragment_show_preview_button_return"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</android.support.constraint.ConstraintLayout>
