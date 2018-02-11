@@ -373,13 +373,11 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     @Override
     public void onStart() {
         super.onStart();
-        database.goOnline();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        database.goOffline();
     }
 
     @Override
