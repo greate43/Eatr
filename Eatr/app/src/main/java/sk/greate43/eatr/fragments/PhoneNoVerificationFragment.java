@@ -258,7 +258,6 @@ public class PhoneNoVerificationFragment extends Fragment {
     /**
      * @return Returns a token
      */
-    @Contract(pure = true)
     public PhoneAuthProvider.ForceResendingToken getToken() {
         return mResendToken;
     }
@@ -405,7 +404,8 @@ public class PhoneNoVerificationFragment extends Fragment {
                         }
 
                     }
-                } else {
+                }
+                else {
                     if (mListener != null) {
                         mListener.onFragmentReplaced(ProfileFragment.newInstance());
                     }
@@ -413,7 +413,7 @@ public class PhoneNoVerificationFragment extends Fragment {
                 }
             }
         } else {
-            Log.d(TAG, "onDataChange: dont exisit ");
+            Log.d(TAG, "onDataChange: dent exist ");
 
         }
     }
