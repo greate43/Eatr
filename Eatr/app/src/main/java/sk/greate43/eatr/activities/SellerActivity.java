@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.fragments.SellFoodFragment;
+import sk.greate43.eatr.fragments.PostedFoodFragment;
 
 public class SellerActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
@@ -29,7 +29,7 @@ public class SellerActivity extends AppCompatActivity {
                     FragmentManager fragmentManager = getSupportFragmentManager();
 
                     fragmentManager.beginTransaction()
-                            .replace(R.id.activity_seller_fragment_container, SellFoodFragment.newInstance())
+                            .replace(R.id.activity_seller_fragment_container, PostedFoodFragment.newInstance())
                             .addToBackStack(null)
                             .commit();
                     return true;

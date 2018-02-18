@@ -11,15 +11,12 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -27,9 +24,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Map;
 
 import sk.greate43.eatr.R;
@@ -152,68 +149,21 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
     private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri, final long price, final long expiryTime, final String numberOfServings, final double longitude, final double latitude) {
 
-        StorageReference sellerRef = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
-
-        sellerRef.putFile(imgUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
-
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
-
-                        food = new Food();
-                        food.setPushId(pushId);
-                        food.setDishName(dishName);
-                        food.setCuisine(cuisine);
-                        food.setIngredientsTags(ingredientsTags);
-                        food.setPickUpLocation(pickUpLocation);
-                        food.setImageUri(downloadUrl);
-                        food.setTimeStamp(ServerValue.TIMESTAMP);
-                        food.setExpiryTime(expiryTime);
-                        food.setPrice(price);
-                        food.setNumberOfServings(Long.parseLong(numberOfServings));
-                        food.setCheckIfOrderIsActive(true);
-                        food.setCheckIfFoodIsInDraftMode(false);
-
-                        food.setLongitude(longitude);
-                        food.setLatitude(latitude);
-                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
-
-
-                    }
-
-
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        food = new Food();
-                        food.setDishName(pushId);
-                        food.setCuisine(cuisine);
-                        food.setIngredientsTags(ingredientsTags);
-                        food.setPickUpLocation(pickUpLocation);
-                        food.setImageUri("");
-                        food.setTimeStamp(ServerValue.TIMESTAMP);
-                        food.setExpiryTime(expiryTime);
-                        food.setPrice(price);
-                        food.setNumberOfServings(Long.parseLong(numberOfServings));
-                        food.setCheckIfOrderIsActive(true);
-                        food.setCheckIfFoodIsInDraftMode(false);
-                        food.setLongitude(longitude);
-                        food.setLatitude(latitude);
-                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(dishName).setValue(food);
-                        Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
-
-
-                    }
-                });
+        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).updateChildren(toMap(pushId, price, numberOfServings, expiryTime));
 
 
     }
 
+    public Map<String, Object> toMap(String pushId, long price, String numberOfServings, long expiryTime) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("pushId", pushId);
+        result.put("price", price);
+        result.put("numberOfServings", numberOfServings);
+        result.put("expiryTime", expiryTime);
+        result.put("checkIfOrderIsActive",true);
+        result.put("checkIfFoodIsInDraftMode",false);
+        return result;
+    }
 
     @Override
     public void onClick(View v) {
@@ -292,6 +242,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                     if (!etExpiryTime.getText().toString().isEmpty()) {
                         expiryTime = Long.parseLong(etExpiryTime.getText().toString());
                     }
+
                     if (
                             !TextUtils.isEmpty(etNumberOfServings.getText())
                                     && !TextUtils.isEmpty(etPrice.getText())) {
@@ -301,16 +252,16 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                                 , food.getCuisine()
                                 , food.getIngredientsTags()
                                 , food.getPickUpLocation()
-                                , food.getImage()
+                                , Uri.parse(food.getImageUri())
                                 , Long.parseLong(etPrice.getText().toString())
                                 , expiryTime
                                 , etNumberOfServings.getText().toString()
                                 , food.getLongitude()
                                 , food.getLatitude()
                         );
-                    }else if(TextUtils.isEmpty(etNumberOfServings.getText())){
+                    } else if (TextUtils.isEmpty(etNumberOfServings.getText())) {
                         etNumberOfServings.setError("Number of Servings is Empty ");
-                    }else if(TextUtils.isEmpty(etPrice.getText())){
+                    } else if (TextUtils.isEmpty(etPrice.getText())) {
                         etPrice.setError("Price is Empty ");
                     }
                 }
