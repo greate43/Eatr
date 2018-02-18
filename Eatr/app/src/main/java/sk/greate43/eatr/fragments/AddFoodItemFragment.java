@@ -48,7 +48,10 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -98,12 +101,15 @@ public class AddFoodItemFragment extends Fragment implements
     private double latitude;
     private String pushId;
 
-
     public static AddFoodItemFragment newInstance() {
-//        Bundle args = new Bundle();
-//        args.putSerializable(ADD_FOOD_ITEM_FRAGMENTS, food);
+        return new AddFoodItemFragment();
+    }
+
+    public static AddFoodItemFragment newInstance(Food food) {
+        Bundle args = new Bundle();
+        args.putSerializable(Constants.ARGS_FOOD, food);
         AddFoodItemFragment addFoodItemFragment = new AddFoodItemFragment();
-        //addFoodItemFragment.setArguments(args);
+        addFoodItemFragment.setArguments(args);
         return addFoodItemFragment;
     }
 
@@ -173,10 +179,28 @@ public class AddFoodItemFragment extends Fragment implements
 
 
         if (food != null) {
-            imgChooseImage.setImageURI(imgUri);
-            imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            if (getActivity() != null && food.getImageUri() != null && !food.getImageUri().isEmpty()) {
+                Picasso.with(getActivity())
+                        .load(food.getImageUri())
+                        .fit()
+                        .centerCrop()
+                        .into(imgChooseImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "onSuccess: ");
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+            }
             etIncidentsTags.addTag(food.getIngredientsTags());
             pushId = String.valueOf(food.getPushId());
+            etDishName.setText(food.getDishName());
+            etCuisine.setText(food.getCuisine());
+            etPickLocation.setText(food.getPickUpLocation());
 
         } else {
             pushId = String.valueOf(mDatabaseReference.push().getKey());
@@ -331,7 +355,7 @@ public class AddFoodItemFragment extends Fragment implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        assert getActivity() !=null;
+        assert getActivity() != null;
         int HasFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), ACCESS_FINE_LOCATION);
 
         if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
@@ -391,78 +415,88 @@ public class AddFoodItemFragment extends Fragment implements
     private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri, final double longitude, final double latitude) {
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
-        Log.d(TAG, "writeSellerData: " + user.getUid());
-        StorageReference sellerRef = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
-        sellerRef.putFile(imgUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        // Get the data from an ImageView as bytes
+        imgChooseImage.setDrawingCacheEnabled(true);
+        imgChooseImage.buildDrawingCache();
+        Bitmap bitmap = imgChooseImage.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(pushId).putBytes(data);
+
+        //     storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
 
 
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Get a URL to the uploaded content
-                        String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
+      //  storageRef.putFile(imgUri)
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
 
-                        food = new Food();
-                        food.setPushId(pushId);
-                        food.setDishName(dishName);
-                        food.setCuisine(cuisine);
-                        food.setIngredientsTags(ingredientsTags);
-                        food.setPickUpLocation(pickUpLocation);
-                        food.setImageUri(downloadUrl);
-                        food.setImage(imgUri);
-                        food.setLongitude(longitude);
-                        food.setLatitude(latitude);
-                        food.setCheckIfFoodIsInDraftMode(true);
-                        food.setTimeStamp(ServerValue.TIMESTAMP);
-                        Log.d(TAG, "writeSellerData: " + user.getUid());
+                food = new Food();
+                food.setPushId(pushId);
+                food.setDishName(dishName);
+                food.setCuisine(cuisine);
+                food.setIngredientsTags(ingredientsTags);
+                food.setPickUpLocation(pickUpLocation);
+                food.setImageUri("");
+                food.setLongitude(longitude);
+                food.setLatitude(latitude);
+                food.setCheckIfFoodIsInDraftMode(true);
+                food.setTimeStamp(ServerValue.TIMESTAMP);
 
-                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
-                        if (dialogUploadingImage.isShowing()) {
-                            dialogUploadingImage.dismiss();
-                        }
-
-                        if (replaceFragment != null) {
-
-
-                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
-                        }
+                mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
+                Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                if (dialogUploadingImage.isShowing()) {
+                    dialogUploadingImage.dismiss();
+                }
+                if (replaceFragment != null) {
 
 
-                    }
+                    replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                }
+
+                //  getActivity().finish();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                // Get a URL to the uploaded content
+
+                food = new Food();
+                food.setPushId(pushId);
+                food.setDishName(dishName);
+                food.setCuisine(cuisine);
+                food.setIngredientsTags(ingredientsTags);
+                food.setPickUpLocation(pickUpLocation);
+                food.setImageUri(String.valueOf(downloadUrl));
+                food.setImage(imgUri);
+                food.setLongitude(longitude);
+                food.setLatitude(latitude);
+                food.setCheckIfFoodIsInDraftMode(true);
+                food.setTimeStamp(ServerValue.TIMESTAMP);
+                Log.d(TAG, "writeSellerData: " + user.getUid());
+
+                mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
+                if (dialogUploadingImage.isShowing()) {
+                    dialogUploadingImage.dismiss();
+                }
+
+                if (replaceFragment != null) {
 
 
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        food = new Food();
-                        food.setPushId(pushId);
-                        food.setDishName(dishName);
-                        food.setCuisine(cuisine);
-                        food.setIngredientsTags(ingredientsTags);
-                        food.setPickUpLocation(pickUpLocation);
-                        food.setImageUri("");
-                        food.setLongitude(longitude);
-                        food.setLatitude(latitude);
-                        food.setCheckIfFoodIsInDraftMode(true);
-                        food.setTimeStamp(ServerValue.TIMESTAMP);
-
-                        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
-                        Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
-                        if (dialogUploadingImage.isShowing()) {
-                            dialogUploadingImage.dismiss();
-                        }
-                        if (replaceFragment != null) {
+                    replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                }
 
 
-                            replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
-                        }
+            }
 
-                        //  getActivity().finish();
 
-                    }
-                });
+        });
+
 
 
     }
@@ -549,6 +583,11 @@ public class AddFoodItemFragment extends Fragment implements
                 break;
             case R.id.fragment_add_food_item_button_share_food:
 
+                if (food != null && food.getImageUri() != null && !food.getImageUri().isEmpty())  {
+                    imgUri = Uri.parse(food.getImageUri());
+                }
+
+
                 if (
                         !TextUtils.isEmpty(etDishName.getText().toString())
                                 && !TextUtils.isEmpty(etCuisine.getText().toString())
@@ -556,6 +595,8 @@ public class AddFoodItemFragment extends Fragment implements
                                 && !TextUtils.isEmpty(etPickLocation.getText().toString())
                                 && imgUri != null
                         ) {
+
+
                     writeSellerData(
                             pushId
                             , etDishName.getText().toString()
@@ -565,6 +606,8 @@ public class AddFoodItemFragment extends Fragment implements
                             , imgUri
                             , longitude
                             , latitude);
+
+
                 } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
                     etDishName.setError("Dish Name is Empty  ");
                 } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {

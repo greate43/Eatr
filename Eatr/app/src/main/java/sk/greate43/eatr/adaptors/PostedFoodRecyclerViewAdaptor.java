@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.fragments.PostedFoodFragment;
 import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
 import sk.greate43.eatr.interfaces.SwipeListener;
 import sk.greate43.eatr.utils.Constants;
@@ -28,26 +29,25 @@ import sk.greate43.eatr.utils.Constants;
  * Created by great on 11/12/2017.
  */
 
-public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder> implements SwipeListener {
+public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder>  {
 
     private static final String TAG = "SellFoodRecyclerViewAda";
 
 
-    DatabaseReference mDatabaseReference;
-    private StorageReference storageReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private ArrayList<Food> foods;
     private LayoutInflater inflater;
     private SellerActivity sellerActivity;
+    private PostedFoodFragment postedFoodFragment;
 
-    public PostedFoodRecyclerViewAdaptor(SellerActivity sellerActivity, DatabaseReference mDatabaseReference) {
+    public PostedFoodRecyclerViewAdaptor(SellerActivity sellerActivity, PostedFoodFragment postedFoodFragment) {
         this.sellerActivity = sellerActivity;
         inflater = sellerActivity.getLayoutInflater();
         foods = new ArrayList<>();
-        this.mDatabaseReference = mDatabaseReference;
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        this.postedFoodFragment = postedFoodFragment;
 
     }
 
@@ -66,11 +66,11 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     @Override
     public void onBindViewHolder(PostedFoodRecyclerViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
-           // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
+            // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
 
         } else {
 
-            holder.populate(sellerActivity, foods.get(position));
+            holder.populate(sellerActivity, foods.get(position),postedFoodFragment,position);
         }
     }
 
@@ -101,34 +101,9 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         return super.getItemViewType(position);
     }
 
-    @Override
-    public void onSwipe(int position) {
-        if (!foods.isEmpty()) {
-            Log.d(TAG, "onSwipe: " + position);
-            Log.d(TAG, "onSwipe: " + foods.get(position).getPushId());
-            mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(foods.get(position).getPushId()).removeValue();
-            storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(foods.get(position).getImageUri());
 
-            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    // File deleted successfully
-                    Log.d(TAG, "onSuccess: deleted file");
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Uh-oh, an error occurred!
-                    Log.d(TAG, "onFailure: did not delete file");
-                }
-            });
-            removeItem(position);
 
-        }
-
-    }
-
-    private void removeItem(int position) {
+    public void removeItem(int position) {
         foods.remove(position);
         // notify the item removed by position
         // to perform recycler view delete animations

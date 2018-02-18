@@ -8,12 +8,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,6 +23,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -30,25 +34,26 @@ import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.PostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
-import sk.greate43.eatr.recyclerCustomItem.SimpleTouchCallback;
+import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
 import sk.greate43.eatr.utils.Constants;
 
 
-public class SellFoodFragment extends Fragment {
+public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerViewHolder.EditPostedFood {
 
-    public static final String TAG = "SellFoodFragment";
+    public static final String TAG = "PostedFoodFragment";
     RecyclerView recyclerView;
-    ArrayList<Food> sellers;
-   // ArrayList<Profile> profiles;
+    ArrayList<Food> foods;
+    // ArrayList<Profile> profiles;
     PostedFoodRecyclerViewAdaptor adaptor;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private StorageReference storageReference;
 
 
-    public static SellFoodFragment newInstance() {
-        SellFoodFragment fragment = new SellFoodFragment();
+    public static PostedFoodFragment newInstance() {
+        PostedFoodFragment fragment = new PostedFoodFragment();
 
         return fragment;
     }
@@ -73,20 +78,23 @@ public class SellFoodFragment extends Fragment {
             }
         });
 
-        adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), mDatabaseReference);
+        adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), this);
         adaptor.setHasStableIds(true);
 
-        sellers = adaptor.getFoods();
+        foods = adaptor.getFoods();
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
+
+
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        SimpleTouchCallback simpleTouchCallback = new SimpleTouchCallback(adaptor);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+//        SimpleTouchCallback simpleTouchCallback = new SimpleTouchCallback(adaptor);
+//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
+//        itemTouchHelper.attachToRecyclerView(recyclerView);
 
 
         mDatabaseReference.child(Constants.FOOD).child(user.getUid()).orderByChild(Constants.TIME_STAMP).addValueEventListener(new ValueEventListener() {
@@ -103,12 +111,8 @@ public class SellFoodFragment extends Fragment {
         });
 
 
-
         return view;
     }
-
-
-
 
 
     private void showData(DataSnapshot dataSnapshot) {
@@ -142,6 +146,7 @@ public class SellFoodFragment extends Fragment {
     public void onStop() {
         super.onStop();
     }
+
     private void collectSeller(Map<String, Object> value) {
         Log.d(TAG, "collectSeller: " + value);
 
@@ -172,10 +177,47 @@ public class SellFoodFragment extends Fragment {
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
         }
-        sellers.add(food);
+        foods.add(food);
 //
 //        }
 
+    }
+
+
+    @Override
+    public void onEdit(Food food, int position) {
+        if (getActivity() != null) {
+            Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
+            intent.putExtra(Constants.ARGS_FOOD,food);
+            startActivity(intent);
+
+        }
+        Toast.makeText(getActivity(), "Edit ", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDelete(Food food, int position) {
+        if (food != null) {
+            mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(foods.get(position).getPushId()).removeValue();
+            storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(foods.get(position).getImageUri());
+
+            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Log.d(TAG, "onSuccess: deleted file");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "onFailure: did not delete file");
+                }
+            });
+            Toast.makeText(getActivity(), "Deleted " + food.getPushId(), Toast.LENGTH_SHORT).show();
+
+            adaptor.removeItem(position);
+        }
     }
 }
 
