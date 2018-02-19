@@ -35,8 +35,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.jetbrains.annotations.Contract;
-
 import java.util.concurrent.TimeUnit;
 
 import sk.greate43.eatr.R;
@@ -404,8 +402,7 @@ public class PhoneNoVerificationFragment extends Fragment {
                         }
 
                     }
-                }
-                else {
+                } else {
                     if (mListener != null) {
                         mListener.onFragmentReplaced(ProfileFragment.newInstance());
                     }

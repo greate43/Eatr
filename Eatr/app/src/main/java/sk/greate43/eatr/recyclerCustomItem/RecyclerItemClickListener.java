@@ -16,14 +16,6 @@ import android.view.View;
 public class RecyclerItemClickListener extends SimpleOnItemTouchListener {
 
     private static final String TAG = "RecyclerItemClick";
-
-    public interface OnRecyclerClickListenier {
-        void OnItemClick(View v, int position);
-
-        void OnItemLongClick(View v, int position);
-
-    }
-
     private final OnRecyclerClickListenier mListener;
     private final GestureDetectorCompat mDetectorCompat;
 
@@ -64,6 +56,13 @@ public class RecyclerItemClickListener extends SimpleOnItemTouchListener {
             return false;
         }
         return false;
+    }
+
+    public interface OnRecyclerClickListenier {
+        void OnItemClick(View v, int position);
+
+        void OnItemLongClick(View v, int position);
+
     }
 }
 

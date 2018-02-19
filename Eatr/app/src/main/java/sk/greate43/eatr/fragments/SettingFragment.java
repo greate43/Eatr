@@ -1,7 +1,5 @@
 package sk.greate43.eatr.fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,8 +10,6 @@ import sk.greate43.eatr.R;
 
 
 public class SettingFragment extends Fragment {
-
-
 
 
     public SettingFragment() {

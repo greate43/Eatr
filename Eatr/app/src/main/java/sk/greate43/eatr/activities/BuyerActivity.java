@@ -61,6 +61,10 @@ public class BuyerActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.activity_buyer_fragment_container, ListOfAllPostedFoodFragment.newInstance())
+                .commit();
 
         BottomNavigationView navigation = findViewById(R.id.activity_buyer_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
