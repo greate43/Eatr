@@ -160,8 +160,8 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         result.put("price", price);
         result.put("numberOfServings", numberOfServings);
         result.put("expiryTime", expiryTime);
-        result.put("checkIfOrderIsActive",true);
-        result.put("checkIfFoodIsInDraftMode",false);
+        result.put("checkIfOrderIsActive", true);
+        result.put("checkIfFoodIsInDraftMode", false);
         return result;
     }
 

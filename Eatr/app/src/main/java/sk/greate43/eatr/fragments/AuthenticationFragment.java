@@ -177,7 +177,7 @@ public class AuthenticationFragment extends Fragment {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                        showData(dataSnapshot, user.getUid());
+                                    showData(dataSnapshot, user.getUid());
 
                                 }
 
@@ -247,8 +247,7 @@ public class AuthenticationFragment extends Fragment {
                         }
 
                     }
-                }
-                else {
+                } else {
                     if (mListener != null) {
                         mListener.onFragmentReplaced(ProfileFragment.newInstance());
                     }

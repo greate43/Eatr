@@ -28,7 +28,7 @@ public interface Constants {
     String NO_OF_SERVINGS = "numberOfServings";
     String LONGITUDE = "longitude";
     String LATITUDE = "latitude";
-    String CHECK_IF_ORDER_Is_PURCHASED = "checkIfOrderPurchased";
+    String CHECK_IF_ORDER_Is_PURCHASED = "checkIfOrderIsPurchased";
     //Food Constants
 
 

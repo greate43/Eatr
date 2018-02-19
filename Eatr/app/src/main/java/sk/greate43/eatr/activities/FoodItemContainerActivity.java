@@ -26,7 +26,7 @@ public class FoodItemContainerActivity extends AppCompatActivity implements Repl
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (food != null) {
-            Log.d(TAG, "onCreate: "+food.getPushId());
+            Log.d(TAG, "onCreate: " + food.getPushId());
             fragmentManager.beginTransaction()
                     .add(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance(food))
                     .commit();

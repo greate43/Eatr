@@ -171,13 +171,14 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         }
         food.setIngredientsTags(String.valueOf(value.get(Constants.INCIDENT_TAGS)));
         food.setImageUri((String) value.get(Constants.IMAGE_URI));
-        food.setPrice((long)value.get(Constants.PRICE));
+        food.setPrice((long) value.get(Constants.PRICE));
         food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
-        food.setLatitude((double)value.get(Constants.LATITUDE));
-        food.setLongitude((double)value.get(Constants.LONGITUDE));
+        food.setLatitude((double) value.get(Constants.LATITUDE));
+        food.setLongitude((double) value.get(Constants.LONGITUDE));
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
         food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
         }
@@ -192,7 +193,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
     public void onEdit(Food food, int position) {
         if (getActivity() != null) {
             Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
-            intent.putExtra(Constants.ARGS_FOOD,food);
+            intent.putExtra(Constants.ARGS_FOOD, food);
             startActivity(intent);
 
         }
