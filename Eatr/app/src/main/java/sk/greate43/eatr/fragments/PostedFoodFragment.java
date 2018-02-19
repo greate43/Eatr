@@ -61,14 +61,14 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_sell_food, container, false);
-        recyclerView = view.findViewById(R.id.fragment_sell_food_recycler_view);
+        View view = inflater.inflate(R.layout.fragment_posted_food, container, false);
+        recyclerView = view.findViewById(R.id.fragment_posted_food_recycler_view);
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
 
-        FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_sell_food_add_food_item_btn);
+        FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_posted_food_add_food_item_btn);
         addFoodItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,6 +171,10 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         }
         food.setIngredientsTags(String.valueOf(value.get(Constants.INCIDENT_TAGS)));
         food.setImageUri((String) value.get(Constants.IMAGE_URI));
+        food.setPrice((long)value.get(Constants.PRICE));
+        food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
+        food.setLatitude((double)value.get(Constants.LATITUDE));
+        food.setLongitude((double)value.get(Constants.LONGITUDE));
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
         food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));

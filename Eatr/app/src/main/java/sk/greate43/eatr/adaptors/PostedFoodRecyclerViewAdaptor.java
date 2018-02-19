@@ -1,19 +1,9 @@
 package sk.greate43.eatr.adaptors;
 
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -22,20 +12,16 @@ import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.fragments.PostedFoodFragment;
 import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
-import sk.greate43.eatr.interfaces.SwipeListener;
-import sk.greate43.eatr.utils.Constants;
 
 /**
  * Created by great on 11/12/2017.
  */
 
-public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder>  {
+public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder> {
 
     private static final String TAG = "SellFoodRecyclerViewAda";
 
 
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
     private ArrayList<Food> foods;
     private LayoutInflater inflater;
     private SellerActivity sellerActivity;
@@ -45,8 +31,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         this.sellerActivity = sellerActivity;
         inflater = sellerActivity.getLayoutInflater();
         foods = new ArrayList<>();
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
         this.postedFoodFragment = postedFoodFragment;
 
     }
@@ -70,7 +54,7 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
 
         } else {
 
-            holder.populate(sellerActivity, foods.get(position),postedFoodFragment,position);
+            holder.populate(sellerActivity, foods.get(position), postedFoodFragment, position);
         }
     }
 
@@ -100,7 +84,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     public int getItemViewType(int position) {
         return super.getItemViewType(position);
     }
-
 
 
     public void removeItem(int position) {
