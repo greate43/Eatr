@@ -33,6 +33,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
@@ -157,9 +159,18 @@ public class ProfileFragment extends Fragment {
 
     private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType) {
         showProgressDialog();
-        final StorageReference profileRef = storageRef.child(Constants.PHOTOS).child(userId).child(Constants.PROFILE).child(imgUri.getLastPathSegment());
 
-        profileRef.putFile(imgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        imgProfilePicture.setDrawingCacheEnabled(true);
+        imgProfilePicture.buildDrawingCache();
+        Bitmap bitmap = imgProfilePicture.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+
+        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(userId).child(Constants.PROFILE).child(userId).putBytes(data);
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
 
             @Override

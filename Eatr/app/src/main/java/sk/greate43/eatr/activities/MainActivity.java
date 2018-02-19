@@ -13,7 +13,7 @@ import sk.greate43.eatr.fragments.AuthenticationFragment;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
 
 
-public class MainActivity extends AppCompatActivity implements ReplaceFragment{
+public class MainActivity extends AppCompatActivity implements ReplaceFragment {
 
 
     @Override

@@ -21,6 +21,7 @@ public class PostedFoodHeaderHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "PostedFoodHeaderHolder";
     ImageView imgProfilePic;
     TextView tvName;
+
     public PostedFoodHeaderHolder(View itemView) {
         super(itemView);
         imgProfilePic = itemView.findViewById(R.id.posted_food_header_profile_picture);
@@ -47,8 +48,8 @@ public class PostedFoodHeaderHolder extends RecyclerView.ViewHolder {
                     });
         }
 
-        tvName.setText(profile.getFirstName()+" "+profile.getLastName());
+        tvName.setText(profile.getFirstName() + " " + profile.getLastName());
 
     }
 
-    }
+}

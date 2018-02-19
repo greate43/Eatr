@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.fragments.SellFoodFragment;
+import sk.greate43.eatr.fragments.PostedFoodFragment;
 
 public class SellerActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
@@ -25,17 +25,17 @@ public class SellerActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.navigation_seller_home:
                     FragmentManager fragmentManager = getSupportFragmentManager();
 
                     fragmentManager.beginTransaction()
-                            .replace(R.id.activity_seller_fragment_container, SellFoodFragment.newInstance())
+                            .replace(R.id.activity_seller_fragment_container, PostedFoodFragment.newInstance())
                             .addToBackStack(null)
                             .commit();
                     return true;
-                case R.id.navigation_dashboard:
+                case R.id.navigation_seller_dashboard:
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navigation_seller_notifications:
                     return true;
             }
             return false;
@@ -50,7 +50,7 @@ public class SellerActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
-        BottomNavigationView navigation = findViewById(R.id.navigation);
+        BottomNavigationView navigation = findViewById(R.id.activity_seller_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
