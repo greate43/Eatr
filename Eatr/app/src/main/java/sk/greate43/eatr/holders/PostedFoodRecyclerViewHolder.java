@@ -29,6 +29,13 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
     Food food;
     //ADD AN ONMENUITEM LISTENER TO EXECUTE COMMANDS ONCLICK OF CONTEXT MENU TASK
     private EditPostedFood editPostedFood;
+    private ImageView imgFoodItem;
+    private TextView tvStatus;
+    private TextView tvLocation;
+    private TextView tvDishName;
+    private TextView tvTimeStamp;
+    private TextView tvPrice;
+    private int position;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
@@ -37,13 +44,13 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
             switch (item.getItemId()) {
                 case 1:
                     if (editPostedFood != null) {
-                        editPostedFood.onEdit(food,position);
+                        editPostedFood.onEdit(food, position);
                     }
                     break;
 
                 case 2:
                     if (editPostedFood != null) {
-                        editPostedFood.onDelete(food,position);
+                        editPostedFood.onDelete(food, position);
                     }
 
                     break;
@@ -51,12 +58,6 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
             return true;
         }
     };
-    private ImageView imgFoodItem;
-    private TextView tvStatus;
-    private TextView tvLocation;
-    private TextView tvDishName;
-    private TextView tvTimeStamp;
-    private int position;
 
     public PostedFoodRecyclerViewHolder(View itemView) {
         super(itemView);
@@ -66,7 +67,7 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
         tvLocation = itemView.findViewById(R.id.posted_food_list_location_text_view);
         tvDishName = itemView.findViewById(R.id.posted_food_list_food_item_dish_name);
         tvTimeStamp = itemView.findViewById(R.id.posted_food_list_food_item_timeStamp);
-
+        tvPrice = itemView.findViewById(R.id.posted_food_list_item_price_text_view);
 
     }
 
@@ -106,6 +107,7 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
             tvStatus.setText("Expired");
 
         }
+        tvPrice.setText(String.valueOf("Rs : "+food.getPrice()));
         tvLocation.setText(food.getPickUpLocation());
         if (food.getTime() != null && !food.getTime().isEmpty()) {
             tvTimeStamp.setText(DateUtils

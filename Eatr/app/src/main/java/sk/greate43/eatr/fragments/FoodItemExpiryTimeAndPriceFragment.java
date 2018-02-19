@@ -147,14 +147,14 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         return view;
     }
 
-    private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, Uri imgUri, final long price, final long expiryTime, final String numberOfServings, final double longitude, final double latitude) {
+    private void writeSellerData(final String pushId, final long price, final long expiryTime, final long numberOfServings) {
 
         mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).updateChildren(toMap(pushId, price, numberOfServings, expiryTime));
 
 
     }
 
-    public Map<String, Object> toMap(String pushId, long price, String numberOfServings, long expiryTime) {
+    public Map<String, Object> toMap(String pushId, long price, long numberOfServings, long expiryTime) {
         HashMap<String, Object> result = new HashMap<>();
         result.put("pushId", pushId);
         result.put("price", price);
@@ -248,16 +248,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                                     && !TextUtils.isEmpty(etPrice.getText())) {
                         writeSellerData(
                                 food.getPushId()
-                                , food.getDishName()
-                                , food.getCuisine()
-                                , food.getIngredientsTags()
-                                , food.getPickUpLocation()
-                                , Uri.parse(food.getImageUri())
                                 , Long.parseLong(etPrice.getText().toString())
                                 , expiryTime
-                                , etNumberOfServings.getText().toString()
-                                , food.getLongitude()
-                                , food.getLatitude()
+                                , Long.parseLong(etNumberOfServings.getText().toString())
                         );
                     } else if (TextUtils.isEmpty(etNumberOfServings.getText())) {
                         etNumberOfServings.setError("Number of Servings is Empty ");

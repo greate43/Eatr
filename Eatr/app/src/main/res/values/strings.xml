@@ -34,6 +34,16 @@
 
     <string name="user_type_prompt">Choose a User Type</string>
 
+    <!--
+     navigation buyer
+     -->
+    <string name="navigation_buyer_buy">Buy</string>
+    <string name="navigation_buyer_history">History</string>
+    <string name="navigation_buyer_settings">Settings</string>
+    <!--
+        navigation buyer
+        -->
+
     <string-array name="user_type_arrays">
         <item>Buyer</item>
         <item>Seller</item>

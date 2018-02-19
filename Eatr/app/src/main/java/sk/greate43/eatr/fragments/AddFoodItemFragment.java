@@ -100,6 +100,12 @@ public class AddFoodItemFragment extends Fragment implements
     private double longitude;
     private double latitude;
     private String pushId;
+    private long price = 0;
+    private long numberOfServings = 0;
+    private long expiryTime = 0;
+    private boolean checkIfOrderIsActive = false;
+    private boolean checkIfFoodIsInDraftMode = true;
+
 
     public static AddFoodItemFragment newInstance() {
         return new AddFoodItemFragment();
@@ -196,11 +202,25 @@ public class AddFoodItemFragment extends Fragment implements
                             }
                         });
             }
+            String tags;
+            if (food.getIngredientsTags().contains("[") || food.getIngredientsTags().contains("]")) {
+                tags = food.getIngredientsTags().replace("[", "");
+            }
+
             etIncidentsTags.addTag(food.getIngredientsTags());
             pushId = String.valueOf(food.getPushId());
             etDishName.setText(food.getDishName());
             etCuisine.setText(food.getCuisine());
             etPickLocation.setText(food.getPickUpLocation());
+            price = food.getPrice();
+
+            Log.d(TAG, "onCreateView:p1 "+food.getPrice());
+            Log.d(TAG, "onCreateView:p2 "+price);
+
+            numberOfServings = food.getNumberOfServings();
+            expiryTime = food.getExpiryTime();
+            checkIfFoodIsInDraftMode = food.getCheckIfFoodIsInDraftMode();
+            checkIfOrderIsActive = food.getCheckIfOrderIsActive();
 
         } else {
             pushId = String.valueOf(mDatabaseReference.push().getKey());
@@ -412,7 +432,8 @@ public class AddFoodItemFragment extends Fragment implements
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
-    private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri, final double longitude, final double latitude) {
+    private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri, final double longitude, final double latitude, final long price, final long numberOfServings, final long expiryTime, final boolean checkIfFoodIsInDraftMode, final boolean checkIfOrderIsActive) {
+
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
         // Get the data from an ImageView as bytes
@@ -428,7 +449,7 @@ public class AddFoodItemFragment extends Fragment implements
         //     storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
 
 
-      //  storageRef.putFile(imgUri)
+        //  storageRef.putFile(imgUri)
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -443,8 +464,12 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setImageUri("");
                 food.setLongitude(longitude);
                 food.setLatitude(latitude);
-                food.setCheckIfFoodIsInDraftMode(true);
+                food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
                 food.setTimeStamp(ServerValue.TIMESTAMP);
+                food.setCheckIfOrderIsActive(checkIfOrderIsActive);
+                food.setPrice(price);
+                food.setNumberOfServings(numberOfServings);
+                food.setExpiryTime(expiryTime);
 
                 mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
                 Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
@@ -476,9 +501,12 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setImage(imgUri);
                 food.setLongitude(longitude);
                 food.setLatitude(latitude);
-                food.setCheckIfFoodIsInDraftMode(true);
+                food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
                 food.setTimeStamp(ServerValue.TIMESTAMP);
-                Log.d(TAG, "writeSellerData: " + user.getUid());
+                food.setCheckIfOrderIsActive(checkIfOrderIsActive);
+                food.setPrice(price);
+                food.setNumberOfServings(numberOfServings);
+                food.setExpiryTime(expiryTime);
 
                 mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
                 if (dialogUploadingImage.isShowing()) {
@@ -496,7 +524,6 @@ public class AddFoodItemFragment extends Fragment implements
 
 
         });
-
 
 
     }
@@ -583,7 +610,8 @@ public class AddFoodItemFragment extends Fragment implements
                 break;
             case R.id.fragment_add_food_item_button_share_food:
 
-                if (food != null && food.getImageUri() != null && !food.getImageUri().isEmpty())  {
+
+                if (food != null && food.getImageUri() != null && !food.getImageUri().isEmpty()) {
                     imgUri = Uri.parse(food.getImageUri());
                 }
 
@@ -605,7 +633,14 @@ public class AddFoodItemFragment extends Fragment implements
                             , etPickLocation.getText().toString()
                             , imgUri
                             , longitude
-                            , latitude);
+                            , latitude
+                            , price
+                            , numberOfServings
+                            , expiryTime
+                            , checkIfFoodIsInDraftMode
+                            , checkIfOrderIsActive
+
+                    );
 
 
                 } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
