@@ -24,7 +24,11 @@ public interface Constants {
     String PICK_UP_LOCATION = "pickUpLocation";
     String CHECK_IF_ORDER_IS_ACTIVE = "checkIfOrderIsActive";
     String CHECK_IF_FOOD_IS_IN_DRAFT_MODE = "checkIfFoodIsInDraftMode";
-
+    String PRICE = "price";
+    String NO_OF_SERVINGS = "numberOfServings";
+    String LONGITUDE = "longitude";
+    String LATITUDE = "latitude";
+    String CHECK_IF_ORDER_Is_PURCHASED = "checkIfOrderIsPurchased";
     //Food Constants
 
 

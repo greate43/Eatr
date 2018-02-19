@@ -82,27 +82,27 @@ public class ShowPreviewFragment extends Fragment {
             imgFoodImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
 
-
         }
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             if (replaceFragment != null){
-                 replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                if (replaceFragment != null) {
+                    replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
 
-             }
+                }
             }
         });
         return view;
     }
 
     private CharSequence showExpiryTime(long time) {
-       return DateUtils
+        return DateUtils
                 .getRelativeTimeSpanString(time,
                         System.currentTimeMillis(),
                         DateUtils.SECOND_IN_MILLIS,
                         0);
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

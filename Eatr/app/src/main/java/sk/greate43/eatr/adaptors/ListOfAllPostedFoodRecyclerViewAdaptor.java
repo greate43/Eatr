@@ -8,30 +8,24 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.activities.SellerActivity;
+import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.entities.Food;
-import sk.greate43.eatr.fragments.PostedFoodFragment;
-import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
+import sk.greate43.eatr.holders.ListOfAllPostedFoodViewHolder;
 
 /**
- * Created by great on 11/12/2017.
+ * Created by great on 2/19/2018.
  */
 
-public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder> {
-
-    private static final String TAG = "SellFoodRecyclerViewAda";
-
-
+public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<ListOfAllPostedFoodViewHolder> {
     private ArrayList<Food> foods;
     private LayoutInflater inflater;
-    private SellerActivity sellerActivity;
-    private PostedFoodFragment postedFoodFragment;
+    private BuyerActivity buyerActivity;
 
-    public PostedFoodRecyclerViewAdaptor(SellerActivity sellerActivity, PostedFoodFragment postedFoodFragment) {
-        this.sellerActivity = sellerActivity;
-        inflater = sellerActivity.getLayoutInflater();
+    public ListOfAllPostedFoodRecyclerViewAdaptor(BuyerActivity buyerActivity) {
+        this.buyerActivity = buyerActivity;
+        inflater = buyerActivity.getLayoutInflater();
         foods = new ArrayList<>();
-        this.postedFoodFragment = postedFoodFragment;
+
 
     }
 
@@ -40,34 +34,35 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     }
 
     @Override
-    public PostedFoodRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListOfAllPostedFoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.posted_food_list, parent, false);
 
 
-        return new PostedFoodRecyclerViewHolder(view);
+        return new ListOfAllPostedFoodViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(PostedFoodRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(ListOfAllPostedFoodViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
 
-        } else {
+        } else  {
 
-            holder.populate(sellerActivity, foods.get(position), postedFoodFragment, position);
+            holder.populate(buyerActivity, foods.get(position));
         }
     }
 
     @Override
     public int getItemCount() {
-        if (foods != null && !foods.isEmpty()) {
+        if (foods != null
+                && !foods.isEmpty()
+
+                ) {
             return foods.size();
         } else {
             return 0;
         }
-
     }
-
 
     public void clear() {
         int size = foods.size();
@@ -80,12 +75,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
-    }
-
-
     public void removeItem(int position) {
         foods.remove(position);
         // notify the item removed by position
@@ -93,5 +82,4 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         // NOTE: don't call notifyDataSetChanged()
         notifyItemRemoved(position);
     }
-
 }
