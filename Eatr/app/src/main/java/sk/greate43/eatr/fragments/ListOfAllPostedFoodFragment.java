@@ -1,5 +1,6 @@
 package sk.greate43.eatr.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,11 +25,13 @@ import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.BuyerActivity;
+import sk.greate43.eatr.activities.DetailFoodActivity;
 import sk.greate43.eatr.adaptors.ListOfAllPostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.recyclerCustomItem.RecyclerItemClickListener;
 import sk.greate43.eatr.utils.Constants;
 
-public class ListOfAllPostedFoodFragment extends Fragment {
+public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerItemClickListener.OnRecyclerClickListenier{
     private static final String TAG = "ListOfAllPostedFoodFrag";
     RecyclerView recyclerView;
     ArrayList<Food> foods;
@@ -78,6 +81,11 @@ public class ListOfAllPostedFoodFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
+
+
+
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(),recyclerView,this));
+
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -155,4 +163,22 @@ public class ListOfAllPostedFoodFragment extends Fragment {
     }
 
 
+    @Override
+    public void OnItemClick(View v, int position) {
+        if (v.getTag() instanceof Food){
+            Food food= (Food) v.getTag();
+            Log.d(TAG, "OnItemClick: "+food.getDishName());
+
+            Intent intent = new Intent(getActivity(), DetailFoodActivity.class);
+            intent.putExtra(Constants.ARGS_FOOD,food);
+            startActivity(intent);
+
+        }
+
+    }
+
+    @Override
+    public void OnItemLongClick(View v, int position) {
+
+    }
 }
