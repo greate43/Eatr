@@ -30,11 +30,13 @@
             android:name=".activities.SellerActivity"
             android:label="@string/title_activity_seller"
             android:screenOrientation="portrait">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".activities.FoodItemContainerActivity"
@@ -61,7 +63,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activities.BuyerActivity"></activity>
+        <activity android:name=".activities.BuyerActivity" />
+        <activity android:name=".activities.DetailFoodActivity"></activity>
     </application>
 
 </manifest>
