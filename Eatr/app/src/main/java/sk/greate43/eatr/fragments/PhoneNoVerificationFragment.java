@@ -35,12 +35,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
-import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
 import sk.greate43.eatr.utils.Constants;
 
@@ -221,12 +221,13 @@ public class PhoneNoVerificationFragment extends Fragment {
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
                     // ...
-
-                    Toast.makeText(getActivity().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    if (getActivity() != null)
+                        Toast.makeText(getActivity().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 } else if (e instanceof FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
                     // ...
-                    Toast.makeText(getActivity().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    if (getActivity() != null)
+                        Toast.makeText(getActivity().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 
                 }
 
@@ -265,7 +266,7 @@ public class PhoneNoVerificationFragment extends Fragment {
      * @param callbacks pass the callback
      */
     public void verificationCode(String phoneNo, PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks) {
-        if (phoneNo != null) {
+        if (phoneNo != null && getActivity() != null) {
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
                     phoneNo,        // Phone number to verify
                     60,                 // Timeout duration
@@ -283,7 +284,7 @@ public class PhoneNoVerificationFragment extends Fragment {
      * @param token     pass the token to resend the verification code
      */
     public void resendVerificationCode(String phoneNo, PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks, PhoneAuthProvider.ForceResendingToken token) {
-        if (phoneNo != null) {
+        if (phoneNo != null && getActivity() != null) {
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
                     phoneNo,        // Phone number to verify
                     60,                 // Timeout duration
@@ -322,10 +323,10 @@ public class PhoneNoVerificationFragment extends Fragment {
 
                             final FirebaseUser user = task.getResult().getUser();
                             // Attach a listener to read the data at our posts reference
-                            databaseReference.addValueEventListener(new ValueEventListener() {
+                            databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    showData(dataSnapshot, user.getUid());
+                                    showData(dataSnapshot);
 
                                 }
 
@@ -363,7 +364,7 @@ public class PhoneNoVerificationFragment extends Fragment {
         super.onStop();
     }
 
-    private void showData(DataSnapshot dataSnapshot, String uid) {
+    private void showData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             if (mListener != null) {
                 mListener.onFragmentReplaced(ProfileFragment.newInstance());
@@ -373,46 +374,44 @@ public class PhoneNoVerificationFragment extends Fragment {
 
             return;
         }
-        if (dataSnapshot.exists()) {
-            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                Profile profile = ds.child(uid).getValue(Profile.class);
 
-                if (profile != null && profile.getUserId() != null) {
+        collectProfile((Map<String, Object>) dataSnapshot.getValue());
 
-                    Log.d(TAG, "showData: 2 " + profile.getUserType());
+    }
 
 
-                    String userType = String.valueOf(profile.getUserType());
-                    if (userType != null) {
+    private void collectProfile(Map<String, Object> value) {
+        String userType = String.valueOf(value.get(Constants.USER_TYPE));
+        if (userType != null) {
+            if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
 
-                        if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
-                            if (getActivity() != null) {
-
-                                Intent intent = new Intent(getActivity(), SellerActivity.class);
-                                getActivity().startActivity(intent);
-                                getActivity().finish();
-                            }
-                        } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
-                            if (getActivity() != null) {
-
-                                Intent intent = new Intent(getActivity(), BuyerActivity.class);
-                                getActivity().startActivity(intent);
-                                getActivity().finish();
-                            }
-                        }
-
-                    }
-                } else {
-                    if (mListener != null) {
-                        mListener.onFragmentReplaced(ProfileFragment.newInstance());
-                    }
+                if (getActivity() != null) {
+                    Intent intent = new Intent(getActivity(), SellerActivity.class);
+                    getActivity().startActivity(intent);
+                    getActivity().finish();
+                    hideProgressDialog();
 
                 }
-            }
-        } else {
-            Log.d(TAG, "onDataChange: dent exist ");
 
+            } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+
+                if (getActivity() != null) {
+                    Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                    getActivity().startActivity(intent);
+                    getActivity().finish();
+                    hideProgressDialog();
+
+                }
+
+            }
+
+        } else {
+            if (mListener != null) {
+                mListener.onFragmentReplaced(ProfileFragment.newInstance());
+                hideProgressDialog();
+            }
         }
+
     }
 
 

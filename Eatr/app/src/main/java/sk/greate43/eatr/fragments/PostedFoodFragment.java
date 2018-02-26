@@ -182,6 +182,14 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
         }
+        if (value.get(Constants.PURCHASED_BY) != null) {
+            food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
+        }
+
+
+        if (value.get(Constants.POSTED_BY) != null) {
+            food.setPurchasedBy((String) value.get(Constants.POSTED_BY));
+        }
         foods.add(food);
 //
 //        }

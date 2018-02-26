@@ -119,13 +119,13 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
             if (ds.getValue() != null) {
 
 
-                collectBuyer((Map<String, Object>) ds.getValue());
+                collectFood((Map<String, Object>) ds.getValue());
             }
         }
         adaptor.notifyDataSetChanged();
     }
 
-    private void collectBuyer(Map<String, Object> value) {
+    private void collectFood(Map<String, Object> value) {
 
         for (Map.Entry<String, Object> entry : value.entrySet()) {
 //            //Get food map
@@ -149,12 +149,24 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
             food.setCheckIfOrderIsActive((Boolean) singleUser.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
             food.setCheckIfFoodIsInDraftMode((Boolean) singleUser.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
             food.setCheckIfOrderIsPurchased((Boolean) singleUser.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+            if (singleUser.get(Constants.POSTED_BY) != null) {
+                food.setPostedBy((String) singleUser.get(Constants.POSTED_BY));
+            }
 
             if (singleUser.get(Constants.TIME_STAMP) != null) {
                 food.setTime(singleUser.get(Constants.TIME_STAMP).toString());
             }
+            if (singleUser.get(Constants.PURCHASED_BY) != null) {
+                food.setPurchasedBy((String) singleUser.get(Constants.PURCHASED_BY));
+            }
 
-            if (!food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && food.getCheckIfOrderIsActive()) {
+
+            if (
+                    !food.getCheckIfFoodIsInDraftMode()
+                    && !food.getCheckIfOrderIsPurchased()
+                    && food.getCheckIfOrderIsActive()
+                    && !food.getPostedBy().equals(user.getUid())
+                    ) {
 
                 foods.add(food);
             }
@@ -167,7 +179,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     public void OnItemClick(View v, int position) {
         if (v.getTag() instanceof Food){
             Food food= (Food) v.getTag();
-            Log.d(TAG, "OnItemClick: "+food.getDishName());
+            Log.d(TAG, "OnItemClick: "+food.getPostedBy());
 
             Intent intent = new Intent(getActivity(), DetailFoodActivity.class);
             intent.putExtra(Constants.ARGS_FOOD,food);

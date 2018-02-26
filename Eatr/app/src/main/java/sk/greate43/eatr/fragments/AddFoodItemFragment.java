@@ -202,14 +202,22 @@ public class AddFoodItemFragment extends Fragment implements
                             }
                         });
             }
+            String tags = food.getIngredientsTags();
+            String singleTag = "";
+            if (tags.contains("[")) {
+                singleTag = tags.replace("[", "");
+            }
+            if (singleTag.contains("]")) {
 
-            //TODO
-//            String tags;
-//            if (food.getIngredientsTags().contains("[") || food.getIngredientsTags().contains("]")) {
-//                tags = food.getIngredientsTags().replace("[", "");
-//            }
+                Log.d(TAG, "onCreateView: tags 1 " + singleTag);
 
-            etIncidentsTags.addTag(food.getIngredientsTags());
+                singleTag = singleTag.replace("]", "");
+            }
+
+
+
+
+            etIncidentsTags.addTag(String.valueOf(singleTag));
             pushId = String.valueOf(food.getPushId());
             etDishName.setText(food.getDishName());
             etCuisine.setText(food.getCuisine());
@@ -462,6 +470,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setIngredientsTags(ingredientsTags);
                 food.setPickUpLocation(pickUpLocation);
                 food.setImageUri("");
+                food.setImage(imgUri);
                 food.setLongitude(longitude);
                 food.setLatitude(latitude);
                 food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
@@ -470,6 +479,9 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setPrice(price);
                 food.setNumberOfServings(numberOfServings);
                 food.setExpiryTime(expiryTime);
+                food.setCheckIfOrderIsPurchased(false);
+                food.setPostedBy(user.getUid());
+                food.setPurchasedBy("");
 
                 mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
                 Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
@@ -508,7 +520,8 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setNumberOfServings(numberOfServings);
                 food.setExpiryTime(expiryTime);
                 food.setCheckIfOrderIsPurchased(false);
-
+                food.setPostedBy(user.getUid());
+                food.setPurchasedBy("");
                 mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
                 if (dialogUploadingImage.isShowing()) {
                     dialogUploadingImage.dismiss();

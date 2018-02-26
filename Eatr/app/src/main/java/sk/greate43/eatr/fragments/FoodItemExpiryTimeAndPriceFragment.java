@@ -156,12 +156,12 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
     public Map<String, Object> toMap(String pushId, long price, long numberOfServings, long expiryTime) {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("pushId", pushId);
-        result.put("price", price);
-        result.put("numberOfServings", numberOfServings);
-        result.put("expiryTime", expiryTime);
-        result.put("checkIfOrderIsActive", true);
-        result.put("checkIfFoodIsInDraftMode", false);
+        result.put(Constants.PUSH_ID, pushId);
+        result.put(Constants.PRICE, price);
+        result.put(Constants.NO_OF_SERVINGS, numberOfServings);
+        result.put(Constants.EXPIRY_TIME, expiryTime);
+        result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, true);
+        result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
         return result;
     }
 

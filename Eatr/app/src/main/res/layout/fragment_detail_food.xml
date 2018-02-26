@@ -27,13 +27,11 @@
 
         <Button
             android:id="@+id/fragment_detail_food_button_order"
-            android:layout_width="0dp"
+            android:layout_width="178dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="90dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="88dp"
+            android:layout_marginTop="8dp"
             android:text="Order"
-            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_price"
             app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_image_view_food_item"
             app:layout_constraintStart_toEndOf="@+id/fragment_detail_food_price"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_image_view_food_item" />
@@ -62,6 +60,7 @@
             android:textColor="@android:color/holo_green_dark"
             android:textSize="30sp"
             android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_button_order"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_image_view_food_item"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_image_view_food_item"
             tools:text="Rs : 14" />
@@ -70,10 +69,11 @@
             android:id="@+id/fragment_detail_food_no_of_servings_lbl"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="No Of Servings "
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_no_of_servings"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_cuisine_lbl"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_cuisine_lbl" />
 
@@ -81,21 +81,23 @@
             android:id="@+id/fragment_detail_food_no_of_servings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
 
-            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_no_of_servings_lbl"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_cuisine"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_cuisine"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_cuisine"
             tools:text="4" />
 
         <TextView
             android:id="@+id/fragment_detail_food_no_of_pick_up_location_lbl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="Pick Up Location"
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_no_of_pick_up_location"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_servings_lbl"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_servings_lbl" />
 
@@ -105,7 +107,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_no_of_pick_up_location_lbl"
             app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_no_of_servings"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_servings"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_servings"
@@ -115,11 +116,12 @@
             android:id="@+id/fragment_detail_food_tags_lbl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
+
             android:text="Tags"
             android:textSize="18sp"
             android:textStyle="bold"
-
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_tags"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_pick_up_location_lbl"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_pick_up_location_lbl" />
 
@@ -129,7 +131,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_tags_lbl"
             app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_no_of_pick_up_location"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_pick_up_location"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_pick_up_location"
@@ -143,6 +144,7 @@
             android:text="Cuisine"
             android:textSize="18sp"
             android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_cuisine"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_price"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_price" />
 
