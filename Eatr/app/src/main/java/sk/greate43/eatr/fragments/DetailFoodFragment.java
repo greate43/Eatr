@@ -10,8 +10,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
@@ -21,6 +28,10 @@ import sk.greate43.eatr.utils.Constants;
 public class DetailFoodFragment extends Fragment {
     private static final String TAG = "DetailFoodFragment";
     private Food food;
+    private DatabaseReference mDatabaseReference;
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     public DetailFoodFragment() {
         // Required empty public constructor
@@ -48,20 +59,25 @@ public class DetailFoodFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_detail_food, container, false);
-        ImageView imgDishPic=view.findViewById(R.id.fragment_detail_food_image_view_food_item);
-        Button btnOrder=view.findViewById(R.id.fragment_detail_food_button_order);
-        TextView tvPrice=view.findViewById(R.id.fragment_detail_food_price);
-        TextView tvCuisine=view.findViewById(R.id.fragment_detail_food_cuisine);
-        TextView tvNoOfServings=view.findViewById(R.id.fragment_detail_food_no_of_servings);
-        TextView tvPickUpLocation=view.findViewById(R.id.fragment_detail_food_no_of_pick_up_location);
-        TextView tvTags=view.findViewById(R.id.fragment_detail_food_tags);
-        TextView tvDishName=view.findViewById(R.id.fragment_detail_food_dish_name);
+        ImageView imgDishPic = view.findViewById(R.id.fragment_detail_food_image_view_food_item);
+        Button btnOrder = view.findViewById(R.id.fragment_detail_food_button_order);
+        TextView tvPrice = view.findViewById(R.id.fragment_detail_food_price);
+        TextView tvCuisine = view.findViewById(R.id.fragment_detail_food_cuisine);
+        TextView tvNoOfServings = view.findViewById(R.id.fragment_detail_food_no_of_servings);
+        TextView tvPickUpLocation = view.findViewById(R.id.fragment_detail_food_no_of_pick_up_location);
+        TextView tvTags = view.findViewById(R.id.fragment_detail_food_tags);
+        TextView tvDishName = view.findViewById(R.id.fragment_detail_food_dish_name);
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
 
 
+        database = FirebaseDatabase.getInstance();
+
+        mDatabaseReference = database.getReference();
 
 
-
-        if (food != null){
+        if (food != null) {
             if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
                 Picasso.with(getActivity())
                         .load(food.getImageUri())
@@ -80,18 +96,50 @@ public class DetailFoodFragment extends Fragment {
                         });
             }
             tvDishName.setText(String.valueOf(food.getDishName()));
-            tvPrice.setText(String.valueOf("Rs : "+food.getPrice()));
+            tvPrice.setText(String.valueOf("Rs : " + food.getPrice()));
             tvNoOfServings.setText(String.valueOf(food.getNumberOfServings()));
             tvCuisine.setText(String.valueOf(food.getCuisine()));
             tvPickUpLocation.setText(String.valueOf(food.getPickUpLocation()));
             tvTags.setText(String.valueOf(food.getIngredientsTags()));
 
-        }
+            btnOrder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String userId = "";
+                    String pushId = "";
 
+                    if (food.getPostedBy() != null) {
+                        userId = food.getPostedBy();
+                    }
+
+                    if (food.getPushId() != null) {
+                        pushId = food.getPushId();
+                    }
+
+                    writeData(userId, pushId);
+
+                }
+            });
+
+        }
 
 
         return view;
     }
 
+    private void writeData(String userId, final String pushId) {
+        mDatabaseReference.child(Constants.FOOD).child(userId).child(pushId).updateChildren(toMap(user.getUid()));
+
+
+    }
+
+    public Map<String, Object> toMap(String purchasedBy) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.CHECK_IF_ORDER_Is_PURCHASED, true);
+        result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, false);
+        result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
+        result.put(Constants.PURCHASED_BY, purchasedBy);
+        return result;
+    }
 
 }

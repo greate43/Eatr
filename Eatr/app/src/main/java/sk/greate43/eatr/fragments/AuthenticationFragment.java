@@ -32,10 +32,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Map;
+
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
-import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
 import sk.greate43.eatr.utils.Constants;
 
@@ -87,12 +88,12 @@ public class AuthenticationFragment extends Fragment {
         showProgressDialog();
         hideAllUiWidgets();
         if (user != null) {
-            databaseReference.addValueEventListener(new ValueEventListener() {
+            databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
 
-                    showData(dataSnapshot, user.getUid());
+                    showData(dataSnapshot);
 
                 }
 
@@ -136,9 +137,13 @@ public class AuthenticationFragment extends Fragment {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+
+        if (getActivity() != null) {
+            mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }
     }
 
     @Override
@@ -147,6 +152,7 @@ public class AuthenticationFragment extends Fragment {
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
+
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
@@ -162,47 +168,50 @@ public class AuthenticationFragment extends Fragment {
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         Log.d(TAG, "firebaseAuthWithGoogle: " + account.getId());
+        showProgressDialog();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            final FirebaseUser user = task.getResult().getUser();
+        if (getActivity() != null)
+            mAuth.signInWithCredential(credential)
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "signInWithCredential:success");
+                                final FirebaseUser user = task.getResult().getUser();
 
-                            databaseReference.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                    showData(dataSnapshot, user.getUid());
+                                        Log.d(TAG, "onDataChange: " + dataSnapshot);
+                                        showData(dataSnapshot);
 
-                                }
+                                    }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    hideProgressDialog();
-                                    System.out.println("The read failed: " + databaseError.getCode());
-                                }
-                            });
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        hideProgressDialog();
+                                        System.out.println("The read failed: " + databaseError.getCode());
+                                    }
+                                });
 
-                            // updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            // updateUI(null);
+                                // updateUI(user);
+                            } else {
+                                hideProgressDialog();
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithCredential:failure", task.getException());
+                                // updateUI(null);
+                            }
+                            // ...
                         }
-
-                        // ...
-                    }
-                });
+                    });
 
     }
 
 
-    private void showData(DataSnapshot dataSnapshot, String uid) {
+    private void showData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
 
             if (mListener != null) {
@@ -213,54 +222,44 @@ public class AuthenticationFragment extends Fragment {
             hideProgressDialog();
             return;
         }
-        if (dataSnapshot.exists()) {
+
+        collectProfile((Map<String, Object>) dataSnapshot.getValue());
 
 
-            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                Profile profile = ds.child(uid).getValue(Profile.class);
+    }
 
-                if ((profile != null ? profile.getUserId() : null) != null) {
-                    Log.d(TAG, "showData: 2 " + profile.getUserType());
+    private void collectProfile(Map<String, Object> value) {
+        String userType = String.valueOf(value.get(Constants.USER_TYPE));
+        if (userType != null) {
+            if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
 
-
-                    String userType = String.valueOf(profile.getUserType());
-                    if (userType != null) {
-
-                        if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
-
-                            if (getActivity() != null) {
-                                Intent intent = new Intent(getActivity(), SellerActivity.class);
-                                getActivity().startActivity(intent);
-                                getActivity().finish();
-                            }
-                            hideProgressDialog();
-
-                        } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
-
-                            if (getActivity() != null) {
-                                Intent intent = new Intent(getActivity(), BuyerActivity.class);
-                                getActivity().startActivity(intent);
-                                getActivity().finish();
-                            }
-                            hideProgressDialog();
-
-                        }
-
-                    }
-                } else {
-                    if (mListener != null) {
-                        mListener.onFragmentReplaced(ProfileFragment.newInstance());
-                    }
+                if (getActivity() != null) {
+                    Intent intent = new Intent(getActivity(), SellerActivity.class);
+                    getActivity().startActivity(intent);
+                    getActivity().finish();
                     hideProgressDialog();
 
+                }
+
+            } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+
+                if (getActivity() != null) {
+                    Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                    getActivity().startActivity(intent);
+                    getActivity().finish();
+                    hideProgressDialog();
 
                 }
-            }
-        } else {
-            Log.d(TAG, "onDataChange: dont exist ");
 
+            }
+
+        } else {
+            if (mListener != null) {
+                mListener.onFragmentReplaced(ProfileFragment.newInstance());
+                hideProgressDialog();
+            }
         }
-        hideProgressDialog();
+
     }
 
 

@@ -30,6 +30,8 @@ public class Food implements Serializable {
     private Boolean checkIfFoodIsInDraftMode;
     private String pushId;
     private Boolean checkIfOrderIsPurchased;
+    private String purchasedBy;
+    private String postedBy;
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
@@ -41,6 +43,22 @@ public class Food implements Serializable {
 
     public void setCheckIfFoodIsInDraftMode(Boolean checkIfFoodIsInDraftMode) {
         this.checkIfFoodIsInDraftMode = checkIfFoodIsInDraftMode;
+    }
+
+    public String getPostedBy() {
+        return postedBy;
+    }
+
+    public void setPostedBy(String postedBy) {
+        this.postedBy = postedBy;
+    }
+
+    public String getPurchasedBy() {
+        return purchasedBy;
+    }
+
+    public void setPurchasedBy(String purchasedBy) {
+        this.purchasedBy = purchasedBy;
     }
 
     public Boolean getCheckIfOrderIsPurchased() {
