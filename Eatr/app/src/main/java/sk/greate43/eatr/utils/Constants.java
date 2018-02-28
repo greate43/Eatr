@@ -29,8 +29,9 @@ public interface Constants {
     String LONGITUDE = "longitude";
     String LATITUDE = "latitude";
     String CHECK_IF_ORDER_Is_PURCHASED = "checkIfOrderIsPurchased";
-    String PURCHASED_BY="purchasedBy";
-    String POSTED_BY ="postedBy";
+    String PURCHASED_BY = "purchasedBy";
+    String POSTED_BY = "postedBy";
+    String PURCHASED_DATE = "purchasedDate";
     //Food Constants
 
 

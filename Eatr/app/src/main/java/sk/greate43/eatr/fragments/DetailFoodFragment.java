@@ -1,5 +1,6 @@
 package sk.greate43.eatr.fragments;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -32,6 +34,7 @@ public class DetailFoodFragment extends Fragment {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private ProgressDialog mProgressDialog;
 
     public DetailFoodFragment() {
         // Required empty public constructor
@@ -128,9 +131,12 @@ public class DetailFoodFragment extends Fragment {
     }
 
     private void writeData(String userId, final String pushId) {
+        showProgressDialog();
         mDatabaseReference.child(Constants.FOOD).child(userId).child(pushId).updateChildren(toMap(user.getUid()));
-
-
+        if (getActivity() != null){
+            getActivity().finish();
+        }
+        hideProgressDialog();
     }
 
     public Map<String, Object> toMap(String purchasedBy) {
@@ -139,7 +145,24 @@ public class DetailFoodFragment extends Fragment {
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, false);
         result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
         result.put(Constants.PURCHASED_BY, purchasedBy);
+        result.put(Constants.PURCHASED_DATE, ServerValue.TIMESTAMP);
         return result;
+
+    }
+
+    public void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(getActivity());
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage("Loading...");
+        }
+        mProgressDialog.show();
+    }
+
+    public void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+        }
     }
 
 }

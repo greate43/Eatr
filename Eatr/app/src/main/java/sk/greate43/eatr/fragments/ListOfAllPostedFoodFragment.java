@@ -2,6 +2,7 @@ package sk.greate43.eatr.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -62,7 +63,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_list_of_all_posted_food, container, false);
@@ -74,7 +75,6 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
         recyclerView = view.findViewById(R.id.fragment_list_of_all_posted_food_recycler_view);
         adaptor = new ListOfAllPostedFoodRecyclerViewAdaptor((BuyerActivity) getActivity());
-        adaptor.setHasStableIds(true);
 
         foods = adaptor.getFoods();
 
