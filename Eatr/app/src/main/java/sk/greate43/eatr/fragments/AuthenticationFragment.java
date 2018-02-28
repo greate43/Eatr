@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -124,7 +125,6 @@ public class AuthenticationFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-
                 signIn();
             }
         });
@@ -133,12 +133,16 @@ public class AuthenticationFragment extends Fragment {
     }
 
     private void signIn() {
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
+
                 .requestEmail()
                 .build();
 
+
         if (getActivity() != null) {
+
             mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -152,17 +156,17 @@ public class AuthenticationFragment extends Fragment {
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
-
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
+                // ...
             }
-
         }
     }
 
@@ -171,6 +175,7 @@ public class AuthenticationFragment extends Fragment {
         showProgressDialog();
 
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+
         if (getActivity() != null)
             mAuth.signInWithCredential(credential)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {

@@ -32,9 +32,18 @@ public class Food implements Serializable {
     private Boolean checkIfOrderIsPurchased;
     private String purchasedBy;
     private String postedBy;
+    private long purchasedDate;
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+    public long getPurchasedDate() {
+        return purchasedDate;
+    }
+
+    public void setPurchasedDate(long purchasedDate) {
+        this.purchasedDate = purchasedDate;
     }
 
     public Boolean getCheckIfFoodIsInDraftMode() {

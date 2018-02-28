@@ -14,7 +14,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.fragments.HistoryFragment;
 import sk.greate43.eatr.fragments.PostedFoodFragment;
+import sk.greate43.eatr.fragments.SettingFragment;
+import sk.greate43.eatr.utils.Constants;
 
 public class SellerActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
@@ -24,18 +27,30 @@ public class SellerActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
             switch (item.getItemId()) {
                 case R.id.navigation_seller_home:
-                    FragmentManager fragmentManager = getSupportFragmentManager();
 
                     fragmentManager.beginTransaction()
                             .replace(R.id.activity_seller_fragment_container, PostedFoodFragment.newInstance())
                             .addToBackStack(null)
                             .commit();
                     return true;
-                case R.id.navigation_seller_dashboard:
+                case R.id.navigation_seller_history:
+
+
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.activity_seller_fragment_container, HistoryFragment.newInstance(Constants.TYPE_SELLER))
+                            .addToBackStack(null)
+                            .commit();
                     return true;
-                case R.id.navigation_seller_notifications:
+                case R.id.navigation_seller_settings:
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.activity_seller_fragment_container, SettingFragment.newInstance())
+                            .addToBackStack(null)
+                            .commit();
+
                     return true;
             }
             return false;
@@ -50,8 +65,17 @@ public class SellerActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
+
+
         BottomNavigationView navigation = findViewById(R.id.activity_seller_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        fragmentManager.beginTransaction()
+                .add(R.id.activity_seller_fragment_container, PostedFoodFragment.newInstance())
+                .commit();
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -69,7 +93,6 @@ public class SellerActivity extends AppCompatActivity {
             case R.id.menu_item_sign_out:
                 if (user != null) {
                     mAuth.signOut();
-
 
                     finish();
                     Intent intent = new Intent(SellerActivity.this, MainActivity.class);
