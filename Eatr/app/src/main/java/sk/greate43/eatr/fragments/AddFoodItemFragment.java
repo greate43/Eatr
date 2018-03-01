@@ -215,8 +215,6 @@ public class AddFoodItemFragment extends Fragment implements
             }
 
 
-
-
             etIncidentsTags.addTag(String.valueOf(singleTag));
             pushId = String.valueOf(food.getPushId());
             etDishName.setText(food.getDishName());

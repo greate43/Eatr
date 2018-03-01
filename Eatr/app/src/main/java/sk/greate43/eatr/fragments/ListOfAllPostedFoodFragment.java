@@ -32,7 +32,7 @@ import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.recyclerCustomItem.RecyclerItemClickListener;
 import sk.greate43.eatr.utils.Constants;
 
-public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerItemClickListener.OnRecyclerClickListenier{
+public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerItemClickListener.OnRecyclerClickListenier {
     private static final String TAG = "ListOfAllPostedFoodFrag";
     RecyclerView recyclerView;
     ArrayList<Food> foods;
@@ -83,8 +83,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         recyclerView.setLayoutManager(layoutManager);
 
 
-
-        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(),recyclerView,this));
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), recyclerView, this));
 
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -163,9 +162,9 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
             if (
                     !food.getCheckIfFoodIsInDraftMode()
-                    && !food.getCheckIfOrderIsPurchased()
-                    && food.getCheckIfOrderIsActive()
-                    && !food.getPostedBy().equals(user.getUid())
+                            && !food.getCheckIfOrderIsPurchased()
+                            && food.getCheckIfOrderIsActive()
+                            && !food.getPostedBy().equals(user.getUid())
                     ) {
 
                 foods.add(food);
@@ -177,12 +176,12 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
     @Override
     public void OnItemClick(View v, int position) {
-        if (v.getTag() instanceof Food){
-            Food food= (Food) v.getTag();
-            Log.d(TAG, "OnItemClick: "+food.getPostedBy());
+        if (v.getTag() instanceof Food) {
+            Food food = (Food) v.getTag();
+            Log.d(TAG, "OnItemClick: " + food.getPostedBy());
 
             Intent intent = new Intent(getActivity(), DetailFoodActivity.class);
-            intent.putExtra(Constants.ARGS_FOOD,food);
+            intent.putExtra(Constants.ARGS_FOOD, food);
             startActivity(intent);
 
         }

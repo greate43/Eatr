@@ -133,7 +133,7 @@ public class DetailFoodFragment extends Fragment {
     private void writeData(String userId, final String pushId) {
         showProgressDialog();
         mDatabaseReference.child(Constants.FOOD).child(userId).child(pushId).updateChildren(toMap(user.getUid()));
-        if (getActivity() != null){
+        if (getActivity() != null) {
             getActivity().finish();
         }
         hideProgressDialog();

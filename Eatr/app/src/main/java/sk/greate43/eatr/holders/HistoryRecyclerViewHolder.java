@@ -24,8 +24,8 @@ public class HistoryRecyclerViewHolder extends RecyclerView.ViewHolder {
         tvPrice = itemView.findViewById(R.id.history_list_price);
     }
 
-    public void populate(Food food){
-        tvPrice.setText(String.valueOf("PKR "+food.getPrice()));
+    public void populate(Food food) {
+        tvPrice.setText(String.valueOf("PKR " + food.getPrice()));
         tvOrderId.setText(String.valueOf(food.getPushId()));
         tvPurchasedDate.setText(DateUtils
                 .getRelativeTimeSpanString(food.getPurchasedDate(),
