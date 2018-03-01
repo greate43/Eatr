@@ -66,7 +66,6 @@ public class SellerActivity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
 
 
-
         BottomNavigationView navigation = findViewById(R.id.activity_seller_navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
