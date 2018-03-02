@@ -61,7 +61,6 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
 
     public PostedFoodRecyclerViewHolder(View itemView) {
         super(itemView);
-        itemView.setOnCreateContextMenuListener(this);
         tvStatus = itemView.findViewById(R.id.posted_food_list_status_text_view);
         imgFoodItem = itemView.findViewById(R.id.posted_food_list_food_item_image_view);
         tvLocation = itemView.findViewById(R.id.posted_food_list_location_text_view);
@@ -96,17 +95,20 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
                     });
         }
 
-        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive()) {
+        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased()) {
+            activateContextMenu();
             tvStatus.setTextColor(Color.GRAY);
             tvStatus.setText("Draft");
-        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode()) {
+        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased()) {
+            activateContextMenu();
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode()) {
+            activateContextMenu();
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
-        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased()) {
+        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode()) {
             tvStatus.setTextColor(Color.BLACK);
             tvStatus.setText("Purchased");
 
@@ -123,6 +125,10 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
             tvTimeStamp.setText("");
         }
         tvDishName.setText(food.getDishName());
+    }
+
+    private void activateContextMenu() {
+        itemView.setOnCreateContextMenuListener(this);
     }
 
     @Override

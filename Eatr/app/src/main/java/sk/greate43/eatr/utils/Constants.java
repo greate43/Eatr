@@ -42,11 +42,11 @@ public interface Constants {
 
     // Add Food Fragment
 
-
-    /**
-     * {@link sk.greate43.eatr.fragments.FoodItemExpiryTimeAndPriceFragment}
-     *
-     */
+    String ALL_ORDERS = "ALL_ORDERS";
+    String ORDER_STATE = "ORDER_STATE";
+    String ORDER_ACTIVE = "ORDER_ACTIVE";
+    String ORDER_DRAFT = "ORDER_DRAFT";
+    String ORDER_PURCHASED = "ORDER_PURCHASED";
 
     //FoodItemExpiryTimeAndPriceFragment
 

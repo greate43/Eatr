@@ -107,6 +107,7 @@ public class AddFoodItemFragment extends Fragment implements
     private boolean checkIfFoodIsInDraftMode = true;
 
 
+    @NonNull
     public static AddFoodItemFragment newInstance() {
         return new AddFoodItemFragment();
     }

@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.fragments.HistoryFragment;
-import sk.greate43.eatr.fragments.PostedFoodFragment;
 import sk.greate43.eatr.fragments.SettingFragment;
 import sk.greate43.eatr.utils.Constants;
 
@@ -33,7 +32,7 @@ public class SellerActivity extends AppCompatActivity {
                 case R.id.navigation_seller_home:
 
                     fragmentManager.beginTransaction()
-                            .replace(R.id.activity_seller_fragment_container, PostedFoodFragment.newInstance())
+                            .replace(R.id.activity_seller_fragment_container, PostedFoodPagerFragment.newInstance())
                             .addToBackStack(null)
                             .commit();
                     return true;
@@ -72,7 +71,7 @@ public class SellerActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         fragmentManager.beginTransaction()
-                .add(R.id.activity_seller_fragment_container, PostedFoodFragment.newInstance())
+                .add(R.id.activity_seller_fragment_container, PostedFoodPagerFragment.newInstance())
                 .commit();
 
     }
