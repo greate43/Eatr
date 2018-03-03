@@ -29,6 +29,9 @@ public interface Constants {
     String LONGITUDE = "longitude";
     String LATITUDE = "latitude";
     String CHECK_IF_ORDER_Is_PURCHASED = "checkIfOrderIsPurchased";
+    String PURCHASED_BY = "purchasedBy";
+    String POSTED_BY = "postedBy";
+    String PURCHASED_DATE = "purchasedDate";
     //Food Constants
 
 
@@ -39,11 +42,11 @@ public interface Constants {
 
     // Add Food Fragment
 
-
-    /**
-     * {@link sk.greate43.eatr.fragments.FoodItemExpiryTimeAndPriceFragment}
-     *
-     */
+    String ALL_ORDERS = "ALL_ORDERS";
+    String ORDER_STATE = "ORDER_STATE";
+    String ORDER_ACTIVE = "ORDER_ACTIVE";
+    String ORDER_DRAFT = "ORDER_DRAFT";
+    String ORDER_PURCHASED = "ORDER_PURCHASED";
 
     //FoodItemExpiryTimeAndPriceFragment
 
@@ -54,6 +57,8 @@ public interface Constants {
     String ARGS_PROFILE = "ARGS_PROFILE";
     String TYPE_SELLER = "SELLER";
     String TYPE_BUYER = "BUYER";
+    String USER_TYPE = "userType";
+
     // profile
 
 

@@ -64,17 +64,23 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
                     });
         }
 
-        if (food.getCheckIfFoodIsInDraftMode()) {
+        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive()) {
             tvStatus.setTextColor(Color.GRAY);
             tvStatus.setText("Draft");
-        } else if (food.getCheckIfOrderIsActive()) {
+        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode()) {
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!food.getCheckIfOrderIsActive()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased()) {
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
+        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased()) {
+            tvStatus.setTextColor(Color.BLACK);
+            tvStatus.setText("Purchased");
+
         }
+
+
         tvPrice.setText(String.valueOf("Rs : " + food.getPrice()));
         tvLocation.setText(food.getPickUpLocation());
         if (food.getTime() != null && !food.getTime().isEmpty()) {

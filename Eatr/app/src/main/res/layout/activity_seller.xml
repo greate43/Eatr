@@ -7,9 +7,8 @@
     android:layout_height="match_parent"
     tools:context="sk.greate43.eatr.activities.SellerActivity">
 
-    <fragment
+    <FrameLayout
         android:id="@+id/activity_seller_fragment_container"
-        android:name="sk.greate43.eatr.fragments.PostedFoodFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/activity_seller_navigation"

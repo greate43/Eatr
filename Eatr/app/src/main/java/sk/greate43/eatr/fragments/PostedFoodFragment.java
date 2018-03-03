@@ -3,6 +3,7 @@ package sk.greate43.eatr.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -50,12 +51,24 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
+    private String orderState;
 
 
-    public static PostedFoodFragment newInstance() {
+    public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
-
+        Bundle args = new Bundle();
+        args.putString(Constants.ORDER_STATE, orderState);
+        fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            orderState = getArguments().getString(Constants.ORDER_STATE);
+        }
     }
 
     @Override
@@ -79,7 +92,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         });
 
         adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), this);
-        adaptor.setHasStableIds(true);
 
         foods = adaptor.getFoods();
 
@@ -182,7 +194,48 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
         }
-        foods.add(food);
+        if (value.get(Constants.PURCHASED_BY) != null) {
+            food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
+        }
+
+
+        if (value.get(Constants.POSTED_BY) != null) {
+            food.setPurchasedBy((String) value.get(Constants.POSTED_BY));
+        }
+
+
+        switch (orderState) {
+            case Constants.ALL_ORDERS:
+                foods.add(food);
+
+                break;
+            case Constants.ORDER_ACTIVE:
+                if (food.getCheckIfOrderIsActive()
+                        && !food.getCheckIfOrderIsPurchased()
+                        && !food.getCheckIfFoodIsInDraftMode())
+                    foods.add(food);
+
+                break;
+            case Constants.ORDER_PURCHASED:
+                if (!food.getCheckIfOrderIsActive()
+                        && food.getCheckIfOrderIsPurchased()
+                        && !food.getCheckIfFoodIsInDraftMode())
+                    foods.add(food);
+
+                break;
+            case Constants.ORDER_DRAFT:
+                if (!food.getCheckIfOrderIsActive()
+                        && !food.getCheckIfOrderIsPurchased()
+                        && food.getCheckIfFoodIsInDraftMode())
+                    foods.add(food);
+
+                break;
+
+            default:
+                foods.add(food);
+                break;
+        }
+
 //
 //        }
 
