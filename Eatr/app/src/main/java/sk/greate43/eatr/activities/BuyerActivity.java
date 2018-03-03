@@ -17,6 +17,7 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.fragments.HistoryFragment;
 import sk.greate43.eatr.fragments.ListOfAllPostedFoodFragment;
 import sk.greate43.eatr.fragments.SettingFragment;
+import sk.greate43.eatr.utils.Constants;
 
 public class BuyerActivity extends AppCompatActivity {
 
@@ -39,7 +40,7 @@ public class BuyerActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_buyer_history:
                     fragmentManager.beginTransaction()
-                            .replace(R.id.activity_buyer_fragment_container, HistoryFragment.newInstance())
+                            .replace(R.id.activity_buyer_fragment_container, HistoryFragment.newInstance(Constants.TYPE_BUYER))
                             .addToBackStack(null)
                             .commit();
                     return true;
@@ -86,6 +87,7 @@ public class BuyerActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_item_sign_out:
                 if (user != null) {
+
                     mAuth.signOut();
 
 

@@ -46,7 +46,7 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
 
-        } else  {
+        } else {
 
             holder.populate(buyerActivity, foods.get(position));
         }
