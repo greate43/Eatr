@@ -58,6 +58,11 @@ public interface Constants {
     String TYPE_SELLER = "SELLER";
     String TYPE_BUYER = "BUYER";
     String USER_TYPE = "userType";
+    String PROFILE_PHOTO_URI = "profilePhotoUri";
+    String FIRST_NAME = "firstName";
+    String LAST_NAME = "lastName";
+    String USER_ID = "userId";
+    String EMAIL = "email";
 
     // profile
 
