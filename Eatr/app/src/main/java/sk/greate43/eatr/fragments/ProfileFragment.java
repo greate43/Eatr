@@ -131,6 +131,7 @@ public class ProfileFragment extends Fragment {
                             , etFirstName.getText().toString()
                             , etFirstName.getText().toString()
                             , imgUri
+
                             , spinnerUserType.getSelectedItem().toString());
 
 

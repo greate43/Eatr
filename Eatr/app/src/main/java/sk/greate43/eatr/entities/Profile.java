@@ -12,12 +12,21 @@ public class Profile implements Serializable {
     private String firstName;
     private String lastName;
     private String userType;
+    private String email;
     private String profilePhotoUri;
     private Boolean doesTheProfileNeedAnUpdate;
 
 
     public Profile() {
 
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Boolean getDoesTheProfileNeedAnUpdate() {
@@ -66,5 +75,10 @@ public class Profile implements Serializable {
 
     public void setProfilePhotoUri(String profilePhotoUri) {
         this.profilePhotoUri = profilePhotoUri;
+    }
+
+
+    public String getFullname(){
+        return firstName+" "+lastName;
     }
 }
