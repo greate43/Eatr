@@ -1,5 +1,7 @@
 package sk.greate43.eatr.entities;
 
+import com.google.firebase.database.Exclude;
+
 import java.io.Serializable;
 
 /**
@@ -77,8 +79,8 @@ public class Profile implements Serializable {
         this.profilePhotoUri = profilePhotoUri;
     }
 
-
-    public String getFullname(){
-        return firstName+" "+lastName;
+    @Exclude
+    public String getFullname() {
+        return firstName + " " + lastName;
     }
 }

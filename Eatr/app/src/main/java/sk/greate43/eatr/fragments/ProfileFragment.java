@@ -129,10 +129,11 @@ public class ProfileFragment extends Fragment {
 
                     saveUserProfile(user.getUid()
                             , etFirstName.getText().toString()
-                            , etFirstName.getText().toString()
+                            , etLastName.getText().toString()
                             , imgUri
-
-                            , spinnerUserType.getSelectedItem().toString());
+                            , spinnerUserType.getSelectedItem().toString()
+                            , etEmail.getText().toString()
+                            );
 
 
                 } else if (TextUtils.isEmpty(etFirstName.getText())) {
@@ -158,7 +159,7 @@ public class ProfileFragment extends Fragment {
         return false;
     }
 
-    private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType) {
+    private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType, final String email) {
         showProgressDialog();
 
         imgProfilePicture.setDrawingCacheEnabled(true);
@@ -169,7 +170,7 @@ public class ProfileFragment extends Fragment {
         byte[] data = baos.toByteArray();
 
 
-        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(userId).child(Constants.PROFILE).child(userId).putBytes(data);
+        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(userId).child(userId).putBytes(data);
 
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
@@ -184,6 +185,8 @@ public class ProfileFragment extends Fragment {
                 profile.setLastName(lastName);
                 profile.setProfilePhotoUri(downloadUrl);
                 profile.setUserType(userType);
+                if (!email.isEmpty())
+                    profile.setEmail(email);
 
                 mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
 

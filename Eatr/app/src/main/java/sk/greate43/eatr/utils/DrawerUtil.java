@@ -95,6 +95,7 @@ public class DrawerUtil implements UpdateData {
         headerResult = new AccountHeaderBuilder()
                 .withActivity(activity)
                 .withHeaderBackground(R.drawable.side_nav_bar)
+                .withSelectionListEnabledForSingleProfile(false)
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
 
                     @Override
@@ -112,8 +113,6 @@ public class DrawerUtil implements UpdateData {
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)
                 .withAccountHeader(headerResult)
-
-
                 .addDrawerItems(
                         drawerItemHome,
                         new DividerDrawerItem(),
