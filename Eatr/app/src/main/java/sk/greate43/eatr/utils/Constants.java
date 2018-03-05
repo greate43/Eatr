@@ -19,7 +19,7 @@ public interface Constants {
     String DISH_NAME = "dishName";
     String CUISINE = "cuisine";
     String EXPIRY_TIME = "expiryTime";
-    String INCIDENT_TAGS = "ingredientsTags";
+    String INGREDIENTS_TAGS = "ingredientsTags";
     String IMAGE_URI = "imageUri";
     String PICK_UP_LOCATION = "pickUpLocation";
     String CHECK_IF_ORDER_IS_ACTIVE = "checkIfOrderIsActive";

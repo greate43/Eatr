@@ -482,7 +482,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setPostedBy(user.getUid());
                 food.setPurchasedBy("");
 
-                mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
+                mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
                 if (dialogUploadingImage.isShowing()) {
                     dialogUploadingImage.dismiss();
@@ -521,7 +521,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsPurchased(false);
                 food.setPostedBy(user.getUid());
                 food.setPurchasedBy("");
-                mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).setValue(food);
+                mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 if (dialogUploadingImage.isShowing()) {
                     dialogUploadingImage.dismiss();
                 }

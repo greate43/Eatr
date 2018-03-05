@@ -151,7 +151,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
     private void writeSellerData(final String pushId, final long price, final long expiryTime, final long numberOfServings) {
         showProgressDialog();
-        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(pushId).updateChildren(toMap(pushId, price, numberOfServings, expiryTime));
+        mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(pushId, price, numberOfServings, expiryTime));
         hideProgressDialog();
 
 

@@ -109,7 +109,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 //        itemTouchHelper.attachToRecyclerView(recyclerView);
 
 
-        mDatabaseReference.child(Constants.FOOD).child(user.getUid()).orderByChild(Constants.TIME_STAMP).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).startAt(user.getUid()).endAt(user.getUid() + "\uf8ff").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -138,11 +138,10 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             if (ds.getValue() != null) {
-
-
                 collectSeller((Map<String, Object>) ds.getValue());
             }
         }
+
         adaptor.notifyDataSetChanged();
 
 
@@ -160,7 +159,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
     }
 
     private void collectSeller(Map<String, Object> value) {
-        Log.d(TAG, "collectSeller: " + value);
 
 
 //        //iterate through each user, ignoring their UID
@@ -174,6 +172,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 //
 //            Log.d(TAG, "collectSeller: " + singleUser);
 //
+        Log.d(TAG, "collectSeller: " + value);
         Food food = new Food();
         food.setPushId((String) value.get(Constants.PUSH_ID));
         food.setDishName((String) value.get(Constants.DISH_NAME));
@@ -181,9 +180,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         if (value.get(Constants.EXPIRY_TIME) != null) {
             food.setExpiryTime((long) value.get(Constants.EXPIRY_TIME));
         }
-        food.setIngredientsTags(String.valueOf(value.get(Constants.INCIDENT_TAGS)));
+        food.setIngredientsTags(String.valueOf(value.get(Constants.INGREDIENTS_TAGS)));
         food.setImageUri((String) value.get(Constants.IMAGE_URI));
-        food.setPrice((long) value.get(Constants.PRICE));
+        food.setPrice(Long.parseLong(String.valueOf(value.get(Constants.PRICE))));
         food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
         food.setLatitude((double) value.get(Constants.LATITUDE));
         food.setLongitude((double) value.get(Constants.LONGITUDE));
@@ -191,6 +190,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
         food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
         }
@@ -256,7 +256,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
     @Override
     public void onDelete(Food food, int position) {
         if (food != null) {
-            mDatabaseReference.child(Constants.FOOD).child(user.getUid()).child(foods.get(position).getPushId()).removeValue();
+            mDatabaseReference.child(Constants.FOOD).child(foods.get(position).getPushId()).removeValue();
             storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(foods.get(position).getImageUri());
 
             storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {

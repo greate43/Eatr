@@ -119,7 +119,7 @@ public class DetailFoodFragment extends Fragment {
                         pushId = food.getPushId();
                     }
 
-                    writeData(userId, pushId);
+                    writeData(userId,pushId);
 
                 }
             });
@@ -130,9 +130,9 @@ public class DetailFoodFragment extends Fragment {
         return view;
     }
 
-    private void writeData(String userId, final String pushId) {
+    private void writeData(final  String uid,final String pushId) {
         showProgressDialog();
-        mDatabaseReference.child(Constants.FOOD).child(userId).child(pushId).updateChildren(toMap(user.getUid()));
+        mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(uid));
         if (getActivity() != null) {
             getActivity().finish();
         }

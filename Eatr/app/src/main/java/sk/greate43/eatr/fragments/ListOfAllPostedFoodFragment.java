@@ -88,7 +88,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mDatabaseReference.child(Constants.FOOD).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt("").endAt("" + "\uf8ff").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -126,37 +126,35 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
     private void collectFood(Map<String, Object> value) {
 
-        for (Map.Entry<String, Object> entry : value.entrySet()) {
-//            //Get food map
-            Map singleUser = (Map) entry.getValue();
 
-            Log.d(TAG, "collectSeller: " + singleUser);
+
+            Log.d(TAG, "collectSeller: " + value);
             Food food = new Food();
-            food.setPushId((String) singleUser.get(Constants.PUSH_ID));
-            food.setDishName((String) singleUser.get(Constants.DISH_NAME));
-            food.setCuisine((String) singleUser.get(Constants.CUISINE));
-            if (singleUser.get(Constants.EXPIRY_TIME) != null) {
-                food.setExpiryTime((long) singleUser.get(Constants.EXPIRY_TIME));
+            food.setPushId((String) value.get(Constants.PUSH_ID));
+            food.setDishName((String) value.get(Constants.DISH_NAME));
+            food.setCuisine((String) value.get(Constants.CUISINE));
+            if (value.get(Constants.EXPIRY_TIME) != null) {
+                food.setExpiryTime((long) value.get(Constants.EXPIRY_TIME));
             }
-            food.setIngredientsTags(String.valueOf(singleUser.get(Constants.INCIDENT_TAGS)));
-            food.setImageUri((String) singleUser.get(Constants.IMAGE_URI));
-            food.setPrice((long) singleUser.get(Constants.PRICE));
-            food.setNumberOfServings((long) singleUser.get(Constants.NO_OF_SERVINGS));
-            food.setLatitude((double) singleUser.get(Constants.LATITUDE));
-            food.setLongitude((double) singleUser.get(Constants.LONGITUDE));
-            food.setPickUpLocation((String) singleUser.get(Constants.PICK_UP_LOCATION));
-            food.setCheckIfOrderIsActive((Boolean) singleUser.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
-            food.setCheckIfFoodIsInDraftMode((Boolean) singleUser.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-            food.setCheckIfOrderIsPurchased((Boolean) singleUser.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
-            if (singleUser.get(Constants.POSTED_BY) != null) {
-                food.setPostedBy((String) singleUser.get(Constants.POSTED_BY));
+            food.setIngredientsTags(String.valueOf(value.get(Constants.INGREDIENTS_TAGS)));
+            food.setImageUri((String) value.get(Constants.IMAGE_URI));
+            food.setPrice((long) value.get(Constants.PRICE));
+            food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
+            food.setLatitude((double) value.get(Constants.LATITUDE));
+            food.setLongitude((double) value.get(Constants.LONGITUDE));
+            food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
+            food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
+            food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+            food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+            if (value.get(Constants.POSTED_BY) != null) {
+                food.setPostedBy((String) value.get(Constants.POSTED_BY));
             }
 
-            if (singleUser.get(Constants.TIME_STAMP) != null) {
-                food.setTime(singleUser.get(Constants.TIME_STAMP).toString());
+            if (value.get(Constants.TIME_STAMP) != null) {
+                food.setTime(value.get(Constants.TIME_STAMP).toString());
             }
-            if (singleUser.get(Constants.PURCHASED_BY) != null) {
-                food.setPurchasedBy((String) singleUser.get(Constants.PURCHASED_BY));
+            if (value.get(Constants.PURCHASED_BY) != null) {
+                food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
             }
 
 
@@ -167,11 +165,12 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
                             && !food.getPostedBy().equals(user.getUid())
                     ) {
 
-                foods.add(food);
+                    foods.add(food);
+
             }
 
         }
-    }
+
 
 
     @Override
