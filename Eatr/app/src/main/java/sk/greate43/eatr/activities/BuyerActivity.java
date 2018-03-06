@@ -3,6 +3,7 @@ package sk.greate43.eatr.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Profile;
+import sk.greate43.eatr.interfaces.Search;
 import sk.greate43.eatr.interfaces.UpdateData;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
@@ -36,7 +38,7 @@ public class BuyerActivity extends AppCompatActivity {
     FirebaseStorage mStorage;
     StorageReference storageRef;
     UpdateData updateData;
-
+    private Search search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +59,6 @@ public class BuyerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-
-
         mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -75,7 +75,10 @@ public class BuyerActivity extends AppCompatActivity {
         });
 
 
+    }
 
+    public void setCallbackListener(Search search) {
+        this.search = search;
     }
 
 
@@ -83,7 +86,32 @@ public class BuyerActivity extends AppCompatActivity {
         if (user != null) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.menu, menu);
+            // Get the SearchView and set the searchable configuration
+            final SearchView searchView = (SearchView) menu.findItem(R.id.menu_item_search).getActionView();
+            // perform set on query text listener event
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    if (search != null) {
+                        search.onSearchCompleted(query);
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+
+                    if (search != null) {
+                        search.onSearchCompleted(newText);
+                    }
+                    return false;
+                }
+            });
+
+
             return true;
+
+
         }
         return false;
     }

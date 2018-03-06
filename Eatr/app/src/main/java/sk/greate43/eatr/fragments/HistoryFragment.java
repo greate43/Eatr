@@ -8,6 +8,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -48,6 +50,7 @@ public class HistoryFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(Constants.USER_TYPE, userType);
         fragment.setArguments(args);
+        Log.d(TAG, "newInstance: "+userType);
         return fragment;
     }
 
@@ -56,6 +59,7 @@ public class HistoryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             userType = getArguments().getString(Constants.USER_TYPE);
+            Log.d(TAG, "onCreate: "+userType);
         }
     }
 
@@ -64,6 +68,9 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
+        setHasOptionsMenu(true);
+
+
         recyclerView = view.findViewById(R.id.fragment_history_recycler_view);
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -121,41 +128,44 @@ public class HistoryFragment extends Fragment {
     }
 
     private void collectHistory(Map<String, Object> value) {
-        Log.d(TAG, "collectHistory: "+value);
 
-            Food food = new Food();
-            food.setPushId((String) value.get(Constants.PUSH_ID));
-            food.setDishName((String) value.get(Constants.DISH_NAME));
-            food.setCuisine((String) value.get(Constants.CUISINE));
-            if (value.get(Constants.EXPIRY_TIME) != null) {
-                food.setExpiryTime((long) value.get(Constants.EXPIRY_TIME));
-            }
-            food.setIngredientsTags(String.valueOf(value.get(Constants.INGREDIENTS_TAGS)));
-            food.setImageUri((String) value.get(Constants.IMAGE_URI));
-            food.setPrice((long) value.get(Constants.PRICE));
-            food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
-            food.setLatitude((double) value.get(Constants.LATITUDE));
-            food.setLongitude((double) value.get(Constants.LONGITUDE));
-            food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
-            food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
-            food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-            food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
-            if (value.get(Constants.POSTED_BY) != null) {
-                food.setPostedBy((String) value.get(Constants.POSTED_BY));
-            }
+        Food food = new Food();
+        food.setPushId((String) value.get(Constants.PUSH_ID));
+        food.setDishName((String) value.get(Constants.DISH_NAME));
+        food.setCuisine((String) value.get(Constants.CUISINE));
+        if (value.get(Constants.EXPIRY_TIME) != null) {
+            food.setExpiryTime((long) value.get(Constants.EXPIRY_TIME));
+        }
+        food.setIngredientsTags(String.valueOf(value.get(Constants.INGREDIENTS_TAGS)));
+        food.setImageUri((String) value.get(Constants.IMAGE_URI));
+        food.setPrice((long) value.get(Constants.PRICE));
+        food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
+        food.setLatitude((double) value.get(Constants.LATITUDE));
+        food.setLongitude((double) value.get(Constants.LONGITUDE));
+        food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
+        food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
+        food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+        if (value.get(Constants.POSTED_BY) != null) {
+            food.setPostedBy((String) value.get(Constants.POSTED_BY));
+        }
 
-            if (value.get(Constants.TIME_STAMP) != null) {
-                food.setTime(value.get(Constants.TIME_STAMP).toString());
-            }
-            if (value.get(Constants.PURCHASED_BY) != null) {
-                food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
-            }
+        if (value.get(Constants.TIME_STAMP) != null) {
+            food.setTime(value.get(Constants.TIME_STAMP).toString());
+        }
+        if (value.get(Constants.PURCHASED_BY) != null) {
+            food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
+        }
 
-            if (value.get(Constants.PURCHASED_DATE) != null) {
-                food.setPurchasedDate((long) value.get(Constants.PURCHASED_DATE));
-            }
+        if (value.get(Constants.PURCHASED_DATE) != null) {
+            food.setPurchasedDate((long) value.get(Constants.PURCHASED_DATE));
+        }
 
-            if (userType.equals(Constants.TYPE_BUYER)) {
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                Log.d(TAG, "collectHistory: " + food.getPurchasedBy());
+                Log.d(TAG, "collectHistory:current user "+user.getUid());
+
                 if (
                         !food.getCheckIfFoodIsInDraftMode()
                                 && food.getCheckIfOrderIsPurchased()
@@ -166,7 +176,8 @@ public class HistoryFragment extends Fragment {
                     foods.add(food);
                 }
 
-            } else if (userType.equals(Constants.TYPE_SELLER)) {
+                break;
+            case Constants.TYPE_SELLER:
                 if (
                         !food.getCheckIfFoodIsInDraftMode()
                                 && food.getCheckIfOrderIsPurchased()
@@ -177,11 +188,24 @@ public class HistoryFragment extends Fragment {
                     foods.add(food);
                 }
 
-            }
-
+                break;
         }
 
     }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
+
+
+    }
+
+
+
+}
 
 
 

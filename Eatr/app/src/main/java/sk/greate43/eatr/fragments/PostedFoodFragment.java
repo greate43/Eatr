@@ -109,7 +109,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 //        itemTouchHelper.attachToRecyclerView(recyclerView);
 
 
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).startAt(user.getUid()).endAt(user.getUid() + "\uf8ff").addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 

@@ -29,8 +29,7 @@
         <activity
             android:name=".activities.SellerActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -55,11 +54,15 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".activities.BuyerActivity"
+        <activity
+            android:name=".activities.BuyerActivity"
             android:theme="@style/AppTheme.NoActionBar"
 
-            />
+            >
+
+        </activity>
         <activity android:name=".activities.DetailFoodActivity" />
+
     </application>
 
 </manifest>

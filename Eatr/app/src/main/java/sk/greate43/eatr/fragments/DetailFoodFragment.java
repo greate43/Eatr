@@ -108,18 +108,15 @@ public class DetailFoodFragment extends Fragment {
             btnOrder.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String userId = "";
                     String pushId = "";
 
-                    if (food.getPostedBy() != null) {
-                        userId = food.getPostedBy();
-                    }
+
 
                     if (food.getPushId() != null) {
                         pushId = food.getPushId();
                     }
 
-                    writeData(userId,pushId);
+                    writeData(pushId);
 
                 }
             });
@@ -130,9 +127,9 @@ public class DetailFoodFragment extends Fragment {
         return view;
     }
 
-    private void writeData(final  String uid,final String pushId) {
+    private void writeData(final String pushId) {
         showProgressDialog();
-        mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(uid));
+        mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(user.getUid()));
         if (getActivity() != null) {
             getActivity().finish();
         }

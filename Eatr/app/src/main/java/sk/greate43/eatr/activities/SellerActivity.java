@@ -62,8 +62,6 @@ public class SellerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-
-
         mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -114,6 +112,15 @@ public class SellerActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
+
+        return true;
+    }
 
     private void showData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
