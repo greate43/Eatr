@@ -659,14 +659,12 @@ public class AddFoodItemFragment extends Fragment implements
                 } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
                     etDishName.setError("Dish Name is Empty  ");
                 } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
-                    etDishName.setError("Cuisine Name is Empty  ");
-                } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
-                    etCuisine.setError("Dish Name is Empty  ");
+                    etCuisine.setError("Cuisine Name is Empty  ");
+                } else if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
+                    etPickLocation.setError("Pick Up Name is Empty  ");
                 } else if (etIncidentsTags.getTagList().isEmpty()) {
 
                     tilIncidentsTags.setError("There Should be at Lest 1 Tag");
-                } else if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
-                    etDishName.setError("Pick Up Name is Empty  ");
                 }
 
                 break;

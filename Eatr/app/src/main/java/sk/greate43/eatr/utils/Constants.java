@@ -79,4 +79,6 @@ public interface Constants {
     // Permission and Requests Constants
 
 
+    String MAX_UNI_CODE_LIMIT = "\uf8ff";
+
 }
