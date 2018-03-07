@@ -32,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
@@ -129,9 +131,11 @@ public class ProfileFragment extends Fragment {
 
                     saveUserProfile(user.getUid()
                             , etFirstName.getText().toString()
-                            , etFirstName.getText().toString()
+                            , etLastName.getText().toString()
                             , imgUri
-                            , spinnerUserType.getSelectedItem().toString());
+                            , spinnerUserType.getSelectedItem().toString()
+                            , etEmail.getText().toString()
+                    );
 
 
                 } else if (TextUtils.isEmpty(etFirstName.getText())) {
@@ -157,7 +161,7 @@ public class ProfileFragment extends Fragment {
         return false;
     }
 
-    private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType) {
+    private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType, final String email) {
         showProgressDialog();
 
         imgProfilePicture.setDrawingCacheEnabled(true);
@@ -168,7 +172,7 @@ public class ProfileFragment extends Fragment {
         byte[] data = baos.toByteArray();
 
 
-        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(userId).child(Constants.PROFILE).child(userId).putBytes(data);
+        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(userId).child(userId).putBytes(data);
 
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
@@ -183,6 +187,8 @@ public class ProfileFragment extends Fragment {
                 profile.setLastName(lastName);
                 profile.setProfilePhotoUri(downloadUrl);
                 profile.setUserType(userType);
+                if (!email.isEmpty())
+                    profile.setEmail(email);
 
                 mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
 
@@ -303,10 +309,7 @@ public class ProfileFragment extends Fragment {
         if (requestCode == GALLERY_RESULT) {
             if (data != null) {
                 imgUri = data.getData();
-                imgProfilePicture.setImageURI(Uri.parse(String.valueOf(imgUri)));
-                imgProfilePicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                Log.d(TAG, "onActivityResult: " + imgUri.getLastPathSegment());
+                setProfileImage(imgUri);
             }
 
         } else if (requestCode == CAMERA_RESULT) {
@@ -315,14 +318,28 @@ public class ProfileFragment extends Fragment {
             String pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
 
             imgUri = Uri.parse(pathOfBmp);
-
-            imgProfilePicture.setImageURI(Uri.parse(String.valueOf(imgUri)));
-            imgProfilePicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            Log.d(TAG, "onActivityResult: " + imgUri);
-
+            setProfileImage(imgUri);
         }
 
+    }
 
+
+    private void setProfileImage(Uri imgUri) {
+        Picasso.with(getActivity())
+                .load(imgUri)
+                .fit()
+                .centerCrop()
+                .into(imgProfilePicture, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "onSuccess: ");
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
     }
 
     public void showProgressDialog() {

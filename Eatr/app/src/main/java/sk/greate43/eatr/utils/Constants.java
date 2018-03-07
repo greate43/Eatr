@@ -19,7 +19,7 @@ public interface Constants {
     String DISH_NAME = "dishName";
     String CUISINE = "cuisine";
     String EXPIRY_TIME = "expiryTime";
-    String INCIDENT_TAGS = "ingredientsTags";
+    String INGREDIENTS_TAGS = "ingredientsTags";
     String IMAGE_URI = "imageUri";
     String PICK_UP_LOCATION = "pickUpLocation";
     String CHECK_IF_ORDER_IS_ACTIVE = "checkIfOrderIsActive";
@@ -58,6 +58,11 @@ public interface Constants {
     String TYPE_SELLER = "SELLER";
     String TYPE_BUYER = "BUYER";
     String USER_TYPE = "userType";
+    String PROFILE_PHOTO_URI = "profilePhotoUri";
+    String FIRST_NAME = "firstName";
+    String LAST_NAME = "lastName";
+    String USER_ID = "userId";
+    String EMAIL = "email";
 
     // profile
 
@@ -73,5 +78,7 @@ public interface Constants {
     int PLACE_PICKER_REQUEST = 1;
     // Permission and Requests Constants
 
+
+    String MAX_UNI_CODE_LIMIT = "\uf8ff";
 
 }
