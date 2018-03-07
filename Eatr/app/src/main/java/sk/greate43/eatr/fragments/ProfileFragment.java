@@ -32,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
@@ -133,7 +135,7 @@ public class ProfileFragment extends Fragment {
                             , imgUri
                             , spinnerUserType.getSelectedItem().toString()
                             , etEmail.getText().toString()
-                            );
+                    );
 
 
                 } else if (TextUtils.isEmpty(etFirstName.getText())) {
@@ -307,10 +309,7 @@ public class ProfileFragment extends Fragment {
         if (requestCode == GALLERY_RESULT) {
             if (data != null) {
                 imgUri = data.getData();
-                imgProfilePicture.setImageURI(Uri.parse(String.valueOf(imgUri)));
-                imgProfilePicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-                Log.d(TAG, "onActivityResult: " + imgUri.getLastPathSegment());
+                setProfileImage(imgUri);
             }
 
         } else if (requestCode == CAMERA_RESULT) {
@@ -319,14 +318,28 @@ public class ProfileFragment extends Fragment {
             String pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
 
             imgUri = Uri.parse(pathOfBmp);
-
-            imgProfilePicture.setImageURI(Uri.parse(String.valueOf(imgUri)));
-            imgProfilePicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            Log.d(TAG, "onActivityResult: " + imgUri);
-
+            setProfileImage(imgUri);
         }
 
+    }
 
+
+    private void setProfileImage(Uri imgUri) {
+        Picasso.with(getActivity())
+                .load(imgUri)
+                .fit()
+                .centerCrop()
+                .into(imgProfilePicture, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(TAG, "onSuccess: ");
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
     }
 
     public void showProgressDialog() {

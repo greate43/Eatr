@@ -5,6 +5,7 @@ package sk.greate43.eatr.utils;
  */
 
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
@@ -13,11 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
@@ -29,10 +31,12 @@ import com.squareup.picasso.Picasso;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.BuyerActivity;
+import sk.greate43.eatr.activities.MainActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.fragments.BuyerFragment;
 import sk.greate43.eatr.fragments.SellerFragment;
+import sk.greate43.eatr.fragments.SettingFragment;
 import sk.greate43.eatr.interfaces.UpdateData;
 
 
@@ -61,10 +65,10 @@ public class DrawerUtil implements UpdateData {
                 .withName("Home").withIcon(R.drawable.ic_home_black_24dp);
 
 
-        SecondaryDrawerItem drawerItemSettings = new SecondaryDrawerItem().withIdentifier(3)
-                .withName("Settings").withIcon(R.drawable.ic_home_black_24dp);
-        SecondaryDrawerItem drawerItemLogout = new SecondaryDrawerItem().withIdentifier(4)
-                .withName("Logout").withIcon(R.drawable.ic_home_black_24dp);
+        SecondaryDrawerItem drawerItemSettings = new SecondaryDrawerItem().withIdentifier(2)
+                .withName("Settings").withIcon(R.drawable.ic_settings_black_24dp);
+        SecondaryDrawerItem drawerItemLogout = new SecondaryDrawerItem().withIdentifier(3)
+                .withName("Logout").withIcon(R.drawable.logout);
 
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
             @Override
@@ -115,9 +119,10 @@ public class DrawerUtil implements UpdateData {
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         drawerItemHome,
-                        new DividerDrawerItem(),
-                        drawerItemLogout,
-                        drawerItemSettings
+                        //  new DividerDrawerItem(),
+                        drawerItemSettings,
+                        drawerItemLogout
+
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -128,14 +133,37 @@ public class DrawerUtil implements UpdateData {
 //                            view.getContext().startActivity(intent);
 
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_seller_container, SellerFragment.getInstance()).commit();
+                            fragment.beginTransaction().replace(R.id.content_seller_container, SellerFragment.newInstance()).commit();
                         } else if (drawerItem.getIdentifier() == 1 && (activity instanceof BuyerActivity)) {
                             // load tournament screen
 //                            Intent intent = new Intent(activity, MainActivity.class);
 //                            view.getContext().startActivity(intent);
 
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_buyer_container, BuyerFragment.getInstance()).commit();
+                            fragment.beginTransaction().replace(R.id.content_buyer_container, BuyerFragment.newInstance()).commit();
+                        } else if (drawerItem.getIdentifier() == 2 && (activity instanceof SellerActivity)) {
+
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().replace(R.id.content_seller_container, SettingFragment.newInstance()).commit();
+
+                        } else if (drawerItem.getIdentifier() == 2 && (activity instanceof BuyerActivity)) {
+
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().replace(R.id.content_buyer_container, SettingFragment.newInstance()).commit();
+
+                        } else if (drawerItem.getIdentifier() == 3) {
+                            FirebaseAuth mAuth;
+                            FirebaseUser user;
+                            mAuth = FirebaseAuth.getInstance();
+                            user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                mAuth.signOut();
+                                activity.finish();
+                                Intent intent = new Intent(activity, MainActivity.class);
+
+                                activity.startActivity(intent);
+                            }
+
                         }
 
 
@@ -162,7 +190,8 @@ public class DrawerUtil implements UpdateData {
     @Override
     public void onNavDrawerDataUpdated(Profile data) {
 
-        if (data != null) {
+        if (data != null && data.getProfilePhotoUri() != null) {
+
             headerResult.addProfiles(new ProfileDrawerItem().withName(data.getFullname()).withIcon(Uri.parse(data.getProfilePhotoUri())));
         }
 

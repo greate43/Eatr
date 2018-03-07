@@ -11,9 +11,6 @@
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="@string/title_history" />
 
-    <item
-        android:id="@+id/navigation_seller_settings"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_settings" />
+
 
 </menu>
