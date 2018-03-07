@@ -22,7 +22,7 @@ public class SellerFragment extends Fragment {
 
 
     @NonNull
-    public static SellerFragment getInstance(){
+    public static SellerFragment newInstance(){
         return new SellerFragment();
     }
 
@@ -51,13 +51,7 @@ public class SellerFragment extends Fragment {
                             .addToBackStack(null)
                             .commit();
                     return true;
-                case R.id.navigation_seller_settings:
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.fragment_seller_container, SettingFragment.newInstance())
-                            .addToBackStack(null)
-                            .commit();
 
-                    return true;
             }
             return false;
         }

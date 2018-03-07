@@ -141,7 +141,7 @@ public class SellerActivity extends AppCompatActivity {
         if (String.valueOf(value.get(Constants.EMAIL)) != null) {
             profile.setUserId(String.valueOf(value.get(Constants.EMAIL)));
         }
-        if (updateData != null) {
+        if (updateData != null ) {
             updateData.onNavDrawerDataUpdated(profile);
         }
 

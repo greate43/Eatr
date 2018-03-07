@@ -25,7 +25,7 @@ public class BuyerFragment extends Fragment {
     FirebaseUser user;
 
     @NonNull
-    public static BuyerFragment getInstance(){
+    public static BuyerFragment newInstance(){
         return new BuyerFragment();
     }
     public BuyerFragment() {
@@ -52,12 +52,7 @@ public class BuyerFragment extends Fragment {
                             .addToBackStack(null)
                             .commit();
                     return true;
-                case R.id.navigation_buyer_settings:
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.fragment_buyer_container, SettingFragment.newInstance())
-                            .addToBackStack(null)
-                            .commit();
-                    return true;
+
             }
             return false;
         }
