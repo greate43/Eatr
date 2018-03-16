@@ -1,0 +1,164 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_edit_text"
+    tools:context="sk.greate43.eatr.fragments.DetailFoodFragment">
+
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/fragment_detail_food_image_view_food_item"
+        app:layout_constraintTop_toTopOf="@+id/fragment_detail_food_image_view_food_item">
+
+        <ImageView
+            android:id="@+id/fragment_detail_food_image_view_food_item"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+            android:src="@drawable/bg_sample_tag"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_dish_name"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_dish_name"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_dish_name" />
+
+        <Button
+            android:id="@+id/fragment_detail_food_button_order"
+            android:layout_width="178dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="88dp"
+            android:layout_marginTop="8dp"
+            android:text="Order"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_image_view_food_item"
+            app:layout_constraintStart_toEndOf="@+id/fragment_detail_food_price"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_image_view_food_item" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_dish_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/black_transparent"
+            android:textAlignment="center"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Aloo " />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@android:color/holo_green_dark"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_button_order"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_image_view_food_item"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_image_view_food_item"
+            tools:text="Rs : 14" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_no_of_servings_lbl"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="No Of Servings "
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_no_of_servings"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_cuisine_lbl"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_cuisine_lbl" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_no_of_servings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_cuisine"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_cuisine"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_cuisine"
+            tools:text="4" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_no_of_pick_up_location_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Pick Up Location"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_no_of_pick_up_location"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_servings_lbl"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_servings_lbl" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_no_of_pick_up_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_no_of_servings"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_servings"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_servings"
+            tools:text="Sir Syed Colony Street No 7 " />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_tags_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+
+            android:text="Tags"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_tags"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_pick_up_location_lbl"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_pick_up_location_lbl" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_tags"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_no_of_pick_up_location"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_pick_up_location"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_pick_up_location"
+            tools:text="Aloo,salt,noodles ,baking powder" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_cuisine_lbl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cuisine"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_cuisine"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_price"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_price" />
+
+        <TextView
+            android:id="@+id/fragment_detail_food_cuisine"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_button_order"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_button_order"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_button_order"
+            tools:text="Pakistani" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

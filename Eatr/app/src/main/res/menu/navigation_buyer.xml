@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_buyer_buy"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/navigation_buyer_buy" />
+
+    <item
+        android:id="@+id/navigation_buyer_history"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="@string/navigation_buyer_history" />
+
+
+
+</menu>
