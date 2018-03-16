@@ -1,3 +1,6 @@
+/**
+ * Activities Package
+ */
 package sk.greate43.eatr.activities;
 
 import android.os.Bundle;
@@ -10,7 +13,7 @@ import sk.greate43.eatr.fragments.AuthenticationFragment;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
 
 
-public class MainActivity extends AppCompatActivity implements ReplaceFragment{
+public class MainActivity extends AppCompatActivity implements ReplaceFragment {
 
 
     @Override
@@ -31,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements ReplaceFragment{
         fragmentManager.beginTransaction()
                 .replace(R.id.actvivity_main_frame_layout_fragment_container, fragment)
                 .addToBackStack(null)
-                .commit();
+                .commitAllowingStateLoss();
     }
+
+
 }

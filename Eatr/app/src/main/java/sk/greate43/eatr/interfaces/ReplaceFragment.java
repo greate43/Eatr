@@ -7,5 +7,9 @@ import android.support.v4.app.Fragment;
  */
 
 public interface ReplaceFragment {
+
+    /**
+     * @param fragment : passed fragment will be replaced with current fragment
+     */
     void onFragmentReplaced(Fragment fragment);
 }
