@@ -199,6 +199,11 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         }
 
 
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null){
+            food.setCheckIfOrderIsInProgress((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+        }
+
+
         if (value.get(Constants.POSTED_BY) != null) {
             food.setPurchasedBy((String) value.get(Constants.POSTED_BY));
         }

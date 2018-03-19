@@ -33,9 +33,19 @@ public class Food implements Serializable {
     private String purchasedBy;
     private String postedBy;
     private long purchasedDate;
+    private Boolean checkIfOrderIsInProgress;
+
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+    public Boolean getCheckIfOrderIsInProgress() {
+        return checkIfOrderIsInProgress;
+    }
+
+    public void setCheckIfOrderIsInProgress(Boolean checkIfOrderIsInProgress) {
+        this.checkIfOrderIsInProgress = checkIfOrderIsInProgress;
     }
 
     public long getPurchasedDate() {

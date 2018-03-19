@@ -481,6 +481,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsPurchased(false);
                 food.setPostedBy(user.getUid());
                 food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
 
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
@@ -521,6 +522,8 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsPurchased(false);
                 food.setPostedBy(user.getUid());
                 food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
+
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 if (dialogUploadingImage.isShowing()) {
                     dialogUploadingImage.dismiss();
