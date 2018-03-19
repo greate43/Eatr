@@ -32,6 +32,7 @@ public interface Constants {
     String PURCHASED_BY = "purchasedBy";
     String POSTED_BY = "postedBy";
     String PURCHASED_DATE = "purchasedDate";
+    String CHECK_IF_ORDER_IS_IN_PROGRESS = "checkIfOrderIsInProgress";
     //Food Constants
 
 

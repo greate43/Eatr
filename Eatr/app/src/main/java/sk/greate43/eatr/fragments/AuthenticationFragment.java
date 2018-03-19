@@ -21,6 +21,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,8 +77,11 @@ public class AuthenticationFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_authentation, container, false);
+        FirebaseApp.initializeApp(getActivity());
+
         btnAuthPhoneNo = view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
         btnAuthGoogle = view.findViewById(R.id.fragment_authentation_button_google_auth);
         imgAppLogo = view.findViewById(R.id.fragment_authemtation_app_logo);
