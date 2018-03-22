@@ -33,8 +33,22 @@ public interface Constants {
     String POSTED_BY = "postedBy";
     String PURCHASED_DATE = "purchasedDate";
     String CHECK_IF_ORDER_IS_IN_PROGRESS = "checkIfOrderIsInProgress";
+    String CHECK_IF_ORDER_IS_ACCEPTED = "checkIfOrderIsAccepted";
+    String CHECK_IF_ORDERED_IS_BOOKED = "checkIfOrderIsBooked";
     //Food Constants
 
+
+    /**
+     * {@link sk.greate43.eatr.entities.Notification }
+     */
+    String ARGS_NOTIFICATION = "ARGS_NOTIFICATION";
+    String NOTIFICATION = "Notification";
+    String CHECK_IF_BUTTON_SHOULD_BE_ENABLED = "checkIfButtonShouldBeEnabled";
+    String MESSAGE = "message";
+    String TITLE = "title";
+    String SENDER_ID = "senderId";
+    String RECEIVER_ID = "receiverId";
+    String ORDER_ID = "orderId";
 
     /**
      * {@link sk.greate43.eatr.fragments.AddFoodItemFragment}

@@ -36,6 +36,7 @@ import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.fragments.BuyerFragment;
 import sk.greate43.eatr.fragments.MapFragment;
+import sk.greate43.eatr.fragments.NotificationFragment;
 import sk.greate43.eatr.fragments.ProfileFragment;
 import sk.greate43.eatr.fragments.SellerFragment;
 import sk.greate43.eatr.fragments.SettingFragment;
@@ -75,7 +76,8 @@ public class DrawerUtil implements UpdateData {
                 .withName("Map").withIcon(R.drawable.logout);
         SecondaryDrawerItem drawerProfile = new SecondaryDrawerItem().withIdentifier(4)
                 .withName("Profile").withIcon(R.drawable.ic_account_box_black_24dp);
-
+        SecondaryDrawerItem drawerNotification = new SecondaryDrawerItem().withIdentifier(6)
+                .withName("Notification").withIcon(R.drawable.ic_notifications_black_24dp);
 
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
             @Override
@@ -126,6 +128,7 @@ public class DrawerUtil implements UpdateData {
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         drawerItemHome,
+                        drawerNotification,
                         drawerProfile,
                         //  new DividerDrawerItem(),
                         drawerItemSettings,
@@ -186,8 +189,15 @@ public class DrawerUtil implements UpdateData {
                                 FragmentManager fragment = activity.getSupportFragmentManager();
                                 fragment.beginTransaction().replace(R.id.content_seller_container, MapFragment.newInstance()).commit();
                             }
-                        }
+                        } else if (drawerItem.getIdentifier() == 6 && activity instanceof SellerActivity) {
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().replace(R.id.content_seller_container, NotificationFragment.newInstance()).commit();
 
+                        } else if (drawerItem.getIdentifier() == 6 && activity instanceof BuyerActivity) {
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().replace(R.id.content_buyer_container, NotificationFragment.newInstance()).commit();
+
+                        }
 
                         closeDrawer();
 

@@ -87,7 +87,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
                 startActivity(intent);
-
             }
         });
 
