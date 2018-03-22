@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -20,7 +21,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,6 +37,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
@@ -65,21 +66,34 @@ public class ProfileFragment extends Fragment {
     private TextInputEditText etFirstName;
     private TextInputEditText etLastName;
     private TextInputEditText etEmail;
-    private ImageView imgProfilePicture;
+    private CircleImageView imgProfilePicture;
     private Spinner spinnerUserType;
     private Button btnSaveProfile;
     private Uri imgUri;
     private ProgressDialog mProgressDialog;
+    Boolean allowToCheckUserType ;
 
     public ProfileFragment() {
     }
 
+    public static final String ALLOW_TO_CHECK_USER_TYPE = "ALLOW_TO_CHECK_USER_TYPE";
 
+    @NonNull
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
-//        Bundle args = new Bundle();
-//
-//        fragment.setArguments(args);
+        Bundle args = new Bundle();
+        args.putBoolean(ALLOW_TO_CHECK_USER_TYPE, true);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static ProfileFragment newInstance(Profile profile) {
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ALLOW_TO_CHECK_USER_TYPE, false);
+        args.putSerializable(Constants.ARGS_PROFILE, profile);
+
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -87,13 +101,13 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
-            profile = (Profile) getArguments().getSerializable(Constants.ARGS_FOOD);
+            allowToCheckUserType = getArguments().getBoolean(ALLOW_TO_CHECK_USER_TYPE);
+            profile = (Profile) getArguments().getSerializable(Constants.ARGS_PROFILE);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -135,6 +149,7 @@ public class ProfileFragment extends Fragment {
                             , imgUri
                             , spinnerUserType.getSelectedItem().toString()
                             , etEmail.getText().toString()
+                            , v
                     );
 
 
@@ -147,6 +162,23 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+
+        if (profile != null) {
+            imgUri = Uri.parse(profile.getProfilePhotoUri());
+            etFirstName.setText(profile.getFirstName());
+            etLastName.setText(profile.getLastName());
+            etEmail.setText(profile.getEmail());
+            if (imgUri != null)
+                setProfileImage(imgUri);
+            if (profile.getUserType() != null && profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
+                spinnerUserType.setSelection(0);
+            } else if (profile.getUserType() != null && profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
+                spinnerUserType.setSelection(1);
+
+            }
+
+
+        }
 
         return view;
     }
@@ -161,7 +193,7 @@ public class ProfileFragment extends Fragment {
         return false;
     }
 
-    private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType, final String email) {
+    private void saveUserProfile(final String userId, final String firstName, final String lastName, Uri imgUri, final String userType, final String email, final View view) {
         showProgressDialog();
 
         imgProfilePicture.setDrawingCacheEnabled(true);
@@ -191,22 +223,28 @@ public class ProfileFragment extends Fragment {
                     profile.setEmail(email);
 
                 mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
+                if (allowToCheckUserType) {
+                    if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
+                        if (getActivity() != null) {
+                            Intent intent = new Intent(getActivity(), SellerActivity.class);
+                            getActivity().startActivity(intent);
+                            getActivity().finish();
+                        }
 
-                if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
-                    if (getActivity() != null) {
-                        Intent intent = new Intent(getActivity(), SellerActivity.class);
-                        getActivity().startActivity(intent);
-                        getActivity().finish();
+                    } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
+                        if (getActivity() != null) {
+                            Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                            getActivity().startActivity(intent);
+                            getActivity().finish();
+                        }
                     }
-
-                } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
-                    if (getActivity() != null) {
-                        Intent intent = new Intent(getActivity(), BuyerActivity.class);
-                        getActivity().startActivity(intent);
-                        getActivity().finish();
-                    }
+                } else {
+                    Snackbar.make(view, "Profile was Successfully Updated", Snackbar.LENGTH_LONG).show();
                 }
+
+
                 hideProgressDialog();
+
 
             }
 
@@ -222,7 +260,30 @@ public class ProfileFragment extends Fragment {
                 profile.setUserType(userType);
 
                 mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
+
+
+                if (allowToCheckUserType) {
+                    if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
+                        if (getActivity() != null) {
+                            Intent intent = new Intent(getActivity(), SellerActivity.class);
+                            getActivity().startActivity(intent);
+                            getActivity().finish();
+                        }
+
+                    } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
+                        if (getActivity() != null) {
+                            Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                            getActivity().startActivity(intent);
+                            getActivity().finish();
+                        }
+                    }
+                } else {
+                    Snackbar.make(view, "Profile was Successfully Updated But Image wasn't uploaded", Snackbar.LENGTH_LONG).show();
+                }
+
+
                 hideProgressDialog();
+
             }
         });
 

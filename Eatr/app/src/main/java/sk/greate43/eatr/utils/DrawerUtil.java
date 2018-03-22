@@ -35,6 +35,9 @@ import sk.greate43.eatr.activities.MainActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.fragments.BuyerFragment;
+import sk.greate43.eatr.fragments.MapFragment;
+import sk.greate43.eatr.fragments.NotificationFragment;
+import sk.greate43.eatr.fragments.ProfileFragment;
 import sk.greate43.eatr.fragments.SellerFragment;
 import sk.greate43.eatr.fragments.SettingFragment;
 import sk.greate43.eatr.interfaces.UpdateData;
@@ -69,11 +72,17 @@ public class DrawerUtil implements UpdateData {
                 .withName("Settings").withIcon(R.drawable.ic_settings_black_24dp);
         SecondaryDrawerItem drawerItemLogout = new SecondaryDrawerItem().withIdentifier(3)
                 .withName("Logout").withIcon(R.drawable.logout);
+        SecondaryDrawerItem drawerItemMap = new SecondaryDrawerItem().withIdentifier(5)
+                .withName("Map").withIcon(R.drawable.logout);
+        SecondaryDrawerItem drawerProfile = new SecondaryDrawerItem().withIdentifier(4)
+                .withName("Profile").withIcon(R.drawable.ic_account_box_black_24dp);
+        SecondaryDrawerItem drawerNotification = new SecondaryDrawerItem().withIdentifier(6)
+                .withName("Notification").withIcon(R.drawable.ic_notifications_black_24dp);
 
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
             @Override
             public void set(ImageView imageView, Uri uri, Drawable placeholder) {
-                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).fit().into(imageView);
+                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).fit().centerCrop().into(imageView);
             }
 
             @Override
@@ -119,9 +128,12 @@ public class DrawerUtil implements UpdateData {
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         drawerItemHome,
+                        drawerNotification,
+                        drawerProfile,
                         //  new DividerDrawerItem(),
                         drawerItemSettings,
-                        drawerItemLogout
+                        drawerItemLogout,
+                        drawerItemMap
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -164,8 +176,28 @@ public class DrawerUtil implements UpdateData {
                                 activity.startActivity(intent);
                             }
 
-                        }
+                        } else if (drawerItem.getIdentifier() == 4 && activity instanceof SellerActivity) {
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().replace(R.id.content_seller_container, ProfileFragment.newInstance(profile)).commit();
+                        } else if (drawerItem.getIdentifier() == 4 && activity instanceof BuyerActivity) {
+                            if (profile != null) {
+                                FragmentManager fragment = activity.getSupportFragmentManager();
+                                fragment.beginTransaction().replace(R.id.content_buyer_container, ProfileFragment.newInstance(profile)).commit();
+                            }
+                        } else if (drawerItem.getIdentifier() == 5 && activity instanceof SellerActivity) {
+                            if (profile != null) {
+                                FragmentManager fragment = activity.getSupportFragmentManager();
+                                fragment.beginTransaction().replace(R.id.content_seller_container, MapFragment.newInstance()).commit();
+                            }
+                        } else if (drawerItem.getIdentifier() == 6 && activity instanceof SellerActivity) {
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().replace(R.id.content_seller_container, NotificationFragment.newInstance()).commit();
 
+                        } else if (drawerItem.getIdentifier() == 6 && activity instanceof BuyerActivity) {
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().replace(R.id.content_buyer_container, NotificationFragment.newInstance()).commit();
+
+                        }
 
                         closeDrawer();
 
@@ -187,11 +219,14 @@ public class DrawerUtil implements UpdateData {
         return updateData;
     }
 
+    private Profile profile;
+
     @Override
     public void onNavDrawerDataUpdated(Profile data) {
+        profile = data;
 
         if (data != null && data.getProfilePhotoUri() != null) {
-
+            headerResult.clear();
             headerResult.addProfiles(new ProfileDrawerItem().withName(data.getFullname()).withIcon(Uri.parse(data.getProfilePhotoUri())));
         }
 
