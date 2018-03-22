@@ -2,6 +2,7 @@ package sk.greate43.eatr.fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.entities.Notification;
 import sk.greate43.eatr.utils.Constants;
 
 
@@ -58,7 +60,7 @@ public class DetailFoodFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_detail_food, container, false);
@@ -111,7 +113,6 @@ public class DetailFoodFragment extends Fragment {
                     String pushId = "";
 
 
-
                     if (food.getPushId() != null) {
                         pushId = food.getPushId();
                     }
@@ -129,7 +130,16 @@ public class DetailFoodFragment extends Fragment {
 
     private void writeData(final String pushId) {
         showProgressDialog();
+        Notification notification = new Notification();
+        notification.setTitle(food.getDishName());
+        notification.setMessage("Would you Like To Accept The Order ?");
+        notification.setSenderId(food.getPurchasedBy());
+        notification.setReceiverId(food.getPostedBy());
+        notification.setOrderId(food.getPushId());
+        notification.setCheckIfButtonShouldBeEnabled(true);
+
         mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(user.getUid()));
+        mDatabaseReference.child(Constants.NOTIFICATION).push().setValue(notification);
         if (getActivity() != null) {
             getActivity().finish();
         }
@@ -138,9 +148,10 @@ public class DetailFoodFragment extends Fragment {
 
     public Map<String, Object> toMap(String purchasedBy) {
         HashMap<String, Object> result = new HashMap<>();
-        result.put(Constants.CHECK_IF_ORDER_Is_PURCHASED, true);
+        result.put(Constants.CHECK_IF_ORDER_Is_PURCHASED, false);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, false);
         result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
+        result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, true);
         result.put(Constants.PURCHASED_BY, purchasedBy);
         result.put(Constants.PURCHASED_DATE, ServerValue.TIMESTAMP);
         return result;

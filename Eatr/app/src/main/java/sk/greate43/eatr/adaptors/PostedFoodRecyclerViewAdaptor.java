@@ -1,5 +1,6 @@
 package sk.greate43.eatr.adaptors;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,8 +40,9 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         return foods;
     }
 
+    @NonNull
     @Override
-    public PostedFoodRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PostedFoodRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.posted_food_list, parent, false);
 
 
@@ -48,7 +50,7 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     }
 
     @Override
-    public void onBindViewHolder(PostedFoodRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PostedFoodRecyclerViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
 
@@ -73,7 +75,7 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         int size = foods.size();
         if (size > 0) {
             for (int i = 0; i < size; i++) {
-                foods.remove(0);
+                foods.remove(i);
             }
 
             notifyItemRangeRemoved(0, size);

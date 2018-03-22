@@ -156,8 +156,9 @@ public class BuyerActivity extends AppCompatActivity {
         profile.setLastName(String.valueOf(value.get(Constants.LAST_NAME)));
         profile.setProfilePhotoUri(String.valueOf(value.get(Constants.PROFILE_PHOTO_URI)));
         if (String.valueOf(value.get(Constants.EMAIL)) != null) {
-            profile.setUserId(String.valueOf(value.get(Constants.EMAIL)));
+            profile.setEmail(String.valueOf(value.get(Constants.EMAIL)));
         }
+        profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));
         if (updateData != null) {
             updateData.onNavDrawerDataUpdated(profile);
         }
