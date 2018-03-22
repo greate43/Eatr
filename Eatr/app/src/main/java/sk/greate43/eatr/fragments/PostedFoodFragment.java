@@ -87,7 +87,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
                 startActivity(intent);
-
             }
         });
 
@@ -196,6 +195,11 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         }
         if (value.get(Constants.PURCHASED_BY) != null) {
             food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
+        }
+
+
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null){
+            food.setCheckIfOrderIsInProgress((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
         }
 
 

@@ -27,15 +27,34 @@ public class Food implements Serializable {
     private Uri image;
     private double longitude;
     private double latitude;
-    private Boolean checkIfFoodIsInDraftMode;
+    private boolean checkIfFoodIsInDraftMode;
     private String pushId;
-    private Boolean checkIfOrderIsPurchased;
+    private boolean checkIfOrderIsPurchased;
     private String purchasedBy;
     private String postedBy;
     private long purchasedDate;
+    private boolean checkIfOrderIsInProgress;
+    private boolean checkIfOrderIsAccepted;
+    private boolean checkIfOrderIsBooked;
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+    public boolean isCheckIfOrderIsBooked() {
+        return checkIfOrderIsBooked;
+    }
+
+    public void setCheckIfOrderIsBooked(boolean checkIfOrderIsBooked) {
+        this.checkIfOrderIsBooked = checkIfOrderIsBooked;
+    }
+
+    public boolean getCheckIfOrderIsInProgress() {
+        return checkIfOrderIsInProgress;
+    }
+
+    public void setCheckIfOrderIsInProgress(boolean checkIfOrderIsInProgress) {
+        this.checkIfOrderIsInProgress = checkIfOrderIsInProgress;
     }
 
     public long getPurchasedDate() {
@@ -46,11 +65,11 @@ public class Food implements Serializable {
         this.purchasedDate = purchasedDate;
     }
 
-    public Boolean getCheckIfFoodIsInDraftMode() {
+    public boolean getCheckIfFoodIsInDraftMode() {
         return checkIfFoodIsInDraftMode;
     }
 
-    public void setCheckIfFoodIsInDraftMode(Boolean checkIfFoodIsInDraftMode) {
+    public void setCheckIfFoodIsInDraftMode(boolean checkIfFoodIsInDraftMode) {
         this.checkIfFoodIsInDraftMode = checkIfFoodIsInDraftMode;
     }
 
@@ -70,11 +89,11 @@ public class Food implements Serializable {
         this.purchasedBy = purchasedBy;
     }
 
-    public Boolean getCheckIfOrderIsPurchased() {
+    public boolean getCheckIfOrderIsPurchased() {
         return checkIfOrderIsPurchased;
     }
 
-    public void setCheckIfOrderIsPurchased(Boolean checkIfOrderIsPurchased) {
+    public void setCheckIfOrderIsPurchased(boolean checkIfOrderIsPurchased) {
         this.checkIfOrderIsPurchased = checkIfOrderIsPurchased;
     }
 
@@ -84,6 +103,14 @@ public class Food implements Serializable {
 
     public void setPushId(String pushId) {
         this.pushId = pushId;
+    }
+
+    public boolean getCheckIfOrderIsAccepted() {
+        return checkIfOrderIsAccepted;
+    }
+
+    public void setCheckIfOrderIsAccepted(boolean checkIfOrderIsAccepted) {
+        this.checkIfOrderIsAccepted = checkIfOrderIsAccepted;
     }
 
     @Exclude

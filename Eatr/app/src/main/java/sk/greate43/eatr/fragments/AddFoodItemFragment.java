@@ -129,6 +129,7 @@ public class AddFoodItemFragment extends Fragment implements
 
     }
 
+
     //  private String mCurrentPhotoPath;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -177,7 +178,8 @@ public class AddFoodItemFragment extends Fragment implements
 
 // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+            if(getActivity() != null)
+                mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
@@ -238,80 +240,86 @@ public class AddFoodItemFragment extends Fragment implements
     }
 
     private void selectPictureFromGalleryOrCameraDialog() {
-        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(getActivity());
-        pictureDialog.setTitle("Select Action");
-        String[] pictureDialogItems = {
-                "Select photo from gallery",
-                "Capture photo from camera"};
-        pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                choosePhotoFromGallery();
-                                break;
-                            case 1:
-                                takePhotoFromCamera();
-                                break;
+        if(getActivity() != null) {
+            AlertDialog.Builder pictureDialog = new AlertDialog.Builder(getActivity());
+            pictureDialog.setTitle("Select Action");
+            String[] pictureDialogItems = {
+                    "Select photo from gallery",
+                    "Capture photo from camera"};
+            pictureDialog.setItems(pictureDialogItems,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                    choosePhotoFromGallery();
+                                    break;
+                                case 1:
+                                    takePhotoFromCamera();
+                                    break;
+                            }
                         }
-                    }
-                });
-        pictureDialog.show();
+                    });
+            pictureDialog.show();
+        }
     }
 
 
     private void askUserToStartGpsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Would You Like To Turn On The Gps?");
-        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                startGpsFromSettings();
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                showToast("App Might Not be Fully Functional if Gps Is Off  ");
-                dialog.dismiss();
-            }
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        if(getActivity() != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Would You Like To Turn On The Gps?");
+            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    startGpsFromSettings();
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    showToast("App Might Not be Fully Functional if Gps Is Off  ");
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
 
     public void choosePhotoFromGallery() {
-        int HasReadPermission = ContextCompat.checkSelfPermission(getActivity(), READ_EXTERNAL_STORAGE);
-        if (HasReadPermission != PackageManager.PERMISSION_GRANTED) {
+        if(getActivity() != null) {
+            int HasReadPermission = ContextCompat.checkSelfPermission(getActivity(), READ_EXTERNAL_STORAGE);
+            if (HasReadPermission != PackageManager.PERMISSION_GRANTED) {
 
 
-            ActivityCompat.requestPermissions(getActivity(), new String[]{READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
-            return;
+                ActivityCompat.requestPermissions(getActivity(), new String[]{READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
+                return;
+            }
+
+            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+            startActivityForResult(galleryIntent, GALLERY_RESULT);
         }
-
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-        startActivityForResult(galleryIntent, GALLERY_RESULT);
-
     }
 
     private void takePhotoFromCamera() {
+        if(getActivity() != null) {
+            int HasCameraPermission = ContextCompat.checkSelfPermission(getActivity(), CAMERA);
+            int HasWriteExternalStoragePermPermission = ContextCompat.checkSelfPermission(getActivity(), WRITE_EXTERNAL_STORAGE);
 
-        int HasCameraPermission = ContextCompat.checkSelfPermission(getActivity(), CAMERA);
-        int HasWriteExternalStoragePermPermission = ContextCompat.checkSelfPermission(getActivity(), WRITE_EXTERNAL_STORAGE);
-
-        if (HasCameraPermission != PackageManager.PERMISSION_GRANTED || HasWriteExternalStoragePermPermission != PackageManager.PERMISSION_GRANTED) {
+            if (HasCameraPermission != PackageManager.PERMISSION_GRANTED || HasWriteExternalStoragePermPermission != PackageManager.PERMISSION_GRANTED) {
 
 
-            ActivityCompat.requestPermissions(getActivity(), new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_AND_WRITE_PERMISSION);
-            return;
+                ActivityCompat.requestPermissions(getActivity(), new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_AND_WRITE_PERMISSION);
+                return;
+            }
+
+
+            Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, CAMERA_RESULT);
         }
-
-
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, CAMERA_RESULT);
     }
 
 
@@ -481,6 +489,9 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsPurchased(false);
                 food.setPostedBy(user.getUid());
                 food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
+                food.setCheckIfOrderIsAccepted(false);
+                food.setCheckIfOrderIsBooked(false);
 
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
@@ -521,6 +532,10 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsPurchased(false);
                 food.setPostedBy(user.getUid());
                 food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
+                food.setCheckIfOrderIsAccepted(false);
+                food.setCheckIfOrderIsBooked(false);
+
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 if (dialogUploadingImage.isShowing()) {
                     dialogUploadingImage.dismiss();

@@ -57,8 +57,17 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
     <!--fragment profile end-->
 
+
+    <!--
+    map fragment start
+    -->
+    <string name="directionsApiKey">AIzaSyDV8vDgl7OvDxzkQoeQsuK0uBQKK8-erCo</string>
+    <!--
+      map fragment end
+      -->
 
     <!--
        strings created by salman
