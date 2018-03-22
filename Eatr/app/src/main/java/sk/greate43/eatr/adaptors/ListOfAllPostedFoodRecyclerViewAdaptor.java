@@ -68,7 +68,7 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
         int size = foods.size();
         if (size > 0) {
             for (int i = 0; i < size; i++) {
-                foods.remove(0);
+                foods.remove(i);
             }
 
             notifyItemRangeRemoved(0, size);
