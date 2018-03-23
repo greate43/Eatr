@@ -95,22 +95,26 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
                     });
         }
 
-        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased()) {
+        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.GRAY);
             tvStatus.setText("Draft");
-        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased()) {
+        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
-        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode()) {
+        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()) {
             tvStatus.setTextColor(Color.BLACK);
             tvStatus.setText("Purchased");
+
+        } else  if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && food.getCheckIfOrderIsBooked()) {
+            tvStatus.setTextColor(Color.YELLOW);
+            tvStatus.setText("Booked");
 
         }
         tvPrice.setText(String.valueOf("Rs : " + food.getPrice()));

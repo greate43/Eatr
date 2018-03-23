@@ -41,7 +41,7 @@ public class Food implements Serializable {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
     }
 
-    public boolean isCheckIfOrderIsBooked() {
+    public boolean getCheckIfOrderIsBooked() {
         return checkIfOrderIsBooked;
     }
 

@@ -130,6 +130,8 @@ public class DetailFoodFragment extends Fragment {
 
     private void writeData(final String pushId) {
         showProgressDialog();
+        String notificationId = mDatabaseReference.push().getKey();
+
         Notification notification = new Notification();
         notification.setTitle(food.getDishName());
         notification.setMessage("Would you Like To Accept The Order ?");
@@ -137,9 +139,12 @@ public class DetailFoodFragment extends Fragment {
         notification.setReceiverId(food.getPostedBy());
         notification.setOrderId(food.getPushId());
         notification.setCheckIfButtonShouldBeEnabled(true);
+        notification.setCheckIfNotificationAlertShouldBeShown(true);
+        notification.setCheckIfNotificationAlertShouldBeSent(true);
+        notification.setNotificationId(notificationId);
 
         mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(user.getUid()));
-        mDatabaseReference.child(Constants.NOTIFICATION).push().setValue(notification);
+        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notification);
         if (getActivity() != null) {
             getActivity().finish();
         }

@@ -186,9 +186,16 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         food.setLatitude((double) value.get(Constants.LATITUDE));
         food.setLongitude((double) value.get(Constants.LONGITUDE));
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
-        food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
-        food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+        food.setCheckIfOrderIsActive((boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
+        food.setCheckIfFoodIsInDraftMode((boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+
+        if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
+            food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));
+
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
+            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+
 
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
@@ -198,7 +205,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         }
 
 
-        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null){
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null) {
             food.setCheckIfOrderIsInProgress((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
         }
 
@@ -216,25 +223,40 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
             case Constants.ORDER_ACTIVE:
                 if (food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsPurchased()
-                        && !food.getCheckIfFoodIsInDraftMode())
+                        && !food.getCheckIfFoodIsInDraftMode()
+                        && !food.getCheckIfOrderIsBooked()
+                        ) {
                     foods.add(food);
-
+                }
                 break;
             case Constants.ORDER_PURCHASED:
                 if (!food.getCheckIfOrderIsActive()
                         && food.getCheckIfOrderIsPurchased()
-                        && !food.getCheckIfFoodIsInDraftMode())
+                        && !food.getCheckIfFoodIsInDraftMode()
+                        && !food.getCheckIfOrderIsBooked()
+                        ) {
                     foods.add(food);
+                }
 
                 break;
             case Constants.ORDER_DRAFT:
                 if (!food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsPurchased()
-                        && food.getCheckIfFoodIsInDraftMode())
+                        && food.getCheckIfFoodIsInDraftMode()
+                        && !food.getCheckIfOrderIsBooked()
+                        ) {
                     foods.add(food);
-
+                }
                 break;
-
+            case Constants.ORDERED_BOOKED:
+                if (!food.getCheckIfOrderIsActive()
+                        && !food.getCheckIfOrderIsPurchased()
+                        && !food.getCheckIfFoodIsInDraftMode()
+                        && food.getCheckIfOrderIsBooked()
+                        ) {
+                    foods.add(food);
+                }
+                break;
             default:
                 foods.add(food);
                 break;

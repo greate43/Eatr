@@ -9,11 +9,47 @@ import java.io.Serializable;
 public class Notification implements Serializable {
     private static long serialVersionUID = 3L;
     private boolean checkIfButtonShouldBeEnabled;
+    private boolean checkIfNotificationAlertShouldBeSent;
+    private boolean checkIfNotificationAlertShouldBeShown;
+    private String notificationImage;
     private String message;
     private String title;
     private String senderId;
     private String receiverId;
     private String orderId;
+    private String notificationId;
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public boolean getCheckIfNotificationAlertShouldBeShown() {
+        return checkIfNotificationAlertShouldBeShown;
+    }
+
+    public void setCheckIfNotificationAlertShouldBeShown(boolean checkIfNotificationAlertShouldBeShown) {
+        this.checkIfNotificationAlertShouldBeShown = checkIfNotificationAlertShouldBeShown;
+    }
+
+    public boolean getCheckIfNotificationAlertShouldBeSent() {
+        return checkIfNotificationAlertShouldBeSent;
+    }
+
+    public void setCheckIfNotificationAlertShouldBeSent(boolean checkIfNotificationAlertShouldBeSent) {
+        this.checkIfNotificationAlertShouldBeSent = checkIfNotificationAlertShouldBeSent;
+    }
+
+    public String getNotificationImage() {
+        return notificationImage;
+    }
+
+    public void setNotificationImage(String notificationImage) {
+        this.notificationImage = notificationImage;
+    }
 
     public String getSenderId() {
         return senderId;
@@ -44,7 +80,7 @@ public class Notification implements Serializable {
 
     }
 
-    public boolean isCheckIfButtonShouldBeEnabled() {
+    public boolean getCheckIfButtonShouldBeEnabled() {
         return checkIfButtonShouldBeEnabled;
     }
 
