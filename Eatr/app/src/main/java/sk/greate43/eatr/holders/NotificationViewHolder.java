@@ -33,6 +33,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
     public CircleImageView img;
     public Button yes;
     public Button no;
+    public Notification notification;
     private DatabaseReference mDatabaseReference;
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
@@ -56,27 +57,79 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (notification != null){
-                    mDatabaseReference.child(Constants.NOTIFICATION).child(notification.getNotificationId()).updateChildren(updateNotification());
+                if (notification != null) {
+                    mDatabaseReference.child(Constants.NOTIFICATION)
+                            .child(notification.getNotificationId())
+                            .updateChildren(updateNotificationAlert(false));
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(true, false, false));
 
+                    sendNotification(true);
                 }
             }
         });
         no.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (notification != null) {
+                    mDatabaseReference.child(Constants.NOTIFICATION)
+                            .child(notification.getNotificationId())
+                            .updateChildren(updateNotificationAlert(false));
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, true));
+                    sendNotification(false);
 
+
+                }
             }
         });
     }
 
-    private Map<String,Object> updateNotification() {
+    private void sendNotification(Boolean isOrderAccepted) {
+        String notificationId = mDatabaseReference.push().getKey();
+        Notification notificationReply;
+        if (isOrderAccepted) {
+            notificationReply = new Notification();
+            notificationReply.setTitle(notification.getTitle());
+            notificationReply.setMessage("Your Order Has Been Accepted");
+            notificationReply.setSenderId(user.getUid());
+            notificationReply.setReceiverId(notification.getSenderId());
+            notificationReply.setOrderId(notification.getOrderId());
+            notificationReply.setCheckIfButtonShouldBeEnabled(false);
+            notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+            notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+            notificationReply.setNotificationId(notificationId);
+        } else {
+            notificationReply = new Notification();
+            notificationReply.setTitle(notification.getTitle());
+            notificationReply.setMessage("Your Order Has Been Rejected");
+            notificationReply.setSenderId(user.getUid());
+            notificationReply.setReceiverId(notification.getSenderId());
+            notificationReply.setOrderId(notification.getOrderId());
+            notificationReply.setCheckIfButtonShouldBeEnabled(false);
+            notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+            notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+            notificationReply.setNotificationId(notificationId);
+        }
+        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
+    }
+
+    private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive) {
         HashMap<String, Object> result = new HashMap<>();
-        result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN,false);
+        result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
+        result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, booked);
+        result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, isActive);
+
         return result;
     }
 
-    Notification notification;
+    private Map<String, Object> updateNotificationAlert(boolean isShow) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
+        return result;
+    }
 
     public void populate(Notification notification, Context context) {
         this.notification = notification;
