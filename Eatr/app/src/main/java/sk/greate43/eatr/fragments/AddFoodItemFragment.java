@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
@@ -178,12 +179,12 @@ public class AddFoodItemFragment extends Fragment implements
 
 // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
-            if(getActivity() != null)
+            if (getActivity() != null)
                 mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
         }
 
 
@@ -240,7 +241,7 @@ public class AddFoodItemFragment extends Fragment implements
     }
 
     private void selectPictureFromGalleryOrCameraDialog() {
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             AlertDialog.Builder pictureDialog = new AlertDialog.Builder(getActivity());
             pictureDialog.setTitle("Select Action");
             String[] pictureDialogItems = {
@@ -266,7 +267,7 @@ public class AddFoodItemFragment extends Fragment implements
 
 
     private void askUserToStartGpsDialog() {
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Would You Like To Turn On The Gps?");
             builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -288,12 +289,12 @@ public class AddFoodItemFragment extends Fragment implements
 
 
     public void choosePhotoFromGallery() {
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             int HasReadPermission = ContextCompat.checkSelfPermission(getActivity(), READ_EXTERNAL_STORAGE);
             if (HasReadPermission != PackageManager.PERMISSION_GRANTED) {
 
 
-                ActivityCompat.requestPermissions(getActivity(), new String[]{READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
+                requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
                 return;
             }
 
@@ -305,14 +306,14 @@ public class AddFoodItemFragment extends Fragment implements
     }
 
     private void takePhotoFromCamera() {
-        if(getActivity() != null) {
+        if (getActivity() != null) {
             int HasCameraPermission = ContextCompat.checkSelfPermission(getActivity(), CAMERA);
             int HasWriteExternalStoragePermPermission = ContextCompat.checkSelfPermission(getActivity(), WRITE_EXTERNAL_STORAGE);
 
             if (HasCameraPermission != PackageManager.PERMISSION_GRANTED || HasWriteExternalStoragePermPermission != PackageManager.PERMISSION_GRANTED) {
 
 
-                ActivityCompat.requestPermissions(getActivity(), new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_AND_WRITE_PERMISSION);
+                requestPermissions(new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_AND_WRITE_PERMISSION);
                 return;
             }
 
@@ -390,12 +391,18 @@ public class AddFoodItemFragment extends Fragment implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        assert getActivity() != null;
-        int HasFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), ACCESS_FINE_LOCATION);
 
-        if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
-            return;
+        getLocation();
+    }
+
+    public void getLocation() {
+        if (getActivity() != null) {
+            int HasFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), ACCESS_FINE_LOCATION);
+
+            if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
+                return;
+            }
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
@@ -425,9 +432,7 @@ public class AddFoodItemFragment extends Fragment implements
                 etPickLocation.setText(String.format("%s %s %s %s", knownName, city, state, country));
             }
         }
-
     }
-
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -629,9 +634,11 @@ public class AddFoodItemFragment extends Fragment implements
 
     }
 
+    View view;
 
     @Override
     public void onClick(View v) {
+        view = v;
         switch (v.getId()) {
             case R.id.fragment_add_food_item_button_get_location:
                 pickPlace();
@@ -671,6 +678,9 @@ public class AddFoodItemFragment extends Fragment implements
                     );
 
 
+                } else if (imgUri == null) {
+                    Snackbar.make(view, "Please Select the image ", Snackbar.LENGTH_SHORT).show();
+
                 } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
                     etDishName.setError("Dish Name is Empty  ");
                 } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
@@ -709,5 +719,36 @@ public class AddFoodItemFragment extends Fragment implements
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_READ_EXTERNAL_STORAGE_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "onRequestPermissionsResult: 1");
+                    choosePhotoFromGallery();
+                }
+                break;
+            case REQUEST_CAMERA_AND_WRITE_PERMISSION:
+
+                if (grantResults.length > 0) {
+                    Log.d(TAG, "onRequestPermissionsResult: 0");
+                    boolean cameraPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean readExternalStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    Log.d(TAG, "onRequestPermissionsResult: 2 ");
+                    if (cameraPermission && readExternalStorage) {
+                        takePhotoFromCamera();
+                    }
+                }
+
+                break;
+            case REQUEST_FINE_LOCATION_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation();
+                }
+                break;
+
+        }
+    }
 
 }

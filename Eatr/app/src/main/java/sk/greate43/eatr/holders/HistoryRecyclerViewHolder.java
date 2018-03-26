@@ -15,6 +15,8 @@ import sk.greate43.eatr.entities.Food;
 public class HistoryRecyclerViewHolder extends RecyclerView.ViewHolder {
     private TextView tvPurchasedDate;
     private TextView tvOrderId;
+    private TextView tvSellerId;
+    private TextView tvBuyerId;
     private TextView tvPrice;
 
     public HistoryRecyclerViewHolder(View itemView) {
@@ -22,11 +24,16 @@ public class HistoryRecyclerViewHolder extends RecyclerView.ViewHolder {
         tvOrderId = itemView.findViewById(R.id.history_list_order_id);
         tvPurchasedDate = itemView.findViewById(R.id.history_list_text_view_purchased_date);
         tvPrice = itemView.findViewById(R.id.history_list_price);
+        tvSellerId = itemView.findViewById(R.id.history_list_seller_id);
+        tvBuyerId = itemView.findViewById(R.id.history_list_buyer_id);
+
     }
 
     public void populate(Food food) {
         tvPrice.setText(String.valueOf("PKR " + food.getPrice()));
         tvOrderId.setText(String.valueOf(food.getPushId()));
+        tvSellerId.setText(String.valueOf(food.getPostedBy()));
+        tvBuyerId.setText(String.valueOf(food.getPurchasedBy()));
         tvPurchasedDate.setText(DateUtils
                 .getRelativeTimeSpanString(food.getPurchasedDate(),
                         System.currentTimeMillis(),

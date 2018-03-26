@@ -209,6 +209,8 @@ public class DrawerUtil implements UpdateData {
 
         result.setSelection(1, true);
 
+
+
     }
 
     private void closeDrawer() {
