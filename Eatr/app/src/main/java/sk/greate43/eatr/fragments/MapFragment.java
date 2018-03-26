@@ -167,19 +167,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         mUiSettings.setTiltGesturesEnabled(true);
         mUiSettings.setRotateGesturesEnabled(true);
     }
-    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
-      Marker marker=mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_48dp)));
 
-    //animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
+    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_48dp)));
+
+        //animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
 
         mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
     }
 
     public void animateMarker(final Marker marker, final LatLng startPosition, final LatLng toPosition,
                               final boolean hideMarker) {
-
-
-
 
 
         final Handler handler = new Handler();
@@ -214,6 +212,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
             }
         });
     }
+
     private void positionCamera(DirectionsRoute route, GoogleMap mMap) {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 14));
     }
@@ -259,7 +258,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-        Log.d(TAG, "onLocationChanged: "+location.getLatitude());
+        Log.d(TAG, "onLocationChanged: " + location.getLatitude());
         if (null != mLastLocation) {
             updateMapUi(mMap, new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         }
@@ -289,7 +288,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         if (getActivity() != null)
             if (ActivityCompat.checkSelfPermission(getActivity(),
                     android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]
+
+
+                requestPermissions(new String[]
                         {android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
                 return;
             }
@@ -312,7 +313,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         if (getActivity() != null)
             if (ActivityCompat.checkSelfPermission(getActivity(),
                     android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(),
+                requestPermissions(
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_FINE_LOCATION_PERMISSION);
                 return;
@@ -322,7 +323,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     }
 
     protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
+        mLocationRequest = LocationRequest.create();
         // 2
         mLocationRequest.setInterval(10000);
         // 3
@@ -372,6 +373,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_FINE_LOCATION_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "onRequestPermissionsResult: ");
+                    setUpMap();
+
+                }
+                break;
+        }
+
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -384,7 +400,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
             startLocationUpdates();
         }
     }
-
 
 
 }
