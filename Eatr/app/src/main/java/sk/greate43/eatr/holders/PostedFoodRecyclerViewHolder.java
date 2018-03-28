@@ -29,12 +29,12 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
     Food food;
     //ADD AN ONMENUITEM LISTENER TO EXECUTE COMMANDS ONCLICK OF CONTEXT MENU TASK
     private EditPostedFood editPostedFood;
-    private ImageView imgFoodItem;
-    private TextView tvStatus;
-    private TextView tvLocation;
-    private TextView tvDishName;
-    private TextView tvTimeStamp;
-    private TextView tvPrice;
+    public ImageView imgFoodItem;
+    public TextView tvStatus;
+    public TextView tvLocation;
+    public TextView tvDishName;
+    public TextView tvTimeStamp;
+    public TextView tvPrice;
     private int position;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override
@@ -95,22 +95,26 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
                     });
         }
 
-        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased()) {
+        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.GRAY);
             tvStatus.setText("Draft");
-        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased()) {
+        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
-        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode()) {
+        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()) {
             tvStatus.setTextColor(Color.BLACK);
             tvStatus.setText("Purchased");
+
+        } else  if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && food.getCheckIfOrderIsBooked()) {
+            tvStatus.setTextColor(Color.YELLOW);
+            tvStatus.setText("Booked");
 
         }
         tvPrice.setText(String.valueOf("Rs : " + food.getPrice()));

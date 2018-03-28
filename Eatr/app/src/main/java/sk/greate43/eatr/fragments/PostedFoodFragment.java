@@ -61,13 +61,46 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         fragment.setArguments(args);
         return fragment;
     }
-
+  String states ="";
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
             orderState = getArguments().getString(Constants.ORDER_STATE);
+            if (orderState != null) {
+                switch (orderState) {
+                    case Constants.ALL_ORDERS:
+                        states = "No Order Posted";
+
+
+                        break;
+                    case Constants.ORDER_ACTIVE:
+                        states = "No Active Order Available";
+
+
+                        break;
+                    case Constants.ORDER_PURCHASED:
+
+                        states = "No Ordered Purchased Yet";
+
+
+                        break;
+                    case Constants.ORDER_DRAFT:
+
+                        states = "No Order is in Draft";
+
+                        break;
+                    case Constants.ORDERED_BOOKED:
+
+                        states = "No Order Is Booked";
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         }
     }
 
@@ -91,7 +124,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         });
 
         adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), this);
-
+        adaptor.setStates(states);
         foods = adaptor.getFoods();
 
 
@@ -186,9 +219,16 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         food.setLatitude((double) value.get(Constants.LATITUDE));
         food.setLongitude((double) value.get(Constants.LONGITUDE));
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
-        food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
-        food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+        food.setCheckIfOrderIsActive((boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
+        food.setCheckIfFoodIsInDraftMode((boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+
+        if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
+            food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));
+
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
+            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+
 
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
@@ -198,7 +238,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         }
 
 
-        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null){
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null) {
             food.setCheckIfOrderIsInProgress((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
         }
 
@@ -210,31 +250,50 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
         switch (orderState) {
             case Constants.ALL_ORDERS:
-                foods.add(food);
+               foods.add(food);
 
                 break;
             case Constants.ORDER_ACTIVE:
+
                 if (food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsPurchased()
-                        && !food.getCheckIfFoodIsInDraftMode())
+                        && !food.getCheckIfFoodIsInDraftMode()
+                        && !food.getCheckIfOrderIsBooked()
+                        ) {
                     foods.add(food);
-
+                }
                 break;
             case Constants.ORDER_PURCHASED:
+
                 if (!food.getCheckIfOrderIsActive()
                         && food.getCheckIfOrderIsPurchased()
-                        && !food.getCheckIfFoodIsInDraftMode())
+                        && !food.getCheckIfFoodIsInDraftMode()
+                        && !food.getCheckIfOrderIsBooked()
+                        ) {
                     foods.add(food);
+                }
 
                 break;
             case Constants.ORDER_DRAFT:
+
                 if (!food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsPurchased()
-                        && food.getCheckIfFoodIsInDraftMode())
+                        && food.getCheckIfFoodIsInDraftMode()
+                        && !food.getCheckIfOrderIsBooked()
+                        ) {
                     foods.add(food);
-
+                }
                 break;
+            case Constants.ORDERED_BOOKED:
 
+                if (!food.getCheckIfOrderIsActive()
+                        && !food.getCheckIfOrderIsPurchased()
+                        && !food.getCheckIfFoodIsInDraftMode()
+                        && food.getCheckIfOrderIsBooked()
+                        ) {
+                    foods.add(food);
+                }
+                break;
             default:
                 foods.add(food);
                 break;
