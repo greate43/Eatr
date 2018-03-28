@@ -40,6 +40,7 @@ public class Util {
                         // only run on an unmetered network
                         Constraint.ON_ANY_NETWORK
                 )
+
                 .build();
 
         dispatcher.mustSchedule(myJob);

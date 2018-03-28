@@ -29,12 +29,12 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
     Food food;
     //ADD AN ONMENUITEM LISTENER TO EXECUTE COMMANDS ONCLICK OF CONTEXT MENU TASK
     private EditPostedFood editPostedFood;
-    private ImageView imgFoodItem;
-    private TextView tvStatus;
-    private TextView tvLocation;
-    private TextView tvDishName;
-    private TextView tvTimeStamp;
-    private TextView tvPrice;
+    public ImageView imgFoodItem;
+    public TextView tvStatus;
+    public TextView tvLocation;
+    public TextView tvDishName;
+    public TextView tvTimeStamp;
+    public TextView tvPrice;
     private int position;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override

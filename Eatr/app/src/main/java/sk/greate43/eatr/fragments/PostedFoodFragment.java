@@ -61,13 +61,46 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         fragment.setArguments(args);
         return fragment;
     }
-
+  String states ="";
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
             orderState = getArguments().getString(Constants.ORDER_STATE);
+            if (orderState != null) {
+                switch (orderState) {
+                    case Constants.ALL_ORDERS:
+                        states = "No Order Posted";
+
+
+                        break;
+                    case Constants.ORDER_ACTIVE:
+                        states = "No Active Order Available";
+
+
+                        break;
+                    case Constants.ORDER_PURCHASED:
+
+                        states = "No Ordered Purchased Yet";
+
+
+                        break;
+                    case Constants.ORDER_DRAFT:
+
+                        states = "No Order is in Draft";
+
+                        break;
+                    case Constants.ORDERED_BOOKED:
+
+                        states = "No Order Is Booked";
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         }
     }
 
@@ -91,7 +124,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         });
 
         adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), this);
-
+        adaptor.setStates(states);
         foods = adaptor.getFoods();
 
 
@@ -217,10 +250,11 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
         switch (orderState) {
             case Constants.ALL_ORDERS:
-                foods.add(food);
+               foods.add(food);
 
                 break;
             case Constants.ORDER_ACTIVE:
+
                 if (food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
@@ -230,6 +264,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                 }
                 break;
             case Constants.ORDER_PURCHASED:
+
                 if (!food.getCheckIfOrderIsActive()
                         && food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
@@ -240,6 +275,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
                 break;
             case Constants.ORDER_DRAFT:
+
                 if (!food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsPurchased()
                         && food.getCheckIfFoodIsInDraftMode()
@@ -249,6 +285,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                 }
                 break;
             case Constants.ORDERED_BOOKED:
+
                 if (!food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
