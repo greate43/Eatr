@@ -135,7 +135,7 @@ public class DetailFoodFragment extends Fragment {
         Notification notification = new Notification();
         notification.setTitle(food.getDishName());
         notification.setMessage("Would you Like To Accept The Order ?");
-        notification.setSenderId(food.getPurchasedBy());
+        notification.setSenderId(user.getUid());
         notification.setReceiverId(food.getPostedBy());
         notification.setOrderId(food.getPushId());
         notification.setCheckIfButtonShouldBeEnabled(true);
