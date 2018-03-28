@@ -334,30 +334,28 @@ public class AddFoodItemFragment extends Fragment implements
             return;
         }
         if (requestCode == GALLERY_RESULT) {
-            if (data != null) {
+            if (resultCode == RESULT_OK && data != null) {
                 imgUri = data.getData();
-                imgChooseImage.setImageURI(Uri.parse(String.valueOf(imgUri)));
-                imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-                Log.d(TAG, "onActivityResult: " + imgUri.getLastPathSegment());
+                setImage(imgUri);
+
+                Log.d(TAG, "onActivityResult: 1 " + imgUri.getLastPathSegment());
             }
 
         } else if (requestCode == CAMERA_RESULT) {
             String pathOfBmp = null;
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            if (getActivity() != null) {
-                pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
+            if (resultCode == RESULT_OK && data != null) {
+                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                if (getActivity() != null) {
+                    pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
+                }
+                imgUri = Uri.parse(pathOfBmp);
+
+                setImage(imgUri);
+                Log.d(TAG, "onActivityResult:  2 " + imgUri);
             }
-            imgUri = Uri.parse(pathOfBmp);
 
-            imgChooseImage.setImageURI(Uri.parse(String.valueOf(imgUri)));
-            imgChooseImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            Log.d(TAG, "onActivityResult: " + imgUri);
-
-
-        }
-
-        if (requestCode == PLACE_PICKER_REQUEST) {
+        } else if (requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK && data != null) {
                 if (getActivity() != null) {
                     Place place = PlacePicker.getPlace(getActivity(), data);
@@ -373,6 +371,24 @@ public class AddFoodItemFragment extends Fragment implements
 
     }
 
+    public void setImage(Uri uri) {
+        if (uri != null)
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .fit()
+                    .centerCrop()
+                    .into(imgChooseImage, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "onSuccess: ");
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+    }
 
     public void showToast(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
