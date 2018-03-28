@@ -109,6 +109,7 @@ public class DrawerUtil implements UpdateData {
                 .withActivity(activity)
                 .withHeaderBackground(R.drawable.side_nav_bar)
                 .withSelectionListEnabledForSingleProfile(false)
+
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
 
                     @Override

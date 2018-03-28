@@ -5,15 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="3dp"
-    app:cardBackgroundColor="@color/cardview_light_background"
-    app:cardCornerRadius="20dp">
+    app:cardBackgroundColor="@color/colorPrimaryDark">
 
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="2dp"
-        android:background="@color/bg_tag">
+        android:layout_margin="2dp">
 
         <ImageView
             android:id="@+id/posted_food_list_food_item_image_view"

@@ -61,7 +61,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         fragment.setArguments(args);
         return fragment;
     }
-  String states ="";
+
+    String states = "";
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -250,7 +252,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
         switch (orderState) {
             case Constants.ALL_ORDERS:
-               foods.add(food);
+                foods.add(food);
 
                 break;
             case Constants.ORDER_ACTIVE:
@@ -319,22 +321,24 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
     @Override
     public void onDelete(Food food, int position) {
         if (food != null) {
-            mDatabaseReference.child(Constants.FOOD).child(foods.get(position).getPushId()).removeValue();
-            storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(foods.get(position).getImageUri());
+            mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).removeValue();
+            if (food.getImageUri() != null && food.getImageUri().isEmpty()) {
+                storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(food.getImageUri());
 
-            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    // File deleted successfully
-                    Log.d(TAG, "onSuccess: deleted file");
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Uh-oh, an error occurred!
-                    Log.d(TAG, "onFailure: did not delete file");
-                }
-            });
+                storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // File deleted successfully
+                        Log.d(TAG, "onSuccess: deleted file");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Log.d(TAG, "onFailure: did not delete file");
+                    }
+                });
+            }
             Toast.makeText(getActivity(), "Deleted " + food.getPushId(), Toast.LENGTH_SHORT).show();
 
             adaptor.removeItem(position);

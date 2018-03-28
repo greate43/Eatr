@@ -12,7 +12,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@color/black_transparent"
+        android:background="@color/colorPrimaryDark"
         android:src="@android:drawable/ic_menu_gallery"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp"
