@@ -31,7 +31,7 @@ import sk.greate43.eatr.utils.Constants;
  * Created by great on 3/22/2018.
  */
 
-public class NotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener  {
+public class NotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {
     private static final String TAG = "NotificationViewHolder";
     public TextView tvTitle;
     public TextView tvMessage;
@@ -64,61 +64,62 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
             return true;
         }
     };
-        View view;
+    View view;
 
-        public NotificationViewHolder(View itemView) {
-            super(itemView);
-            view = itemView;
-            mAuth = FirebaseAuth.getInstance();
-            user = mAuth.getCurrentUser();
+    public NotificationViewHolder(View itemView) {
+        super(itemView);
+        view = itemView;
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
 
 
-            database = FirebaseDatabase.getInstance();
+        database = FirebaseDatabase.getInstance();
 
-            mDatabaseReference = database.getReference();
+        mDatabaseReference = database.getReference();
 
-            tvTitle = itemView.findViewById(R.id.notification_list_title);
-            tvMessage = itemView.findViewById(R.id.notification_list_message);
-            img = itemView.findViewById(R.id.notification_list_circleImageView);
-            yes = itemView.findViewById(R.id.notification_list_button_yes);
-            no = itemView.findViewById(R.id.notification_list_button_no);
-            yes.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (notification != null) {
-                        mDatabaseReference.child(Constants.NOTIFICATION)
-                                .child(notification.getNotificationId())
-                                .updateChildren(updateNotificationAlert(true,true));
-                        mDatabaseReference.child(Constants.FOOD)
-                                .child(notification.getOrderId())
-                                .updateChildren(updateUpdateProgress(true, false, false));
+        tvTitle = itemView.findViewById(R.id.notification_list_title);
+        tvMessage = itemView.findViewById(R.id.notification_list_message);
+        img = itemView.findViewById(R.id.notification_list_circleImageView);
+        yes = itemView.findViewById(R.id.notification_list_button_yes);
+        no = itemView.findViewById(R.id.notification_list_button_no);
+        yes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (notification != null) {
+                    mDatabaseReference.child(Constants.NOTIFICATION)
+                            .child(notification.getNotificationId())
+                            .updateChildren(updateNotificationAlert(true, true));
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(true, false, false));
 
-                        sendNotification(true);
-                    }
+                    sendNotification(true);
                 }
-            });
-            no.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (notification != null) {
-                        mDatabaseReference.child(Constants.NOTIFICATION)
-                                .child(notification.getNotificationId())
-                                .updateChildren(updateNotificationAlert(true,false));
-                        mDatabaseReference.child(Constants.FOOD)
-                                .child(notification.getOrderId())
-                                .updateChildren(updateUpdateProgress(false, false, true));
-                        sendNotification(false);
+            }
+        });
+        no.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (notification != null) {
+                    mDatabaseReference.child(Constants.NOTIFICATION)
+                            .child(notification.getNotificationId())
+                            .updateChildren(updateNotificationAlert(true, false));
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, true));
+                    sendNotification(false);
 
 
-                    }
                 }
-            });
-        }
+            }
+        });
+    }
 
-        private void sendNotification(Boolean isOrderAccepted) {
-            String notificationId = mDatabaseReference.push().getKey();
-            Notification notificationReply;
-            if (isOrderAccepted) {
+    private void sendNotification(Boolean isOrderAccepted) {
+        String notificationId = mDatabaseReference.push().getKey();
+        Notification notificationReply = null;
+        if (isOrderAccepted) {
+            if (notification != null) {
                 notificationReply = new Notification();
                 notificationReply.setTitle(notification.getTitle());
                 notificationReply.setMessage("Your Order Has Been Accepted");
@@ -129,7 +130,9 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
                 notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
                 notificationReply.setNotificationId(notificationId);
-            } else {
+            }
+        } else {
+            if (notification != null) {
                 notificationReply = new Notification();
                 notificationReply.setTitle(notification.getTitle());
                 notificationReply.setMessage("Your Order Has Been Rejected");
@@ -141,94 +144,95 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
                 notificationReply.setNotificationId(notificationId);
             }
-            mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
         }
+        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
+    }
 
-        private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive) {
-            HashMap<String, Object> result = new HashMap<>();
-            result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
-            result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, booked);
-            result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, isActive);
+    private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
+        result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, booked);
+        result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, isActive);
 
-            return result;
-        }
+        return result;
+    }
 
-        private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
-            HashMap<String, Object> result = new HashMap<>();
-            result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
-            if (isAccepted) {
-                result.put(Constants.MESSAGE, "You Have accepted this order");
-            }else {
-                result.put(Constants.MESSAGE, "You Have rejected this order");
-
-            }
-            result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
-
-            return result;
-        }
-
-        public void populate(Notification notification, Context context) {
-            this.notification = notification;
-            if (notification.getNotificationImage() != null && !notification.getNotificationImage().isEmpty()) {
-                Picasso.with(context)
-                        .load(notification.getNotificationImage())
-                        .fit()
-                        .centerCrop()
-                        .into(img, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d(TAG, "onSuccess: ");
-                            }
-
-                            @Override
-                            public void onError() {
-
-                            }
-                        });
-            } else {
-                Log.d(TAG, "populate: ");
-                Picasso.with(context)
-                        .load(R.drawable.ic_launcher_round)
-                        .fit()
-                        .centerCrop()
-                        .into(img, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d(TAG, "onSuccess: ");
-                            }
-
-                            @Override
-                            public void onError() {
-
-                            }
-                        });
-            }
-            tvMessage.setText(notification.getMessage());
-            tvTitle.setText(notification.getTitle());
-
-            if (notification.getCheckIfButtonShouldBeEnabled()) {
-                yes.setVisibility(View.VISIBLE);
-                no.setVisibility(View.VISIBLE);
-            } else {
-                yes.setVisibility(View.GONE);
-                no.setVisibility(View.GONE);
-                activateContextMenu();
-            }
-        }
-
-
-        @Override
-        public void onClick(View v) {
+    private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
+        if (isAccepted) {
+            result.put(Constants.MESSAGE, "You Have accepted this order");
+        } else {
+            result.put(Constants.MESSAGE, "You Have rejected this order");
 
         }
+        result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
 
-        private void activateContextMenu() {
-            itemView.setOnCreateContextMenuListener(this);
+        return result;
+    }
+
+    public void populate(Notification notification, Context context) {
+        this.notification = notification;
+        if (notification.getNotificationImage() != null && !notification.getNotificationImage().isEmpty()) {
+            Picasso.with(context)
+                    .load(notification.getNotificationImage())
+                    .fit()
+                    .centerCrop()
+                    .into(img, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "onSuccess: ");
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
+        } else {
+            Log.d(TAG, "populate: ");
+            Picasso.with(context)
+                    .load(R.drawable.ic_launcher_round)
+                    .fit()
+                    .centerCrop()
+                    .into(img, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "onSuccess: ");
+                        }
+
+                        @Override
+                        public void onError() {
+
+                        }
+                    });
         }
+        tvMessage.setText(notification.getMessage());
+        tvTitle.setText(notification.getTitle());
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            MenuItem Delete = menu.add(Menu.NONE, 1, 1, "Delete");
-            Delete.setOnMenuItemClickListener(onEditMenu);
+        if (notification.getCheckIfButtonShouldBeEnabled()) {
+            yes.setVisibility(View.VISIBLE);
+            no.setVisibility(View.VISIBLE);
+        } else {
+            yes.setVisibility(View.GONE);
+            no.setVisibility(View.GONE);
+            activateContextMenu();
         }
     }
+
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    private void activateContextMenu() {
+        itemView.setOnCreateContextMenuListener(this);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        MenuItem Delete = menu.add(Menu.NONE, 1, 1, "Delete");
+        Delete.setOnMenuItemClickListener(onEditMenu);
+    }
+}
