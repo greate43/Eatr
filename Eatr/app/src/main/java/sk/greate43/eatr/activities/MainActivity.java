@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.fragments.AuthenticationFragment;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
+import sk.greate43.eatr.utils.Util;
 
 
 public class MainActivity extends AppCompatActivity implements ReplaceFragment {
@@ -20,10 +21,15 @@ public class MainActivity extends AppCompatActivity implements ReplaceFragment {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Util.ScheduleNotification(this);
+
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.actvivity_main_frame_layout_fragment_container, AuthenticationFragment.newInstance())
                 .commit();
+
 
     }
 

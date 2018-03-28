@@ -49,7 +49,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     Button btnExpiryTimeFourHour;
     Button btnExpiryTimeEightHour;
     Button btnExpiryTimeSixteenHour;
-    long expiryTime;
+    long expiryTime = -1;
     long numberOfServings;
     StorageReference storageRef;
     private Food food;
@@ -248,17 +248,33 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
                     if (
                             !TextUtils.isEmpty(etNumberOfServings.getText())
-                                    && !TextUtils.isEmpty(etPrice.getText())) {
+                                    && !TextUtils.isEmpty(etPrice.getText())
+                                    && expiryTime != -1
+                                    && !TextUtils.equals(etNumberOfServings.getText(), "0")
+                                    && !TextUtils.equals(etExpiryTime.getText(), "0")
+                            ) {
                         writeSellerData(
                                 food.getPushId()
                                 , Long.parseLong(etPrice.getText().toString())
                                 , expiryTime
                                 , Long.parseLong(etNumberOfServings.getText().toString())
                         );
-                    } else if (TextUtils.isEmpty(etNumberOfServings.getText())) {
-                        etNumberOfServings.setError("Number of Servings is Empty ");
+
+                        if (getActivity() != null) {
+                            getActivity().finish();
+                        }
                     } else if (TextUtils.isEmpty(etPrice.getText())) {
                         etPrice.setError("Price is Empty ");
+                    } else if (TextUtils.isEmpty(etNumberOfServings.getText())) {
+                        etNumberOfServings.setError("Number of Servings is Empty ");
+                    } else if (TextUtils.equals(etNumberOfServings.getText(), "0")) {
+                        etNumberOfServings.setError("No of Servings  Cant be 0");
+
+                    } else if (expiryTime == -1) {
+                        etExpiryTime.setError("Expiry time Should be Set");
+                    } else if (TextUtils.equals(etExpiryTime.getText(), "0")) {
+                        etExpiryTime.setError("Expiry time Should be Set");
+
                     }
                 }
 
@@ -272,9 +288,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 //
 //                dispatcher.mustSchedule(myJob);
 
-                if (getActivity() != null) {
-                    getActivity().finish();
-                }
+
                 break;
         }
 
@@ -304,7 +318,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
     private long getTimeHrsFromNow(int time) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, time);
+        calendar.add(Calendar.HOUR, time);
         return calendar.getTime().getTime();
 
     }
