@@ -45,9 +45,20 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
     public void onBindViewHolder(ListOfAllPostedFoodViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
+           holder.imgFoodItem.setVisibility(View.GONE);
+           holder.tvDishName.setText("No Food Item Posted");
+            holder.tvPrice.setVisibility(View.GONE);
+            holder.tvStatus.setVisibility(View.GONE);
+            holder.tvTimeStamp.setVisibility(View.GONE);
+            holder.tvLocation.setVisibility(View.GONE);
 
         } else {
-
+            holder.imgFoodItem.setVisibility(View.VISIBLE);
+            holder.tvDishName.setVisibility(View.VISIBLE);
+            holder.tvPrice.setVisibility(View.VISIBLE);
+            holder.tvStatus.setVisibility(View.VISIBLE);
+            holder.tvTimeStamp.setVisibility(View.VISIBLE);
+            holder.tvLocation.setVisibility(View.VISIBLE);
             holder.populate(buyerActivity, foods.get(position));
         }
     }
@@ -60,16 +71,15 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
                 ) {
             return foods.size();
         } else {
-            return 0;
+            return 1;
         }
     }
 
     public void clear() {
         int size = foods.size();
         if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                foods.remove(i);
-            }
+            foods.clear();
+
 
             notifyItemRangeRemoved(0, size);
         }

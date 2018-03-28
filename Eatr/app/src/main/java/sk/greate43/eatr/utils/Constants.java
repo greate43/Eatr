@@ -49,7 +49,10 @@ public interface Constants {
     String SENDER_ID = "senderId";
     String RECEIVER_ID = "receiverId";
     String ORDER_ID = "orderId";
-
+    String NOTIFICATION_ID = "notificationId";
+    String NOTIFICATION_IMAGE = "notificationImage";
+    String CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SENT = "checkIfNotificationAlertShouldBeSent";
+    String CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN = "checkIfNotificationAlertShouldBeShown";
     /**
      * {@link sk.greate43.eatr.fragments.AddFoodItemFragment}
      */
@@ -62,7 +65,7 @@ public interface Constants {
     String ORDER_ACTIVE = "ORDER_ACTIVE";
     String ORDER_DRAFT = "ORDER_DRAFT";
     String ORDER_PURCHASED = "ORDER_PURCHASED";
-
+    String ORDERED_BOOKED = "ORDERED_BOOKED";
     //FoodItemExpiryTimeAndPriceFragment
 
     /**

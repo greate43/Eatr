@@ -20,9 +20,11 @@ import sk.greate43.eatr.holders.NotificationViewHolder;
 public class NotificationRecyclerViewAdaptor extends RecyclerView.Adapter<NotificationViewHolder> {
     LayoutInflater inflater;
     ArrayList<Notification> notifications;
+    Activity activity;
 
     public NotificationRecyclerViewAdaptor(Activity activity) {
-       inflater = activity.getLayoutInflater();
+        inflater = activity.getLayoutInflater();
+        this.activity = activity;
         notifications = new ArrayList<>();
     }
 
@@ -43,17 +45,17 @@ public class NotificationRecyclerViewAdaptor extends RecyclerView.Adapter<Notifi
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         if (notifications == null || notifications.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
-               holder.tvTitle.setText("No Notification Available");
-               holder.tvMessage.setVisibility(View.GONE);
-               holder.no.setVisibility(View.GONE);
-               holder.yes.setVisibility(View.GONE);
-               holder.img.setVisibility(View.GONE);
+            holder.tvTitle.setText("No Notification Available");
+            holder.tvMessage.setVisibility(View.GONE);
+            holder.no.setVisibility(View.GONE);
+            holder.yes.setVisibility(View.GONE);
+            holder.img.setVisibility(View.GONE);
         } else {
             holder.tvMessage.setVisibility(View.VISIBLE);
             holder.no.setVisibility(View.VISIBLE);
             holder.yes.setVisibility(View.VISIBLE);
             holder.img.setVisibility(View.VISIBLE);
-            holder.populate(notifications.get(position));
+            holder.populate(notifications.get(position),activity );
         }
     }
 
@@ -69,9 +71,7 @@ public class NotificationRecyclerViewAdaptor extends RecyclerView.Adapter<Notifi
     public void clear() {
         int size = notifications.size();
         if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                notifications.remove(i);
-            }
+            notifications.clear();
 
             notifyItemRangeRemoved(0, size);
         }

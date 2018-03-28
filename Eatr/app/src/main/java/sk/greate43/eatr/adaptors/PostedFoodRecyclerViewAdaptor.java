@@ -2,6 +2,7 @@ package sk.greate43.eatr.adaptors;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,11 +54,28 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     public void onBindViewHolder(@NonNull PostedFoodRecyclerViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
-
+            holder.imgFoodItem.setVisibility(View.GONE);
+            Log.d(TAG, "onBindViewHolder: "+states);
+            holder.tvDishName.setText(states);
+            holder.tvPrice.setVisibility(View.GONE);
+            holder.tvStatus.setVisibility(View.GONE);
+            holder.tvLocation.setVisibility(View.GONE);
+            holder.tvTimeStamp.setVisibility(View.GONE);
         } else {
-
+            holder.imgFoodItem.setVisibility(View.VISIBLE);
+            holder.tvDishName.setVisibility(View.VISIBLE);
+            holder.tvPrice.setVisibility(View.VISIBLE);
+            holder.tvStatus.setVisibility(View.VISIBLE);
+            holder.tvTimeStamp.setVisibility(View.VISIBLE);
+            holder.tvLocation.setVisibility(View.VISIBLE);
             holder.populate(sellerActivity, foods.get(position), postedFoodFragment, position);
         }
+    }
+
+    private String states = "";
+
+    public void setStates(String states) {
+        this.states = states;
     }
 
     @Override
@@ -65,7 +83,7 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         if (foods != null && !foods.isEmpty()) {
             return foods.size();
         } else {
-            return 0;
+            return 1;
         }
 
     }
@@ -74,9 +92,8 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     public void clear() {
         int size = foods.size();
         if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                foods.remove(i);
-            }
+            foods.clear();
+
 
             notifyItemRangeRemoved(0, size);
         }
