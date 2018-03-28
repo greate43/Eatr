@@ -4,9 +4,9 @@
     <!--
     #3f51b5
     -->
-    <color name="colorPrimary">#ffde17</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#ff4081</color>
+    <color name="colorPrimary">#f9d10b</color>
+    <color name="colorPrimaryDark">#ffe97b</color>
+    <color name="colorAccent">#ffed0b</color>
 
 
     <color name="customBlue">#4b9aba</color>
