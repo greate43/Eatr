@@ -24,12 +24,12 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
 
     private static final String TAG = "ListOfAllPostedFoodView";
-    private ImageView imgFoodItem;
-    private TextView tvStatus;
-    private TextView tvLocation;
-    private TextView tvDishName;
-    private TextView tvTimeStamp;
-    private TextView tvPrice;
+    public ImageView imgFoodItem;
+   public   TextView tvStatus;
+    public TextView tvLocation;
+    public TextView tvDishName;
+    public TextView tvTimeStamp;
+    public TextView tvPrice;
 
     public ListOfAllPostedFoodViewHolder(View itemView) {
         super(itemView);

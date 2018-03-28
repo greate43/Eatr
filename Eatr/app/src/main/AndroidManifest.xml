@@ -56,29 +56,31 @@
 
         <activity
             android:name=".activities.BuyerActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-
-            >
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.DetailFoodActivity" />
+
         <service
             android:name=".service.EatrMessagingService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".service.EatrFirebaseInstanceId">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.NotificationJobService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
 
-        <service android:name=".service.EatrFirebaseInstanceId"
-            >
-        <intent-filter>
-            <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-        </intent-filter>
-    </service>
+
     </application>
-
-
 
 </manifest>

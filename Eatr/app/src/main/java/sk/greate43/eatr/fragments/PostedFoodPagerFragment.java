@@ -85,6 +85,7 @@ public class PostedFoodPagerFragment extends Fragment {
         SectionsPagerAdapter adapter = new SectionsPagerAdapter(getChildFragmentManager());
         adapter.addFragment(PostedFoodFragment.newInstance(Constants.ALL_ORDERS), "All");
         adapter.addFragment(PostedFoodFragment.newInstance(Constants.ORDER_ACTIVE), "Active");
+        adapter.addFragment(PostedFoodFragment.newInstance(Constants.ORDERED_BOOKED), "Booked");
         adapter.addFragment(PostedFoodFragment.newInstance(Constants.ORDER_PURCHASED), "Purchased");
         adapter.addFragment(PostedFoodFragment.newInstance(Constants.ORDER_DRAFT), "Draft");
 

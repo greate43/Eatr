@@ -68,8 +68,8 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
-        setHasOptionsMenu(true);
 
+        setHasOptionsMenu(true);
 
         recyclerView = view.findViewById(R.id.fragment_history_recycler_view);
         mAuth = FirebaseAuth.getInstance();

@@ -11,13 +11,14 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -71,7 +72,7 @@ public class ProfileFragment extends Fragment {
     private Button btnSaveProfile;
     private Uri imgUri;
     private ProgressDialog mProgressDialog;
-    Boolean allowToCheckUserType ;
+    Boolean allowToCheckUserType;
 
     public ProfileFragment() {
     }
@@ -106,11 +107,18 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    View viewSnackBar;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+
+        setHasOptionsMenu(true);
+
+
         etFirstName = view.findViewById(R.id.fragment_profile_edit_text_first_name);
         etLastName = view.findViewById(R.id.fragment_profile_edit_text_last_name);
         etEmail = view.findViewById(R.id.fragment_profile_edit_text_email_address);
@@ -136,6 +144,7 @@ public class ProfileFragment extends Fragment {
         btnSaveProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                viewSnackBar = v;
                 if (
                         !TextUtils.isEmpty(etFirstName.getText())
                                 && !TextUtils.isEmpty(etLastName.getText())
@@ -152,6 +161,9 @@ public class ProfileFragment extends Fragment {
                             , v
                     );
 
+
+                } else if (imgUri == null) {
+                    Snackbar.make(viewSnackBar, "Please Select the image ", Snackbar.LENGTH_SHORT).show();
 
                 } else if (TextUtils.isEmpty(etFirstName.getText())) {
                     etFirstName.setError("First Name is Empty ");
@@ -320,7 +332,7 @@ public class ProfileFragment extends Fragment {
         if (HasReadPermission != PackageManager.PERMISSION_GRANTED) {
 
 
-            ActivityCompat.requestPermissions(getActivity(), new String[]{READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
+            requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE_PERMISSION);
             return;
         }
 
@@ -339,7 +351,7 @@ public class ProfileFragment extends Fragment {
         if (HasCameraPermission != PackageManager.PERMISSION_GRANTED || HasWriteExternalStoragePermPermission != PackageManager.PERMISSION_GRANTED) {
 
 
-            ActivityCompat.requestPermissions(getActivity(), new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_AND_WRITE_PERMISSION);
+            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, CAMERA}, REQUEST_CAMERA_AND_WRITE_PERMISSION);
             return;
         }
 
@@ -418,5 +430,40 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_READ_EXTERNAL_STORAGE_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "onRequestPermissionsResult: 1");
+                    choosePhotoFromGallery();
+                }
+                break;
+            case REQUEST_CAMERA_AND_WRITE_PERMISSION:
 
+                if (grantResults.length > 0) {
+                    Log.d(TAG, "onRequestPermissionsResult: 0");
+                    boolean cameraPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean readExternalStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    Log.d(TAG, "onRequestPermissionsResult: 2 ");
+                    if (cameraPermission && readExternalStorage) {
+                        takePhotoFromCamera();
+                    }
+                }
+
+                break;
+
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
+
+
+    }
 }
