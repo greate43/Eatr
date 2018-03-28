@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,6 +40,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
@@ -54,6 +56,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import sk.greate43.eatr.R;
 
 import static android.app.Activity.RESULT_OK;
@@ -115,14 +124,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         return view;
     }
 
+    @Nullable
     private DirectionsResult getDirectionsDetails(LatLng origin, LatLng destination, TravelMode mode) {
         Log.d(TAG, "getDirectionsDetails: origin " + origin.latitude);
         DateTime now = new DateTime();
         try {
             return DirectionsApi.newRequest(getGeoContext())
                     .mode(mode)
-                    .origin(String.valueOf(origin))
-                    .destination(String.valueOf(destination))
+                    .origin(new com.google.maps.model.LatLng(origin.latitude, origin.longitude))
+                    .destination(new com.google.maps.model.LatLng(destination.latitude, destination.longitude))
                     .departureTime(now)
                     .await();
         } catch (ApiException e) {
@@ -146,7 +156,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     }
 
     private void updateMapUi(GoogleMap googleMap, LatLng origin) {
-        DirectionsResult results = getDirectionsDetails(origin, new LatLng(37.4220, -122.8000), TravelMode.DRIVING);
+        DirectionsResult results;
+        results = getDirectionsDetails(origin, new LatLng(34.1992910, 73.2319881), TravelMode.DRIVING);
         if (results != null) {
             addPolyline(results, googleMap);
             positionCamera(results.routes[overview], googleMap);
@@ -168,12 +179,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         mUiSettings.setRotateGesturesEnabled(true);
     }
 
+    Marker myPosition;
+    Marker myDestination;
+
     private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
-        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_48dp)));
+        if (myPosition == null) {
+            myPosition = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
+        } else {
+            animateMarker(myPosition, myPosition.getPosition(), new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), false);
 
-        //animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
-
-        mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        }
+        // animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
+        if (myDestination == null) {
+            myDestination = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+        }
     }
 
     public void animateMarker(final Marker marker, final LatLng startPosition, final LatLng toPosition,
@@ -214,12 +234,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     }
 
     private void positionCamera(DirectionsRoute route, GoogleMap mMap) {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 14));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 18));
     }
+
+    Polyline line;
 
     private void addPolyline(DirectionsResult results, GoogleMap mMap) {
         List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
-        mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
+        if (line == null) {
+            line = mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
+        } else {
+            line.setPoints(decodedPath);
+        }
     }
 
     private String getEndLocationTitle(DirectionsResult results) {
@@ -229,7 +255,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     private GeoApiContext getGeoContext() {
         GeoApiContext geoApiContext = new GeoApiContext();
         return geoApiContext
-                .setQueryRateLimit(5)
+                .setQueryRateLimit(6)
                 .setApiKey(getString(R.string.directionsApiKey))
                 .setConnectTimeout(2, TimeUnit.SECONDS)
                 .setReadTimeout(2, TimeUnit.SECONDS)
@@ -259,9 +285,97 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         Log.d(TAG, "onLocationChanged: " + location.getLatitude());
-        if (null != mLastLocation) {
-            updateMapUi(mMap, new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        if (mLastLocation != null) {
+
+            updateMapUiOnBackgroundThread(mLastLocation);
+
+            calculateDistanceBetweenTwoPointsOnBackgroundThread();
+
+
         }
+    }
+
+    private void updateMapUiOnBackgroundThread(final Location mLastLocation) {
+        Observable<Location> observable = Observable.create(new ObservableOnSubscribe<Location>() {
+            @Override
+            public void subscribe(ObservableEmitter<Location> emitter) throws Exception {
+                emitter.onNext(mLastLocation);
+            }
+        });
+
+        Observer<Location> observer = new Observer<Location>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+            }
+
+            @Override
+            public void onNext(Location location) {
+                updateMapUi(mMap, new LatLng(location.getLatitude(), location.getLongitude()));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+
+        observable
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    private void calculateDistanceBetweenTwoPointsOnBackgroundThread() {
+        Observable<Boolean> observable = Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
+                emitter.onNext(calculateDistanceBetweenTwoPoints());
+            }
+        });
+
+        Observer<Boolean> observer = new Observer<Boolean>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Boolean isUserNearMe) {
+                if (isUserNearMe) {
+                    Toast.makeText(getActivity(), "You have almost reached your location", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+
+
+        observable
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+
+    private boolean calculateDistanceBetweenTwoPoints() {
+        float[] results = new float[1];
+        Location.distanceBetween(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 34.1992910, 73.2319881, results);
+
+        Log.d(TAG, "onLocationChanged: p0 " + results[0]);
+        return results[0] < 50;
     }
 
     @Override
@@ -299,12 +413,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
         LocationAvailability locationAvailability =
                 LocationServices.FusedLocationApi.getLocationAvailability(mGoogleApiClient);
-        if (null != locationAvailability && locationAvailability.isLocationAvailable()) {
+        if (locationAvailability != null && locationAvailability.isLocationAvailable()) {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (mLastLocation != null) {
-                LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
-                        .getLongitude());
-                updateMapUi(mMap, currentLocation);
+              //  LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
+                //        .getLongitude());
+               // updateMapUi(mMap, currentLocation);
+                updateMapUiOnBackgroundThread(mLastLocation);
             }
         }
     }
@@ -360,6 +475,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
             }
         });
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

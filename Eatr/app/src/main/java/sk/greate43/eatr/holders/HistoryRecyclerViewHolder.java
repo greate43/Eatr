@@ -13,11 +13,17 @@ import sk.greate43.eatr.entities.Food;
  */
 
 public class HistoryRecyclerViewHolder extends RecyclerView.ViewHolder {
-    private TextView tvPurchasedDate;
-    private TextView tvOrderId;
-    private TextView tvSellerId;
-    private TextView tvBuyerId;
-    private TextView tvPrice;
+    private static final String TAG = "HistoryRecyclerViewHold";
+    public TextView tvPurchasedDate;
+    public TextView tvOrderId;
+    public TextView tvSellerId;
+    public TextView tvBuyerId;
+    public TextView tvPrice;
+
+
+    public TextView tvOrderIdLbl;
+    public TextView tvSellerIdLbl;
+    public TextView tvBuyerIdLbl;
 
     public HistoryRecyclerViewHolder(View itemView) {
         super(itemView);
@@ -26,6 +32,10 @@ public class HistoryRecyclerViewHolder extends RecyclerView.ViewHolder {
         tvPrice = itemView.findViewById(R.id.history_list_price);
         tvSellerId = itemView.findViewById(R.id.history_list_seller_id);
         tvBuyerId = itemView.findViewById(R.id.history_list_buyer_id);
+
+        tvBuyerIdLbl = itemView.findViewById(R.id.history_list_Buyer_id_lbl);
+        tvSellerIdLbl = itemView.findViewById(R.id.history_list_seller_id_lbl);
+        tvOrderIdLbl = itemView.findViewById(R.id.history_list_order_id_lbl);
 
     }
 

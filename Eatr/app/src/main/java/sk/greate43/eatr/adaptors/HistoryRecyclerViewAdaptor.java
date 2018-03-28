@@ -18,6 +18,7 @@ import sk.greate43.eatr.holders.HistoryRecyclerViewHolder;
  */
 
 public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryRecyclerViewHolder> {
+    private static final String TAG = "HistoryRecyclerViewAdap";
     LayoutInflater layoutInflater;
     ArrayList<Food> foods;
 
@@ -44,8 +45,27 @@ public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryRecy
     public void onBindViewHolder(@NonNull HistoryRecyclerViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
+            holder.tvPurchasedDate.setText("Order History Not Avialable ");
+            holder.tvOrderId.setVisibility(View.GONE);
+            holder.tvSellerId.setVisibility(View.GONE);
+            holder.tvBuyerId.setVisibility(View.GONE);
+            holder.tvPrice.setVisibility(View.GONE);
 
+
+            holder.tvOrderIdLbl.setVisibility(View.GONE);
+            holder.tvBuyerIdLbl.setVisibility(View.GONE);
+            holder.tvSellerIdLbl.setVisibility(View.GONE);
         } else {
+            holder.tvPurchasedDate.setVisibility(View.VISIBLE);
+
+            holder.tvOrderId.setVisibility(View.VISIBLE);
+            holder.tvSellerId.setVisibility(View.VISIBLE);
+            holder.tvBuyerId.setVisibility(View.VISIBLE);
+            holder.tvPrice.setVisibility(View.VISIBLE);
+
+            holder.tvOrderIdLbl.setVisibility(View.VISIBLE);
+            holder.tvBuyerIdLbl.setVisibility(View.VISIBLE);
+            holder.tvSellerIdLbl.setVisibility(View.VISIBLE);
 
             holder.populate(foods.get(position));
         }
@@ -59,7 +79,7 @@ public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryRecy
                 ) {
             return foods.size();
         } else {
-            return 0;
+            return 1;
         }
     }
 

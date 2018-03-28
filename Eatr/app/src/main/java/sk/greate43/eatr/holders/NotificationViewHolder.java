@@ -88,7 +88,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     if (notification != null) {
                         mDatabaseReference.child(Constants.NOTIFICATION)
                                 .child(notification.getNotificationId())
-                                .updateChildren(updateNotificationAlert(false));
+                                .updateChildren(updateNotificationAlert(true,true));
                         mDatabaseReference.child(Constants.FOOD)
                                 .child(notification.getOrderId())
                                 .updateChildren(updateUpdateProgress(true, false, false));
@@ -103,7 +103,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     if (notification != null) {
                         mDatabaseReference.child(Constants.NOTIFICATION)
                                 .child(notification.getNotificationId())
-                                .updateChildren(updateNotificationAlert(false));
+                                .updateChildren(updateNotificationAlert(true,false));
                         mDatabaseReference.child(Constants.FOOD)
                                 .child(notification.getOrderId())
                                 .updateChildren(updateUpdateProgress(false, false, true));
@@ -153,9 +153,17 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
             return result;
         }
 
-        private Map<String, Object> updateNotificationAlert(boolean isShow) {
+        private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
             HashMap<String, Object> result = new HashMap<>();
             result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
+            if (isAccepted) {
+                result.put(Constants.MESSAGE, "You Have accepted this order");
+            }else {
+                result.put(Constants.MESSAGE, "You Have rejected this order");
+
+            }
+            result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
+
             return result;
         }
 

@@ -43,6 +43,7 @@ public class NotificationJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters job) {
+
         Log.d(TAG, "onStartJob: ");
         mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener(new ValueEventListener() {
             @Override

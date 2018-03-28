@@ -8,6 +8,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -64,6 +66,7 @@ public class NotificationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_notication, container, false);
         recyclerView = view.findViewById(R.id.fragment_notification_recycler_view);
         mAuth = FirebaseAuth.getInstance();
@@ -135,5 +138,13 @@ public class NotificationFragment extends Fragment {
 
 
     }
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
 
+        super.onPrepareOptionsMenu(menu);
+
+
+    }
 }

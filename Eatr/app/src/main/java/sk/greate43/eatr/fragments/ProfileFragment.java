@@ -17,6 +17,8 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -112,6 +114,11 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+
+        setHasOptionsMenu(true);
+
+
         etFirstName = view.findViewById(R.id.fragment_profile_edit_text_first_name);
         etLastName = view.findViewById(R.id.fragment_profile_edit_text_last_name);
         etEmail = view.findViewById(R.id.fragment_profile_edit_text_email_address);
@@ -448,5 +455,15 @@ public class ProfileFragment extends Fragment {
                 break;
 
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
+
+
     }
 }
