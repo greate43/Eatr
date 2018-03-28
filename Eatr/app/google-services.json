@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "872171307525-jooao4jq9ocrvuvvv54nah564bs58lbs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "sk.greate43.eatr",
+            "certificate_hash": "25ec593d5779181cf13095011554bf5f1f9c1fea"
+          }
+        },
+        {
           "client_id": "872171307525-7oha7c43q8h2upj9uj1h3cr7i8fjv88s.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
