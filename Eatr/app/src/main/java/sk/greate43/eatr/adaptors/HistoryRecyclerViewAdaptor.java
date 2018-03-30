@@ -11,13 +11,13 @@ import java.util.ArrayList;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
-import sk.greate43.eatr.holders.HistoryRecyclerViewHolder;
+import sk.greate43.eatr.holders.HistoryViewHolder;
 
 /**
  * Created by great on 2/28/2018.
  */
 
-public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryRecyclerViewHolder> {
+public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryViewHolder> {
     private static final String TAG = "HistoryRecyclerViewAdap";
     LayoutInflater layoutInflater;
     ArrayList<Food> foods;
@@ -34,15 +34,15 @@ public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryRecy
 
     @NonNull
     @Override
-    public HistoryRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = layoutInflater.inflate(R.layout.history_list, parent, false);
 
 
-        return new HistoryRecyclerViewHolder(view);
+        return new HistoryViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HistoryRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
             holder.tvPurchasedDate.setText("Order History Not Avialable ");

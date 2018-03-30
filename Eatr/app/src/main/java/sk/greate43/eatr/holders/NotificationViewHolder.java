@@ -122,7 +122,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
             if (notification != null) {
                 notificationReply = new Notification();
                 notificationReply.setTitle(notification.getTitle());
-                notificationReply.setMessage("Your Order Has Been Accepted");
+                notificationReply.setMessage("Your Order Has Been Accepted and You you can get the Order from your Pick Up Place");
                 notificationReply.setSenderId(user.getUid());
                 notificationReply.setReceiverId(notification.getSenderId());
                 notificationReply.setOrderId(notification.getOrderId());
@@ -153,6 +153,9 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
         result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, booked);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, isActive);
+        if (!progress) {
+            result.put(Constants.PURCHASED_BY,"");
+        }
 
         return result;
     }

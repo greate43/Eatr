@@ -64,22 +64,25 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
                     });
         }
 
-        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive()) {
+        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.GRAY);
             tvStatus.setText("Draft");
-        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode()) {
+        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
-        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased()) {
+        }  else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.BLACK);
-            tvStatus.setText("Purchased");
+            tvStatus.setText("Sold");
+
+        } else  if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
+            tvStatus.setTextColor(Color.YELLOW);
+            tvStatus.setText("Reserved");
 
         }
-
 
         tvPrice.setText(String.valueOf("Rs : " + food.getPrice()));
         tvLocation.setText(food.getPickUpLocation());

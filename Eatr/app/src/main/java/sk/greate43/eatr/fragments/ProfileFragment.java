@@ -125,8 +125,8 @@ public class ProfileFragment extends Fragment {
         imgProfilePicture = view.findViewById(R.id.fragment_profile_image_view_profile_picture);
         spinnerUserType = view.findViewById(R.id.fragment_profile_spinner_select_user_type);
         btnSaveProfile = view.findViewById(R.id.fragment_profile_button_save_profile);
-        mAuth = FirebaseAuth.getInstance();
 
+        mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         database = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance();

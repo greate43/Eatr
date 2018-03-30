@@ -35,11 +35,11 @@ import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.PostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
-import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
+import sk.greate43.eatr.holders.PostedFoodViewHolder;
 import sk.greate43.eatr.utils.Constants;
 
 
-public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerViewHolder.EditPostedFood {
+public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder.EditPostedFood {
 
     public static final String TAG = "PostedFoodFragment";
     RecyclerView recyclerView;
@@ -172,7 +172,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             if (ds.getValue() != null) {
-                collectSeller((Map<String, Object>) ds.getValue());
+                collectFood((Map<String, Object>) ds.getValue());
             }
         }
 
@@ -192,7 +192,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         super.onStop();
     }
 
-    private void collectSeller(Map<String, Object> value) {
+    private void collectFood(Map<String, Object> value) {
 
 
 //        //iterate through each user, ignoring their UID
@@ -204,9 +204,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 ////                   ,
 //
 //
-//            Log.d(TAG, "collectSeller: " + singleUser);
+//            Log.d(TAG, "collectFood: " + singleUser);
 //
-        Log.d(TAG, "collectSeller: " + value);
+        Log.d(TAG, "collectFood: " + value);
         Food food = new Food();
         food.setPushId((String) value.get(Constants.PUSH_ID));
         food.setDishName((String) value.get(Constants.DISH_NAME));
@@ -246,7 +246,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
 
         if (value.get(Constants.POSTED_BY) != null) {
-            food.setPurchasedBy((String) value.get(Constants.POSTED_BY));
+            food.setPostedBy((String) value.get(Constants.POSTED_BY));
         }
 
 
@@ -261,6 +261,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && !food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
                         ) {
                     foods.add(food);
                 }
@@ -271,6 +272,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
+
                         ) {
                     foods.add(food);
                 }
@@ -282,6 +285,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && !food.getCheckIfOrderIsPurchased()
                         && food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
+
+
                         ) {
                     foods.add(food);
                 }
@@ -292,6 +298,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && !food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
                         && food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
+
                         ) {
                     foods.add(food);
                 }

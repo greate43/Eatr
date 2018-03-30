@@ -24,7 +24,7 @@ import sk.greate43.eatr.fragments.PostedFoodFragment;
  * Created by great on 11/12/2017.
  */
 
-public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
     private static final String TAG = "SellFoodRecyclerView";
     Food food;
     //ADD AN ONMENUITEM LISTENER TO EXECUTE COMMANDS ONCLICK OF CONTEXT MENU TASK
@@ -59,7 +59,7 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
         }
     };
 
-    public PostedFoodRecyclerViewHolder(View itemView) {
+    public PostedFoodViewHolder(View itemView) {
         super(itemView);
         tvStatus = itemView.findViewById(R.id.posted_food_list_status_text_view);
         imgFoodItem = itemView.findViewById(R.id.posted_food_list_food_item_image_view);
@@ -95,28 +95,34 @@ public class PostedFoodRecyclerViewHolder extends RecyclerView.ViewHolder implem
                     });
         }
 
-        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()) {
+        if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.GRAY);
             tvStatus.setText("Draft");
-        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()) {
+        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
             activateContextMenu();
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
-        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()) {
+        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.BLACK);
-            tvStatus.setText("Purchased");
+            tvStatus.setText("Sold");
 
-        } else  if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && food.getCheckIfOrderIsBooked()) {
+        } else  if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.YELLOW);
-            tvStatus.setText("Booked");
+            tvStatus.setText("Reserved");
 
         }
+        else  if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()&& food.getCheckIfOrderIsInProgress()) {
+            tvStatus.setTextColor(Color.BLUE);
+            tvStatus.setText("In Progress");
+
+        }
+
         tvPrice.setText(String.valueOf("Rs : " + food.getPrice()));
         tvLocation.setText(food.getPickUpLocation());
         if (food.getTime() != null && !food.getTime().isEmpty()) {

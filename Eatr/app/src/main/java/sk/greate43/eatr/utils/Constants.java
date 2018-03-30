@@ -84,6 +84,15 @@ public interface Constants {
 
     // profile
 
+    /**
+     * {@link sk.greate43.eatr.entities.LiveLocationUpdate}
+     */
+    String LIVE_LOCATION_UPDATE = "LiveLocationUpdate";
+    String SELLER_ID = "sellerId";
+    String BUYER_ID = "buyerId";
+
+    //Live Location Update end
+
 
     // Permission and Requests Constants
     int CAMERA_RESULT = 111;

@@ -156,6 +156,7 @@ public class DetailFoodFragment extends Fragment {
         result.put(Constants.CHECK_IF_ORDER_Is_PURCHASED, false);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, false);
         result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
+        result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS,false);
         result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, true);
         result.put(Constants.PURCHASED_BY, purchasedBy);
         result.put(Constants.PURCHASED_DATE, ServerValue.TIMESTAMP);

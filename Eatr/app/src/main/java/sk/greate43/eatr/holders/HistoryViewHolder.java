@@ -12,7 +12,7 @@ import sk.greate43.eatr.entities.Food;
  * Created by great on 2/28/2018.
  */
 
-public class HistoryRecyclerViewHolder extends RecyclerView.ViewHolder {
+public class HistoryViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "HistoryRecyclerViewHold";
     public TextView tvPurchasedDate;
     public TextView tvOrderId;
@@ -25,7 +25,7 @@ public class HistoryRecyclerViewHolder extends RecyclerView.ViewHolder {
     public TextView tvSellerIdLbl;
     public TextView tvBuyerIdLbl;
 
-    public HistoryRecyclerViewHolder(View itemView) {
+    public HistoryViewHolder(View itemView) {
         super(itemView);
         tvOrderId = itemView.findViewById(R.id.history_list_order_id);
         tvPurchasedDate = itemView.findViewById(R.id.history_list_text_view_purchased_date);

@@ -13,13 +13,13 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.fragments.PostedFoodFragment;
-import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
+import sk.greate43.eatr.holders.PostedFoodViewHolder;
 
 /**
  * Created by great on 11/12/2017.
  */
 
-public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder> {
+public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodViewHolder> {
 
     private static final String TAG = "SellFoodRecyclerViewAda";
 
@@ -37,21 +37,22 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
 
     }
 
+
     public ArrayList<Food> getFoods() {
         return foods;
     }
 
     @NonNull
     @Override
-    public PostedFoodRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PostedFoodViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.posted_food_list, parent, false);
 
 
-        return new PostedFoodRecyclerViewHolder(view);
+        return new PostedFoodViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostedFoodRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PostedFoodViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
             holder.imgFoodItem.setVisibility(View.GONE);
@@ -99,10 +100,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
-    }
 
 
     public void removeItem(int position) {
