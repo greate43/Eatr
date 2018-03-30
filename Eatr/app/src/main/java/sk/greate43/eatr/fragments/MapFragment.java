@@ -42,6 +42,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.android.PolyUtil;
@@ -50,10 +59,13 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.TravelMode;
 
+import org.jetbrains.annotations.Contract;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -64,6 +76,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.entities.LiveLocationUpdate;
+import sk.greate43.eatr.utils.Constants;
 
 import static android.app.Activity.RESULT_OK;
 import static sk.greate43.eatr.utils.Constants.REQUEST_FINE_LOCATION_PERMISSION;
@@ -77,17 +92,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     private boolean mLocationUpdateState;
     private LocationRequest mLocationRequest;
 
-
+    private Food food;
     private GoogleApiClient mGoogleApiClient;
     private int REQUEST_CHECK_SETTINGS = 2;
+    private String userType;
+    LiveLocationUpdate liveLocationUpdate;
+
+
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+    DatabaseReference mDatabaseReference;
+    FirebaseDatabase database;
+    FirebaseStorage mStorage;
+    StorageReference storageRef;
 
     public MapFragment() {
         // Required empty public constructor
     }
 
-    public static MapFragment newInstance() {
+    public static MapFragment newInstance(Food food, String userType) {
         MapFragment fragment = new MapFragment();
-
+        Bundle args = new Bundle();
+        args.putString(Constants.USER_TYPE, userType);
+        args.putSerializable(Constants.ARGS_FOOD, food);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -95,7 +123,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            userType = getArguments().getString(Constants.USER_TYPE);
+            food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
 
+            switch (userType) {
+                case Constants.TYPE_SELLER:
+                    liveLocationUpdate = new LiveLocationUpdate();
+                    break;
+            }
         }
     }
 
@@ -105,15 +140,46 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        if (mGoogleApiClient == null) {
-            if (getActivity() != null)
-                mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        database = FirebaseDatabase.getInstance();
+        mStorage = FirebaseStorage.getInstance();
+        mDatabaseReference = database.getReference();
+        storageRef = mStorage.getReference();
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                if (mGoogleApiClient == null) {
+                    if (getActivity() != null)
+                        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                                .addConnectionCallbacks(this)
+                                .addOnConnectionFailedListener(this)
+                                .addApi(LocationServices.API)
+                                .build();
+                }
+
+
+                createLocationRequest();
+                break;
+            case Constants.TYPE_SELLER:
+                mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        showData(dataSnapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+
+
+                break;
+
+
         }
-        createLocationRequest();
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -122,6 +188,56 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         mapFragment.getMapAsync(this);
 
         return view;
+    }
+
+    private void showData(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+
+
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            if (ds.getValue() != null) {
+                collectUpdateUserLocation((Map<String, Object>) ds.getValue());
+            }
+        }
+
+
+    }
+
+    private void collectUpdateUserLocation(Map<String, Object> value) {
+        Log.d(TAG, "collectUpdateUserLocation: " + value);
+
+        liveLocationUpdate.setBuyerId(String.valueOf(value.get(Constants.BUYER_ID)));
+        liveLocationUpdate.setSellerId(String.valueOf(value.get(Constants.SELLER_ID)));
+        liveLocationUpdate.setOrderID(String.valueOf(value.get(Constants.ORDER_ID)));
+        liveLocationUpdate.setLatitude((double) value.get(Constants.LATITUDE));
+        liveLocationUpdate.setLongitude((double) value.get(Constants.LONGITUDE));
+
+        setUpSellerMaker();
+        positionCamera();
+    }
+
+    Marker sellerMaker;
+    Marker buyerMarker;
+    private void positionCamera() {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(food.getLatitude(), food.getLongitude()), 18));
+    }
+    private void setUpSellerMaker() {
+        if (sellerMaker == null) {
+            sellerMaker = mMap.addMarker(new MarkerOptions().position(new LatLng(food.getLatitude(), food.getLongitude())).title("My Location / Pick Point "));
+        }
+
+
+
+
+        if (buyerMarker == null) {
+            buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude())).title("Buyer ").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
+        } else {
+            animateMarker(buyerMarker, buyerMarker.getPosition(), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()), false);
+
+            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        }
     }
 
     @Nullable
@@ -151,18 +267,39 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         setupGoogleMapScreenSettings(googleMap);
-        //    updateMapUi(googleMap, new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        //    updateMapUiForBuyer(googleMap, new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        switch (userType) {
+            case Constants.TYPE_BUYER:
 
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
+        }
     }
 
-    private void updateMapUi(GoogleMap googleMap, LatLng origin) {
+    private void updateMapUiForBuyer(GoogleMap googleMap, LatLng origin, LatLng destination) {
+        mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).child(food.getPushId()).updateChildren(updateLocation(origin));
         DirectionsResult results;
-        results = getDirectionsDetails(origin, new LatLng(34.1992910, 73.2319881), TravelMode.DRIVING);
+        results = getDirectionsDetails(origin, destination, TravelMode.DRIVING);
         if (results != null) {
             addPolyline(results, googleMap);
-            positionCamera(results.routes[overview], googleMap);
+            positionBuyerCamera(results.routes[overview], googleMap);
             addMarkersToMap(results, googleMap);
         }
+    }
+
+    private Map<String, Object> updateLocation(LatLng origin) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.ORDER_ID, food.getPushId());
+        result.put(Constants.SELLER_ID, food.getPostedBy());
+        Log.d(TAG, "updateLocation: "+food.getPostedBy());
+        result.put(Constants.BUYER_ID, food.getPurchasedBy());
+        result.put(Constants.LATITUDE, origin.latitude);
+        result.put(Constants.LONGITUDE, origin.longitude);
+        return result;
     }
 
     private void setupGoogleMapScreenSettings(GoogleMap mMap) {
@@ -179,17 +316,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         mUiSettings.setRotateGesturesEnabled(true);
     }
 
-    Marker myPosition;
+    // Marker myPosition;
     Marker myDestination;
 
     private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
-        if (myPosition == null) {
-            myPosition = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
-        } else {
-            animateMarker(myPosition, myPosition.getPosition(), new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), false);
-
-            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-        }
+//        if (myPosition == null) {
+//            myPosition = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
+//        } else {
+//            animateMarker(myPosition, myPosition.getPosition(), new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), false);
+//
+//            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+//        }
         // animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
         if (myDestination == null) {
             myDestination = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
@@ -233,7 +370,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         });
     }
 
-    private void positionCamera(DirectionsRoute route, GoogleMap mMap) {
+    private void positionBuyerCamera(DirectionsRoute route, GoogleMap mMap) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 18));
     }
 
@@ -248,6 +385,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         }
     }
 
+    @NonNull
+    @Contract(pure = true)
     private String getEndLocationTitle(DirectionsResult results) {
         return "Time :" + results.routes[overview].legs[overview].duration.humanReadable + " Distance :" + results.routes[overview].legs[overview].distance.humanReadable;
     }
@@ -287,7 +426,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         Log.d(TAG, "onLocationChanged: " + location.getLatitude());
         if (mLastLocation != null) {
 
-            updateMapUiOnBackgroundThread(mLastLocation);
+            if (food != null) {
+                updateMapUiForBuyer(mMap, new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(food.getLatitude(), food.getLongitude()));
+            }
+
 
             calculateDistanceBetweenTwoPointsOnBackgroundThread();
 
@@ -295,40 +437,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         }
     }
 
-    private void updateMapUiOnBackgroundThread(final Location mLastLocation) {
-        Observable<Location> observable = Observable.create(new ObservableOnSubscribe<Location>() {
-            @Override
-            public void subscribe(ObservableEmitter<Location> emitter) throws Exception {
-                emitter.onNext(mLastLocation);
-            }
-        });
-
-        Observer<Location> observer = new Observer<Location>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-            }
-
-            @Override
-            public void onNext(Location location) {
-                updateMapUi(mMap, new LatLng(location.getLatitude(), location.getLongitude()));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        };
-
-        observable
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer);
-    }
 
     private void calculateDistanceBetweenTwoPointsOnBackgroundThread() {
         Observable<Boolean> observable = Observable.create(new ObservableOnSubscribe<Boolean>() {
@@ -372,7 +480,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
     private boolean calculateDistanceBetweenTwoPoints() {
         float[] results = new float[1];
-        Location.distanceBetween(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 34.1992910, 73.2319881, results);
+        if (food != null)
+            Location.distanceBetween(mLastLocation.getLatitude(), mLastLocation.getLongitude(), food.getLatitude(), food.getLongitude(), results);
 
         Log.d(TAG, "onLocationChanged: p0 " + results[0]);
         return results[0] < 50;
@@ -387,15 +496,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     public void onStart() {
         super.onStart();
         // 2
-        mGoogleApiClient.connect();
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                mGoogleApiClient.connect();
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
+        }
+
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.disconnect();
+                }
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
         }
+
+
     }
 
     private void setUpMap() {
@@ -416,10 +548,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         if (locationAvailability != null && locationAvailability.isLocationAvailable()) {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (mLastLocation != null) {
-              //  LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
-                //        .getLongitude());
-               // updateMapUi(mMap, currentLocation);
-                updateMapUiOnBackgroundThread(mLastLocation);
+                LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
+                        .getLongitude());
+                Log.d(TAG, "setUpMap: " + food);
+                if (food != null) {
+                    Log.d(TAG, "onNext: lat " + food.getLatitude() + " lng" + food.getLongitude());
+                    updateMapUiForBuyer(mMap, currentLocation, new LatLng(food.getLatitude(), food.getLongitude()));
+                }
             }
         }
     }
@@ -506,15 +641,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public void onPause() {
         super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mGoogleApiClient.isConnected() && !mLocationUpdateState) {
-            startLocationUpdates();
+
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                if (mGoogleApiClient.isConnected() && !mLocationUpdateState) {
+                    startLocationUpdates();
+                }
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
         }
+
+
     }
 
 
