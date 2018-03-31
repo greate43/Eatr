@@ -38,8 +38,8 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
     public CircleImageView img;
     public Button yes;
     public Button no;
-    public Notification notification;
-    View view;
+    private Notification notification;
+    private View view;
     private DatabaseReference mDatabaseReference;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override
@@ -89,9 +89,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     mDatabaseReference.child(Constants.NOTIFICATION)
                             .child(notification.getNotificationId())
                             .updateChildren(updateNotificationAlert(true, true));
-                    mDatabaseReference.child(Constants.FOOD)
-                            .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(true, false, false));
+
 
                     sendNotification(true);
                 }
@@ -104,9 +102,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     mDatabaseReference.child(Constants.NOTIFICATION)
                             .child(notification.getNotificationId())
                             .updateChildren(updateNotificationAlert(true, false));
-                    mDatabaseReference.child(Constants.FOOD)
-                            .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(false, false, true));
+
                     sendNotification(false);
 
 
@@ -118,45 +114,102 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
     private void sendNotification(Boolean isOrderAccepted) {
         String notificationId = mDatabaseReference.push().getKey();
         Notification notificationReply = null;
-        if (isOrderAccepted) {
-            if (notification != null) {
-                notificationReply = new Notification();
-                notificationReply.setTitle(notification.getTitle());
-                notificationReply.setMessage("Your Order Has Been Accepted and You you can get the Order from your Pick Up Place");
-                notificationReply.setSenderId(user.getUid());
-                notificationReply.setReceiverId(notification.getSenderId());
-                notificationReply.setOrderId(notification.getOrderId());
-                notificationReply.setCheckIfButtonShouldBeEnabled(false);
-                notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
-                notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
-                notificationReply.setNotificationId(notificationId);
+        if (notification.getNotificationType().equals(Constants.TYPE_NOTIFICATION_ORDER_REQUEST)) {
+            if (isOrderAccepted) {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Your Order Has Been Accepted and You you can get the Order from your Pick Up Place");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
+
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(true, false, false, false,false));
+
+                }
+            } else {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Your Order Has Been Rejected");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
+
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, true, false,false));
+
+                }
             }
-        } else {
-            if (notification != null) {
-                notificationReply = new Notification();
-                notificationReply.setTitle(notification.getTitle());
-                notificationReply.setMessage("Your Order Has Been Rejected");
-                notificationReply.setSenderId(user.getUid());
-                notificationReply.setReceiverId(notification.getSenderId());
-                notificationReply.setOrderId(notification.getOrderId());
-                notificationReply.setCheckIfButtonShouldBeEnabled(false);
-                notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
-                notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
-                notificationReply.setNotificationId(notificationId);
+        } else if (notification.getNotificationType().equals(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED)) {
+            if (isOrderAccepted) {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Buyer has also marked the order Complete ");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+
+
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, false, true,true));
+                }
+            } else {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Buyer has marked the Incomplete");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, false, false,true));
+
+                }
             }
         }
+
+
         mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
     }
 
-    private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive) {
+    private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive, boolean isPurchase, boolean isCompeted) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
         result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, booked);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, isActive);
-        if (!progress) {
+        if (!progress && !isPurchase && !isCompeted) {
             result.put(Constants.PURCHASED_BY, "");
         }
-
+        if (isPurchase) {
+            result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, isPurchase);
+        }
         return result;
     }
 

@@ -221,7 +221,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
         food.setCheckIfOrderIsActive((boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_IS_PURCHASED));
 
         if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
             food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));
@@ -247,6 +247,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
             food.setPostedBy((String) value.get(Constants.POSTED_BY));
         }
 
+        if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
+            food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
+        }
 
         switch (orderState) {
             case Constants.ALL_ORDERS:
@@ -260,6 +263,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
+                        && !food.getcheckIfOrderIsCompleted()
+
                         ) {
                     foods.add(food);
                 }
@@ -271,6 +276,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
+                        && food.getcheckIfOrderIsCompleted()
 
                         ) {
                     foods.add(food);
@@ -284,6 +290,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
+                        && !food.getcheckIfOrderIsCompleted()
 
 
                         ) {
@@ -297,6 +304,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && !food.getCheckIfFoodIsInDraftMode()
                         && food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
+                        && !food.getcheckIfOrderIsCompleted()
 
                         ) {
                     foods.add(food);

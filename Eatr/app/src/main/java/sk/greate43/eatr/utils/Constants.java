@@ -28,13 +28,16 @@ public interface Constants {
     String NO_OF_SERVINGS = "numberOfServings";
     String LONGITUDE = "longitude";
     String LATITUDE = "latitude";
-    String CHECK_IF_ORDER_Is_PURCHASED = "checkIfOrderIsPurchased";
+    String CHECK_IF_ORDER_IS_PURCHASED = "checkIfOrderIsPurchased";
     String PURCHASED_BY = "purchasedBy";
     String POSTED_BY = "postedBy";
     String PURCHASED_DATE = "purchasedDate";
     String CHECK_IF_ORDER_IS_IN_PROGRESS = "checkIfOrderIsInProgress";
     String CHECK_IF_ORDER_IS_ACCEPTED = "checkIfOrderIsAccepted";
     String CHECK_IF_ORDERED_IS_BOOKED = "checkIfOrderIsBooked";
+    String CHECK_IF_MAP_SHOULD_BE_CLOSED = "checkIfMapShouldBeClosed";
+    String CHECK_IF_ORDER_IS_COMPLETED = "checkIfOrderIsCompleted";
+
     //Food Constants
 
 
@@ -53,6 +56,9 @@ public interface Constants {
     String NOTIFICATION_IMAGE = "notificationImage";
     String CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SENT = "checkIfNotificationAlertShouldBeSent";
     String CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN = "checkIfNotificationAlertShouldBeShown";
+    String NOTIFICATION_TYPE = "notificationType";
+    String TYPE_NOTIFICATION_ORDER_REQUEST = "ORDER_REQUEST";
+    String TYEPE_NOTIFICATION_ORDER_COMPLETED = "ORDER_COMPLETED";
     /**
      * {@link sk.greate43.eatr.fragments.AddFoodItemFragment}
      */
@@ -93,6 +99,12 @@ public interface Constants {
 
     //Live Location Update end
 
+    /**
+     * {@link sk.greate43.eatr.entities.Account}
+     */
+    String BALANCE = "balance";
+    String PAYMENT_DATE = "paymentDate";
+    String ACCOUNT = "Account";
 
     // Permission and Requests Constants
     int CAMERA_RESULT = 111;

@@ -36,9 +36,27 @@ public class Food implements Serializable {
     private boolean checkIfOrderIsInProgress;
     private boolean checkIfOrderIsAccepted;
     private boolean checkIfOrderIsBooked;
+    private boolean checkIfMapShouldBeClosed;
+    private boolean checkIfOrderIsCompleted;
+
+    public boolean getcheckIfOrderIsCompleted() {
+        return checkIfOrderIsCompleted;
+    }
+
+    public void setCheckIfOrderIsCompleted(boolean checkIfOrderIsCompleted) {
+        this.checkIfOrderIsCompleted = checkIfOrderIsCompleted;
+    }
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+    public boolean getcheckIfMapShouldBeClosed() {
+        return checkIfMapShouldBeClosed;
+    }
+
+    public void setCheckIfMapShouldBeClosed(boolean checkIfMapShouldBeClosed) {
+        this.checkIfMapShouldBeClosed = checkIfMapShouldBeClosed;
     }
 
     public boolean getCheckIfOrderIsBooked() {

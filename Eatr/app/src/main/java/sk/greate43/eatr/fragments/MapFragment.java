@@ -54,6 +54,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -82,8 +83,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.entities.Account;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.entities.LiveLocationUpdate;
+import sk.greate43.eatr.entities.Notification;
 import sk.greate43.eatr.utils.Constants;
 
 import static android.app.Activity.RESULT_OK;
@@ -169,13 +172,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
 
                 createLocationRequest();
+                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        showDataForBuyer(dataSnapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+
+
                 break;
             case Constants.TYPE_SELLER:
                 mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        showData(dataSnapshot);
+                        showDataForSeller(dataSnapshot);
                     }
 
                     @Override
@@ -216,6 +233,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         return view;
     }
 
+    private void showDataForBuyer(DataSnapshot dataSnapshot) {
+
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+
+
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            if (ds.getValue() != null) {
+                collectFood((Map<String, Object>) ds.getValue());
+            }
+        }
+    }
+
+    private void collectFood(Map<String, Object> value) {
+        Food food = new Food();
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
+            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+
+        if (value.get(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED) != null)
+            food.setCheckIfMapShouldBeClosed((boolean) value.get(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED));
+
+
+        if (!food.getCheckIfOrderIsInProgress() && food.getCheckIfFoodIsInDraftMode()) {
+
+        }
+    }
+
     private void showAlertDialog() {
         if (getActivity() != null) {
 
@@ -242,13 +287,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
                         @Override
                         public void onClick(View view) {
-                            if (!TextUtils.isEmpty(input.getText())) {
+                            if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) >= food.getPrice()) {
                                 price = input.getText().toString();
+                                updatePaymentForSeller();
+                                sendNotification();
+                                closeMapForBothUser();
+                                Toast.makeText(getActivity(), "Price " + food.getPrice(), Toast.LENGTH_LONG).show();
 
-                                
                                 mAlertDialog.dismiss();
 
-                            } else {
+                            } else if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) <= food.getPrice()) {
+                                input.setError("Price Cant be less then PKR " + food.getPrice());
+
+                            } else if (TextUtils.isEmpty(input.getText())) {
                                 input.setError("It cant be empty");
 
                             }
@@ -260,7 +311,57 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         }
     }
 
-    private void showData(DataSnapshot dataSnapshot) {
+    private void closeMapForBothUser() {
+        mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).updateChildren(updateFood());
+
+
+    }
+
+    private Map<String, Object> updateFood() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, false);
+        result.put(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED, true);
+        result.put(Constants.CHECK_IF_ORDER_IS_COMPLETED, true);
+
+        result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, false);
+        result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, false);
+        result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, false);
+        result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
+
+
+        return result;
+    }
+
+    private void updatePaymentForSeller() {
+        Account account = new Account();
+        account.setBalance(food.getPrice());
+        account.setOrderId(food.getPushId());
+        account.setUserId(user.getUid());
+        account.setPaymentDate(ServerValue.TIMESTAMP);
+        mDatabaseReference.child(Constants.ACCOUNT).push().setValue(account);
+    }
+
+    private void sendNotification() {
+        String notificationId = mDatabaseReference.push().getKey();
+        Notification notification = null;
+
+        notification = new Notification();
+        notification.setTitle("Order Complete");
+        notification.setMessage("Seller has marked the order Complete? If you have gotten your order ? Press yes. ");
+        notification.setSenderId(user.getUid());
+        notification.setReceiverId(food.getPurchasedBy());
+        notification.setOrderId(food.getPushId());
+        notification.setCheckIfButtonShouldBeEnabled(true);
+        notification.setCheckIfNotificationAlertShouldBeShown(true);
+        notification.setCheckIfNotificationAlertShouldBeSent(true);
+        notification.setNotificationId(notificationId);
+        notification.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+
+
+        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notification);
+    }
+
+    private void showDataForSeller(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }
