@@ -138,17 +138,21 @@ public class HistoryFragment extends Fragment {
         }
         food.setIngredientsTags(String.valueOf(value.get(Constants.INGREDIENTS_TAGS)));
         food.setImageUri((String) value.get(Constants.IMAGE_URI));
-        food.setPrice((long) value.get(Constants.PRICE));
+        food.setPrice(Long.parseLong(String.valueOf(value.get(Constants.PRICE))));
         food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
         food.setLatitude((double) value.get(Constants.LATITUDE));
         food.setLongitude((double) value.get(Constants.LONGITUDE));
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
-        food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
-        food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
-        if (value.get(Constants.POSTED_BY) != null) {
-            food.setPostedBy((String) value.get(Constants.POSTED_BY));
-        }
+        food.setCheckIfOrderIsActive((boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
+        food.setCheckIfFoodIsInDraftMode((boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
+        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_IS_PURCHASED));
+
+        if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
+            food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));
+
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
+            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+
 
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
@@ -157,9 +161,20 @@ public class HistoryFragment extends Fragment {
             food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
         }
 
-        if (value.get(Constants.PURCHASED_DATE) != null) {
-            food.setPurchasedDate((long) value.get(Constants.PURCHASED_DATE));
+
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null) {
+            food.setCheckIfOrderIsInProgress((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
         }
+
+
+        if (value.get(Constants.POSTED_BY) != null) {
+            food.setPostedBy((String) value.get(Constants.POSTED_BY));
+        }
+
+        if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
+            food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
+        }
+
 
         switch (userType) {
             case Constants.TYPE_BUYER:
@@ -167,9 +182,12 @@ public class HistoryFragment extends Fragment {
                 Log.d(TAG, "collectHistory:current user " + user.getUid());
 
                 if (
-                        !food.getCheckIfFoodIsInDraftMode()
+                        !food.getCheckIfOrderIsActive()
                                 && food.getCheckIfOrderIsPurchased()
-                                && !food.getCheckIfOrderIsActive()
+                                && !food.getCheckIfFoodIsInDraftMode()
+                                && !food.getCheckIfOrderIsBooked()
+                                && !food.getCheckIfOrderIsInProgress()
+                                && food.getcheckIfOrderIsCompleted()
                                 && food.getPurchasedBy().equals(user.getUid())
                         ) {
 
@@ -179,9 +197,12 @@ public class HistoryFragment extends Fragment {
                 break;
             case Constants.TYPE_SELLER:
                 if (
-                        !food.getCheckIfFoodIsInDraftMode()
+                        !food.getCheckIfOrderIsActive()
                                 && food.getCheckIfOrderIsPurchased()
-                                && !food.getCheckIfOrderIsActive()
+                                && !food.getCheckIfFoodIsInDraftMode()
+                                && !food.getCheckIfOrderIsBooked()
+                                && !food.getCheckIfOrderIsInProgress()
+                                && food.getcheckIfOrderIsCompleted()
                                 && food.getPostedBy().equals(user.getUid())
                         ) {
 

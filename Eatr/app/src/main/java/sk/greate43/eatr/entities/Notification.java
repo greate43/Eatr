@@ -18,9 +18,18 @@ public class Notification implements Serializable {
     private String receiverId;
     private String orderId;
     private String notificationId;
+    private String notificationType;
 
     public Notification() {
 
+    }
+
+    public String getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(String notificationType) {
+        this.notificationType = notificationType;
     }
 
     public String getNotificationId() {

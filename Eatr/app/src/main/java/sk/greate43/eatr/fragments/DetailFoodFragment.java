@@ -142,6 +142,7 @@ public class DetailFoodFragment extends Fragment {
         notification.setCheckIfNotificationAlertShouldBeShown(true);
         notification.setCheckIfNotificationAlertShouldBeSent(true);
         notification.setNotificationId(notificationId);
+        notification.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
 
         mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(user.getUid()));
         mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notification);
@@ -153,7 +154,7 @@ public class DetailFoodFragment extends Fragment {
 
     public Map<String, Object> toMap(String purchasedBy) {
         HashMap<String, Object> result = new HashMap<>();
-        result.put(Constants.CHECK_IF_ORDER_Is_PURCHASED, false);
+        result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, false);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, false);
         result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, false);

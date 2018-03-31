@@ -24,7 +24,7 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/add_entry_btn"
-        app:backgroundTint="@color/md_blue_A700"
+        app:backgroundTint="@color/primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

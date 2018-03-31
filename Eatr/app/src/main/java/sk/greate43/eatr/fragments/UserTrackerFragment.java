@@ -175,7 +175,7 @@ public class UserTrackerFragment extends Fragment {
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
         food.setCheckIfOrderIsActive((boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_IS_PURCHASED));
 
         if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
             food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));

@@ -158,7 +158,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
         food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_PURCHASED));
 
 
         if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
@@ -179,7 +179,9 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         if (value.get(Constants.POSTED_BY) != null) {
             food.setPostedBy((String) value.get(Constants.POSTED_BY));
         }
-
+        if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
+            food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
+        }
 
         if (
                 !food.getCheckIfFoodIsInDraftMode()
@@ -187,6 +189,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
                         && food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsInProgress()
                         && !food.getCheckIfOrderIsBooked()
+                        && !food.getcheckIfOrderIsCompleted()
                         && !food.getPostedBy().equals(user.getUid())
                 ) {
 
