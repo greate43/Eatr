@@ -9,7 +9,7 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
  * Created by great on 3/20/2018.
  */
 
-public class EatrFirebaseInstanceId extends FirebaseInstanceIdService{
+public class EatrFirebaseInstanceId extends FirebaseInstanceIdService {
 
     private static final String TAG = "FirebaseIDService";
 

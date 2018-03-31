@@ -143,7 +143,7 @@ public class SellerActivity extends AppCompatActivity {
         }
         profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));
 
-        if (updateData != null ) {
+        if (updateData != null) {
             updateData.onNavDrawerDataUpdated(profile);
         }
 

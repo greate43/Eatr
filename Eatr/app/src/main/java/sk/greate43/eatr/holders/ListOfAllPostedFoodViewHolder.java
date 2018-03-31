@@ -25,7 +25,7 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
     private static final String TAG = "ListOfAllPostedFoodView";
     public ImageView imgFoodItem;
-   public   TextView tvStatus;
+    public TextView tvStatus;
     public TextView tvLocation;
     public TextView tvDishName;
     public TextView tvTimeStamp;
@@ -67,18 +67,18 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.GRAY);
             tvStatus.setText("Draft");
-        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
+        } else if (food.getCheckIfOrderIsActive() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.GREEN);
             tvStatus.setText("Active");
-        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.RED);
             tvStatus.setText("Expired");
 
-        }  else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
+        } else if (!food.getCheckIfOrderIsActive() && food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.BLACK);
             tvStatus.setText("Sold");
 
-        } else  if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && food.getCheckIfOrderIsBooked()&& !food.getCheckIfOrderIsInProgress()) {
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress()) {
             tvStatus.setTextColor(Color.YELLOW);
             tvStatus.setText("Reserved");
 

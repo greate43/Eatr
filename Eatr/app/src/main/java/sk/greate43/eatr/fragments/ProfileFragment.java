@@ -56,6 +56,7 @@ import static sk.greate43.eatr.utils.Constants.REQUEST_READ_EXTERNAL_STORAGE_PER
 
 
 public class ProfileFragment extends Fragment {
+    public static final String ALLOW_TO_CHECK_USER_TYPE = "ALLOW_TO_CHECK_USER_TYPE";
     private static final String TAG = "ProfileFragment";
     FirebaseAuth mAuth;
     FirebaseUser user;
@@ -64,6 +65,8 @@ public class ProfileFragment extends Fragment {
     FirebaseStorage mStorage;
     StorageReference storageRef;
     Profile profile;
+    Boolean allowToCheckUserType;
+    View viewSnackBar;
     private TextInputEditText etFirstName;
     private TextInputEditText etLastName;
     private TextInputEditText etEmail;
@@ -72,12 +75,9 @@ public class ProfileFragment extends Fragment {
     private Button btnSaveProfile;
     private Uri imgUri;
     private ProgressDialog mProgressDialog;
-    Boolean allowToCheckUserType;
 
     public ProfileFragment() {
     }
-
-    public static final String ALLOW_TO_CHECK_USER_TYPE = "ALLOW_TO_CHECK_USER_TYPE";
 
     @NonNull
     public static ProfileFragment newInstance() {
@@ -106,8 +106,6 @@ public class ProfileFragment extends Fragment {
             profile = (Profile) getArguments().getSerializable(Constants.ARGS_PROFILE);
         }
     }
-
-    View viewSnackBar;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

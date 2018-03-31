@@ -21,9 +21,6 @@ import sk.greate43.eatr.utils.Constants;
 public class PostedFoodPagerFragment extends Fragment {
 
 
-
-
-
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -45,7 +42,6 @@ public class PostedFoodPagerFragment extends Fragment {
     }
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,8 +57,6 @@ public class PostedFoodPagerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.frgment_posted_food_pager, container, false);
-
-
 
 
         // Set up the ViewPager with the sections adapter.
@@ -90,7 +84,6 @@ public class PostedFoodPagerFragment extends Fragment {
         adapter.addFragment(PostedFoodFragment.newInstance(Constants.ORDER_DRAFT), "Draft");
 
         viewPager.setAdapter(adapter);
-
 
 
     }

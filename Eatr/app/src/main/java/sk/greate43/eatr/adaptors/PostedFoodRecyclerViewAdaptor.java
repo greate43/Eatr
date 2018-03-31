@@ -28,6 +28,8 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     private LayoutInflater inflater;
     private SellerActivity sellerActivity;
     private PostedFoodFragment postedFoodFragment;
+    private String states = "";
+
 
     public PostedFoodRecyclerViewAdaptor(SellerActivity sellerActivity, PostedFoodFragment postedFoodFragment) {
         this.sellerActivity = sellerActivity;
@@ -36,7 +38,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         this.postedFoodFragment = postedFoodFragment;
 
     }
-
 
     public ArrayList<Food> getFoods() {
         return foods;
@@ -56,7 +57,7 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
             holder.imgFoodItem.setVisibility(View.GONE);
-            Log.d(TAG, "onBindViewHolder: "+states);
+            Log.d(TAG, "onBindViewHolder: " + states);
             holder.tvDishName.setText(states);
             holder.tvPrice.setVisibility(View.GONE);
             holder.tvStatus.setVisibility(View.GONE);
@@ -72,8 +73,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
             holder.populate(sellerActivity, foods.get(position), postedFoodFragment, position);
         }
     }
-
-    private String states = "";
 
     public void setStates(String states) {
         this.states = states;
@@ -99,7 +98,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
             notifyItemRangeRemoved(0, size);
         }
     }
-
 
 
     public void removeItem(int position) {

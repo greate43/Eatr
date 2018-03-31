@@ -65,6 +65,7 @@ public class NotificationJobService extends JobService {
         Log.d(TAG, "onStopJob: ");
         return false;
     }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -76,7 +77,6 @@ public class NotificationJobService extends JobService {
 
         mDatabaseReference = database.getReference();
     }
-
 
 
     private void showData(DataSnapshot dataSnapshot) {

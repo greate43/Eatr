@@ -132,12 +132,13 @@ public class NotificationFragment extends Fragment {
         notification.setCheckIfNotificationAlertShouldBeShown((boolean) value.get(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN));
         notification.setSenderId(String.valueOf(value.get(Constants.SENDER_ID)));
         notification.setReceiverId(String.valueOf(value.get(Constants.RECEIVER_ID)));
-           if (notification.getReceiverId().equals(user.getUid())&& notification.getCheckIfNotificationAlertShouldBeShown()){
-               notifications.add(notification);
-           }
+        if (notification.getReceiverId().equals(user.getUid()) && notification.getCheckIfNotificationAlertShouldBeShown()) {
+            notifications.add(notification);
+        }
 
 
     }
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.menu_item_search);

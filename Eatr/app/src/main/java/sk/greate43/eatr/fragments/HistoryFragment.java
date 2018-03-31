@@ -50,7 +50,7 @@ public class HistoryFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(Constants.USER_TYPE, userType);
         fragment.setArguments(args);
-        Log.d(TAG, "newInstance: "+userType);
+        Log.d(TAG, "newInstance: " + userType);
         return fragment;
     }
 
@@ -59,7 +59,7 @@ public class HistoryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             userType = getArguments().getString(Constants.USER_TYPE);
-            Log.d(TAG, "onCreate: "+userType);
+            Log.d(TAG, "onCreate: " + userType);
         }
     }
 
@@ -164,7 +164,7 @@ public class HistoryFragment extends Fragment {
         switch (userType) {
             case Constants.TYPE_BUYER:
                 Log.d(TAG, "collectHistory: " + food.getPurchasedBy());
-                Log.d(TAG, "collectHistory:current user "+user.getUid());
+                Log.d(TAG, "collectHistory:current user " + user.getUid());
 
                 if (
                         !food.getCheckIfFoodIsInDraftMode()
@@ -202,7 +202,6 @@ public class HistoryFragment extends Fragment {
 
 
     }
-
 
 
 }
