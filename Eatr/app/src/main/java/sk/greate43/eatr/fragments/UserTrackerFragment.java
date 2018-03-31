@@ -37,12 +37,12 @@ public class UserTrackerFragment extends Fragment {
     ArrayList<Food> foods;
     // ArrayList<Profile> profiles;
     TrackUserRecyclerViewAdaptor adaptor;
+    String userType;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
-    String userType;
 
     public UserTrackerFragment() {
         // Required empty public constructor

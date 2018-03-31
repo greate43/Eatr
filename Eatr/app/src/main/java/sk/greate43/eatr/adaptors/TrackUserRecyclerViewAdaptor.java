@@ -60,7 +60,6 @@ public class TrackUserRecyclerViewAdaptor extends RecyclerView.Adapter<TrackUser
     }
 
 
-
     @Override
     public int getItemCount() {
         if (foods != null && !foods.isEmpty()) {
@@ -81,7 +80,6 @@ public class TrackUserRecyclerViewAdaptor extends RecyclerView.Adapter<TrackUser
             notifyItemRangeRemoved(0, size);
         }
     }
-
 
 
     public void removeItem(int position) {

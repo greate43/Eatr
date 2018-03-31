@@ -55,7 +55,7 @@ public class TrackUserViewHolder extends RecyclerView.ViewHolder {
                 @Override
                 public void onClick(View v) {
                     FragmentManager fragment = activity.getSupportFragmentManager();
-                    fragment.beginTransaction().replace(R.id.content_seller_container, MapFragment.newInstance(food,Constants.TYPE_SELLER)).commit();
+                    fragment.beginTransaction().replace(R.id.content_seller_container, MapFragment.newInstance(food, Constants.TYPE_SELLER)).commit();
                 }
             });
         }

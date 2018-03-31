@@ -19,6 +19,10 @@ public class Notification implements Serializable {
     private String orderId;
     private String notificationId;
 
+    public Notification() {
+
+    }
+
     public String getNotificationId() {
         return notificationId;
     }
@@ -55,6 +59,10 @@ public class Notification implements Serializable {
         return senderId;
     }
 
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
     public String getOrderId() {
         return orderId;
     }
@@ -63,21 +71,12 @@ public class Notification implements Serializable {
         this.orderId = orderId;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-
     public String getReceiverId() {
         return receiverId;
     }
 
     public void setReceiverId(String receiverId) {
         this.receiverId = receiverId;
-    }
-
-    public Notification() {
-
     }
 
     public boolean getCheckIfButtonShouldBeEnabled() {

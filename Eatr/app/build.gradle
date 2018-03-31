@@ -10,6 +10,7 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -30,14 +31,14 @@ dependencies {
     implementation 'com.android.support:support-vector-drawable:27.1.0'
     implementation 'com.android.support:support-v4:27.1.0'
 
-    implementation 'com.google.firebase:firebase-auth:12.0.0'
-    implementation 'com.google.firebase:firebase-messaging:12.0.0'
-    implementation 'com.google.android.gms:play-services-location:12.0.0'
-    implementation 'com.google.android.gms:play-services-places:12.0.0'
-    implementation 'com.google.firebase:firebase-database:12.0.0'
-    implementation 'com.google.firebase:firebase-storage:12.0.0'
-    implementation 'com.google.android.gms:play-services-maps:12.0.0'
-    implementation 'com.google.android.gms:play-services-auth:12.0.0'
+    implementation 'com.google.firebase:firebase-auth:12.0.1'
+    implementation 'com.google.firebase:firebase-messaging:12.0.1'
+    implementation 'com.google.android.gms:play-services-location:12.0.1'
+    implementation 'com.google.android.gms:play-services-places:12.0.1'
+    implementation 'com.google.firebase:firebase-database:12.0.1'
+    implementation 'com.google.firebase:firebase-storage:12.0.1'
+    implementation 'com.google.android.gms:play-services-maps:12.0.1'
+    implementation 'com.google.android.gms:play-services-auth:12.0.1'
 
 
     implementation 'com.android.support:cardview-v7:27.1.0'
@@ -56,6 +57,12 @@ dependencies {
 // explicitly depend on RxJava's latest version for bug fixes and new features.
 // (see https://github.com/ReactiveX/RxJava/releases for latest 2.x.x version)
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
+
+
+    implementation 'com.android.support:multidex:1.0.3'
+
+
+
 
     implementation 'com.hbb20:ccp:2.1.0'
     testImplementation 'junit:junit:4.12'

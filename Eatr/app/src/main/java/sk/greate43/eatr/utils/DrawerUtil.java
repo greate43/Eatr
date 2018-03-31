@@ -50,7 +50,7 @@ public class DrawerUtil implements UpdateData {
     private AccountHeader headerResult;
     private Drawer result;
     private UpdateData updateData = this;
-
+    private Profile profile;
 
     private DrawerUtil() {
 
@@ -72,20 +72,19 @@ public class DrawerUtil implements UpdateData {
                 .withName("Settings").withIcon(R.drawable.ic_settings_black_24dp);
         SecondaryDrawerItem drawerItemLogout = new SecondaryDrawerItem().withIdentifier(3)
                 .withName("Logout").withIcon(R.drawable.logout);
-       // SecondaryDrawerItem drawerItemMap = new SecondaryDrawerItem().withIdentifier(5)
-         //       .withName("Map").withIcon(R.drawable.logout);
+        // SecondaryDrawerItem drawerItemMap = new SecondaryDrawerItem().withIdentifier(5)
+        //       .withName("Map").withIcon(R.drawable.logout);
         SecondaryDrawerItem drawerProfile = new SecondaryDrawerItem().withIdentifier(4)
                 .withName("Profile").withIcon(R.drawable.ic_account_box_black_24dp);
         SecondaryDrawerItem drawerNotification = new SecondaryDrawerItem().withIdentifier(6)
                 .withName("Notification").withIcon(R.drawable.ic_notifications_black_24dp);
 
         SecondaryDrawerItem drawerPickUpLocation = new SecondaryDrawerItem().withIdentifier(7);
-        if (activity instanceof BuyerActivity){
+        if (activity instanceof BuyerActivity) {
             drawerPickUpLocation.withName("Pick Location").withIcon(R.drawable.ic_explore_black_24dp);
-        } else if (activity instanceof SellerActivity){
+        } else if (activity instanceof SellerActivity) {
             drawerPickUpLocation.withName("Track Buyer").withIcon(R.drawable.ic_track_changes_black_24dp);
         }
-
 
 
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
@@ -144,7 +143,7 @@ public class DrawerUtil implements UpdateData {
                         //  new DividerDrawerItem(),
                         drawerItemSettings,
                         drawerItemLogout
-                     //   drawerItemMap
+                        //   drawerItemMap
 
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -212,8 +211,7 @@ public class DrawerUtil implements UpdateData {
                             FragmentManager fragment = activity.getSupportFragmentManager();
                             fragment.beginTransaction().replace(R.id.content_buyer_container, NotificationFragment.newInstance()).commit();
 
-                        }
-                        else if (drawerItem.getIdentifier() == 7 && activity instanceof SellerActivity) {
+                        } else if (drawerItem.getIdentifier() == 7 && activity instanceof SellerActivity) {
                             FragmentManager fragment = activity.getSupportFragmentManager();
                             fragment.beginTransaction().replace(R.id.content_seller_container, UserTrackerFragment.newInstance(Constants.TYPE_SELLER)).commit();
 
@@ -222,7 +220,6 @@ public class DrawerUtil implements UpdateData {
                             fragment.beginTransaction().replace(R.id.content_buyer_container, UserTrackerFragment.newInstance(Constants.TYPE_BUYER)).commit();
 
                         }
-
 
 
                         closeDrawer();
@@ -236,7 +233,6 @@ public class DrawerUtil implements UpdateData {
         result.setSelection(1, true);
 
 
-
     }
 
     private void closeDrawer() {
@@ -246,8 +242,6 @@ public class DrawerUtil implements UpdateData {
     public UpdateData getCallback() {
         return updateData;
     }
-
-    private Profile profile;
 
     @Override
     public void onNavDrawerDataUpdated(Profile data) {

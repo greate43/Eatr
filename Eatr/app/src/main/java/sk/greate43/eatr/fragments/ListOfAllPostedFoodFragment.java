@@ -181,9 +181,6 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         }
 
 
-
-
-
         if (
                 !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsPurchased()
@@ -233,7 +230,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     public void onSearchCompleted(String searchKeyword) {
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
             retrieveFirebaseData(searchKeyword);
-        }else {
+        } else {
             retrieveFirebaseData("");
         }
     }

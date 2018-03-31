@@ -45,8 +45,8 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
     public void onBindViewHolder(ListOfAllPostedFoodViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
-           holder.imgFoodItem.setVisibility(View.GONE);
-           holder.tvDishName.setText("No Food Item Posted");
+            holder.imgFoodItem.setVisibility(View.GONE);
+            holder.tvDishName.setText("No Food Item Posted");
             holder.tvPrice.setVisibility(View.GONE);
             holder.tvStatus.setVisibility(View.GONE);
             holder.tvTimeStamp.setVisibility(View.GONE);

@@ -1,5 +1,6 @@
 package sk.greate43.eatr.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -11,12 +12,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -87,24 +93,26 @@ import static sk.greate43.eatr.utils.Constants.REQUEST_FINE_LOCATION_PERMISSION;
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener, LocationListener {
     private static final String TAG = "MapFragment";
     private static final int overview = 0;
-    private GoogleMap mMap;
-    private Location mLastLocation;
-    private boolean mLocationUpdateState;
-    private LocationRequest mLocationRequest;
-
-    private Food food;
-    private GoogleApiClient mGoogleApiClient;
-    private int REQUEST_CHECK_SETTINGS = 2;
-    private String userType;
     LiveLocationUpdate liveLocationUpdate;
-
-
     FirebaseAuth mAuth;
     FirebaseUser user;
     DatabaseReference mDatabaseReference;
     FirebaseDatabase database;
     FirebaseStorage mStorage;
     StorageReference storageRef;
+    Marker sellerMaker;
+    Marker buyerMarker;
+    Polyline line;
+    private GoogleMap mMap;
+    private Location mLastLocation;
+    private boolean mLocationUpdateState;
+    private LocationRequest mLocationRequest;
+    private Button btnOrder;
+    private Food food;
+    private GoogleApiClient mGoogleApiClient;
+    private int REQUEST_CHECK_SETTINGS = 2;
+    private String userType;
+    private String price;
 
     public MapFragment() {
         // Required empty public constructor
@@ -139,6 +147,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+
+        btnOrder = view.findViewById(R.id.fragment_map_btn_end_order);
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -180,6 +190,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
         }
 
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                btnOrder.setVisibility(View.GONE);
+                break;
+            case Constants.TYPE_SELLER:
+                btnOrder.setBackgroundResource(R.color.red);
+                btnOrder.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAlertDialog();
+                    }
+                });
+                break;
+
+        }
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -188,6 +214,50 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         mapFragment.getMapAsync(this);
 
         return view;
+    }
+
+    private void showAlertDialog() {
+        if (getActivity() != null) {
+
+            // Set up the input
+            final EditText input = new EditText(getActivity());
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Enter The amount you were paid");
+            builder.setPositiveButton("Complete Order", null);
+            builder.setNegativeButton("cancel", null);
+            builder.setView(input);
+
+
+            final AlertDialog mAlertDialog = builder.create();
+            mAlertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                @Override
+                public void onShow(DialogInterface dialog) {
+
+                    Button b = mAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    b.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
+                            if (!TextUtils.isEmpty(input.getText())) {
+                                price = input.getText().toString();
+
+                                
+                                mAlertDialog.dismiss();
+
+                            } else {
+                                input.setError("It cant be empty");
+
+                            }
+                        }
+                    });
+                }
+            });
+            mAlertDialog.show();
+        }
     }
 
     private void showData(DataSnapshot dataSnapshot) {
@@ -214,27 +284,35 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         liveLocationUpdate.setLatitude((double) value.get(Constants.LATITUDE));
         liveLocationUpdate.setLongitude((double) value.get(Constants.LONGITUDE));
 
-        setUpSellerMaker();
-        positionCamera();
+        if (mMap != null) {
+            updateMapUiForSeller(mMap, new LatLng(food.getLatitude(), food.getLongitude()), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()));
+        }
     }
 
-    Marker sellerMaker;
-    Marker buyerMarker;
-    private void positionCamera() {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(food.getLatitude(), food.getLongitude()), 18));
+    private void updateMapUiForSeller(GoogleMap googleMap, LatLng origin, LatLng destination) {
+        DirectionsResult results;
+        results = getDirectionsDetails(origin, destination, TravelMode.DRIVING);
+        if (results != null) {
+            setUpSellerMaker(results, googleMap);
+            positionSellerCamera(results.routes[overview], googleMap);
+        }
     }
-    private void setUpSellerMaker() {
+
+    private void positionSellerCamera(DirectionsRoute route, GoogleMap mMap) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
+    }
+
+    private void setUpSellerMaker(DirectionsResult results, GoogleMap mMap) {
         if (sellerMaker == null) {
-            sellerMaker = mMap.addMarker(new MarkerOptions().position(new LatLng(food.getLatitude(), food.getLongitude())).title("My Location / Pick Point "));
+            sellerMaker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress));
         }
 
 
-
-
         if (buyerMarker == null) {
-            buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude())).title("Buyer ").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
+            buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
         } else {
-            animateMarker(buyerMarker, buyerMarker.getPosition(), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()), false);
+
+            animateMarker(buyerMarker, buyerMarker.getPosition(), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()), false, results);
 
             // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         }
@@ -285,9 +363,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         DirectionsResult results;
         results = getDirectionsDetails(origin, destination, TravelMode.DRIVING);
         if (results != null) {
-            addPolyline(results, googleMap);
+            addBuyerPolyline(results, googleMap);
             positionBuyerCamera(results.routes[overview], googleMap);
-            addMarkersToMap(results, googleMap);
+            addBuyerMarkersToMap(results, googleMap);
         }
     }
 
@@ -295,7 +373,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.ORDER_ID, food.getPushId());
         result.put(Constants.SELLER_ID, food.getPostedBy());
-        Log.d(TAG, "updateLocation: "+food.getPostedBy());
+        Log.d(TAG, "updateLocation: " + food.getPostedBy());
         result.put(Constants.BUYER_ID, food.getPurchasedBy());
         result.put(Constants.LATITUDE, origin.latitude);
         result.put(Constants.LONGITUDE, origin.longitude);
@@ -316,10 +394,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         mUiSettings.setRotateGesturesEnabled(true);
     }
 
-    // Marker myPosition;
-    Marker myDestination;
-
-    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+    private void addBuyerMarkersToMap(DirectionsResult results, GoogleMap mMap) {
 //        if (myPosition == null) {
 //            myPosition = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
 //        } else {
@@ -328,13 +403,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 //            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
 //        }
         // animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
-        if (myDestination == null) {
-            myDestination = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+        if (buyerMarker == null) {
+            buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
         }
     }
 
     public void animateMarker(final Marker marker, final LatLng startPosition, final LatLng toPosition,
-                              final boolean hideMarker) {
+                              final boolean hideMarker, final DirectionsResult results) {
 
 
         final Handler handler = new Handler();
@@ -355,6 +430,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                         * startPosition.latitude;
 
                 marker.setPosition(new LatLng(lat, lng));
+                marker.setTitle(results.routes[overview].legs[overview].startAddress);
+                marker.setSnippet(getEndLocationTitle(results));
 
                 if (t < 1.0) {
                     // Post again 16ms later.
@@ -371,12 +448,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     }
 
     private void positionBuyerCamera(DirectionsRoute route, GoogleMap mMap) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 18));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
     }
 
-    Polyline line;
-
-    private void addPolyline(DirectionsResult results, GoogleMap mMap) {
+    private void addBuyerPolyline(DirectionsResult results, GoogleMap mMap) {
         List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
         if (line == null) {
             line = mMap.addPolyline(new PolylineOptions().addAll(decodedPath));

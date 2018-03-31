@@ -39,10 +39,8 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
     public Button yes;
     public Button no;
     public Notification notification;
+    View view;
     private DatabaseReference mDatabaseReference;
-    private FirebaseDatabase database;
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
@@ -64,7 +62,9 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
             return true;
         }
     };
-    View view;
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     public NotificationViewHolder(View itemView) {
         super(itemView);
@@ -154,7 +154,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, booked);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, isActive);
         if (!progress) {
-            result.put(Constants.PURCHASED_BY,"");
+            result.put(Constants.PURCHASED_BY, "");
         }
 
         return result;

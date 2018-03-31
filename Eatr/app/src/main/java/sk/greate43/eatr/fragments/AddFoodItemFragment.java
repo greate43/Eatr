@@ -84,6 +84,7 @@ public class AddFoodItemFragment extends Fragment implements
     ImageView imgChooseImage;
     GoogleApiClient mGoogleApiClient;
     StorageReference storageRef;
+    View view;
     private Location mLastLocation;
     private TextInputEditText etDishName;
     private TextInputEditText etCuisine;
@@ -107,7 +108,6 @@ public class AddFoodItemFragment extends Fragment implements
     private boolean checkIfOrderIsActive = false;
     private boolean checkIfFoodIsInDraftMode = true;
 
-
     @NonNull
     public static AddFoodItemFragment newInstance() {
         return new AddFoodItemFragment();
@@ -129,7 +129,6 @@ public class AddFoodItemFragment extends Fragment implements
         }
 
     }
-
 
     //  private String mCurrentPhotoPath;
     @Override
@@ -265,7 +264,6 @@ public class AddFoodItemFragment extends Fragment implements
         }
     }
 
-
     private void askUserToStartGpsDialog() {
         if (getActivity() != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -286,7 +284,6 @@ public class AddFoodItemFragment extends Fragment implements
             dialog.show();
         }
     }
-
 
     public void choosePhotoFromGallery() {
         if (getActivity() != null) {
@@ -322,7 +319,6 @@ public class AddFoodItemFragment extends Fragment implements
             startActivityForResult(intent, CAMERA_RESULT);
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -394,7 +390,6 @@ public class AddFoodItemFragment extends Fragment implements
         Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
-
     public void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
@@ -455,17 +450,52 @@ public class AddFoodItemFragment extends Fragment implements
 
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
 //    private boolean isNetworkAvailable() {
 //        ConnectivityManager connectivityManager
 //                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 //        assert connectivityManager != null;
 //        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+//    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+
+//    private File createImageFile() throws IOException {
+//        // Create an image file name
+//
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+//        String imageFileName = "PNG_" + timeStamp + "_";
+//        File storageDir;
+//        String state = Environment.getExternalStorageState();
+//        Log.d(TAG, "createImageFile: state" + state);
+//        // Make sure it's available
+//        if (Environment.MEDIA_MOUNTED.equals(state)) {
+//            // We can read and write the media
+//            storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//        } else {
+//            // Load another directory, probably local memory
+//            storageDir = getFilesDir();
+//        }
+//
+//
+//
+//
+//        Log.d(TAG, "createImageFile:mystring " + mystring);
+//        File image = File.createTempFile(
+//                imageFileName,  /* prefix */
+//                ".png",         /* suffix */
+//                storageDir      /* directory */
+//        );
+//        Log.d(TAG, "createImageFile: image " + image);
+//
+//        // Save a file: path for use with ACTION_VIEW intents
+//        mCurrentPhotoPath = image.getAbsolutePath();
+//        Log.d(TAG, "createImageFile: mCurrentPhotoPath " + mCurrentPhotoPath);
+//        return image;
 //    }
 
     private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri, final double longitude, final double latitude, final long price, final long numberOfServings, final long expiryTime, final boolean checkIfFoodIsInDraftMode, final boolean checkIfOrderIsActive) {
@@ -577,41 +607,6 @@ public class AddFoodItemFragment extends Fragment implements
 
     }
 
-
-//    private File createImageFile() throws IOException {
-//        // Create an image file name
-//
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-//        String imageFileName = "PNG_" + timeStamp + "_";
-//        File storageDir;
-//        String state = Environment.getExternalStorageState();
-//        Log.d(TAG, "createImageFile: state" + state);
-//        // Make sure it's available
-//        if (Environment.MEDIA_MOUNTED.equals(state)) {
-//            // We can read and write the media
-//            storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//        } else {
-//            // Load another directory, probably local memory
-//            storageDir = getFilesDir();
-//        }
-//
-//
-//
-//
-//        Log.d(TAG, "createImageFile:mystring " + mystring);
-//        File image = File.createTempFile(
-//                imageFileName,  /* prefix */
-//                ".png",         /* suffix */
-//                storageDir      /* directory */
-//        );
-//        Log.d(TAG, "createImageFile: image " + image);
-//
-//        // Save a file: path for use with ACTION_VIEW intents
-//        mCurrentPhotoPath = image.getAbsolutePath();
-//        Log.d(TAG, "createImageFile: mCurrentPhotoPath " + mCurrentPhotoPath);
-//        return image;
-//    }
-
     private void pickPlace() {
 
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
@@ -629,7 +624,6 @@ public class AddFoodItemFragment extends Fragment implements
             }
         }
     }
-
 
     private void startGpsFromSettings() {
 
@@ -649,8 +643,6 @@ public class AddFoodItemFragment extends Fragment implements
         return manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
     }
-
-    View view;
 
     @Override
     public void onClick(View v) {

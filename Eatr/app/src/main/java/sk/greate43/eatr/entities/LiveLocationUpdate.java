@@ -19,7 +19,6 @@ public class LiveLocationUpdate implements Serializable {
     }
 
 
-
     public String getBuyerId() {
         return buyerId;
     }

@@ -46,13 +46,13 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     ArrayList<Food> foods;
     // ArrayList<Profile> profiles;
     PostedFoodRecyclerViewAdaptor adaptor;
+    String states = "";
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
     private String orderState;
-
 
     public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
@@ -61,8 +61,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         fragment.setArguments(args);
         return fragment;
     }
-
-    String states = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

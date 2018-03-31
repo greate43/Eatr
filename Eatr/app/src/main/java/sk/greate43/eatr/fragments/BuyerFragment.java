@@ -23,14 +23,6 @@ import sk.greate43.eatr.utils.Constants;
 public class BuyerFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser user;
-
-    @NonNull
-    public static BuyerFragment newInstance(){
-        return new BuyerFragment();
-    }
-    public BuyerFragment() {
-        // Required empty public constructor
-    }
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -57,6 +49,15 @@ public class BuyerFragment extends Fragment {
             return false;
         }
     };
+
+    public BuyerFragment() {
+        // Required empty public constructor
+    }
+
+    @NonNull
+    public static BuyerFragment newInstance() {
+        return new BuyerFragment();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
