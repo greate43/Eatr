@@ -232,6 +232,7 @@ public class DrawerUtil implements UpdateData {
 
         result.setSelection(1, true);
 
+       // result.addStickyFooterItem(new PrimaryDrawerItem().withName("StickyFooterItem"));
 
     }
 
@@ -249,7 +250,7 @@ public class DrawerUtil implements UpdateData {
 
         if (data != null && data.getProfilePhotoUri() != null) {
             headerResult.clear();
-            headerResult.addProfiles(new ProfileDrawerItem().withName(data.getFullname()).withIcon(Uri.parse(data.getProfilePhotoUri())));
+            headerResult.addProfiles(new ProfileDrawerItem().withName(data.getFullname()).withEmail(data.getUserType()).withIcon(Uri.parse(data.getProfilePhotoUri())));
         }
 
     }
