@@ -111,12 +111,12 @@
 
     <Button
         android:id="@+id/fragment_add_food_item_button_share_food"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="350dp"
+        android:layout_height="44dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:text="Share Food"
+        android:text="Submit"
         app:layout_constraintEnd_toEndOf="@+id/fragment_add_food_item_til_ingredient_tag"
         app:layout_constraintStart_toStartOf="@+id/fragment_add_food_item_til_ingredient_tag"
         app:layout_constraintTop_toBottomOf="@+id/fragment_add_food_item_til_ingredient_tag" />
