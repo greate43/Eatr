@@ -17,6 +17,7 @@
             android:id="@+id/history_list_text_view_purchased_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,10 +29,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="24dp"
             app:layout_constraintBaseline_toBaselineOf="@+id/history_list_order_id_lbl"
             app:layout_constraintEnd_toEndOf="@+id/history_list_price"
-            app:layout_constraintStart_toEndOf="@+id/history_list_order_id_lbl"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/history_list_text_view_purchased_date"
             tools:text="xysajkau21243252dsds" />
 
         <TextView
@@ -39,6 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="36dp"
+            android:layout_marginRight="36dp"
             android:layout_marginTop="14dp"
             android:text="PKR 5"
             android:textSize="18sp"
@@ -57,46 +62,45 @@
             app:layout_constraintTop_toBottomOf="@+id/history_list_text_view_purchased_date" />
 
         <TextView
-            android:id="@+id/history_list_Buyer_id_lbl"
+            android:id="@+id/history_list_buyer_name_lbl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Buyer Id"
+            android:text="Buyer Id : "
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/history_list_order_id_lbl"
             app:layout_constraintTop_toBottomOf="@+id/history_list_order_id_lbl" />
 
         <TextView
-            android:id="@+id/history_list_buyer_id"
+            android:id="@+id/history_list_buyer_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBaseline_toBaselineOf="@+id/history_list_Buyer_id_lbl"
+            app:layout_constraintBaseline_toBaselineOf="@+id/history_list_buyer_name_lbl"
             app:layout_constraintEnd_toEndOf="@+id/history_list_order_id"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/history_list_order_id"
             tools:text="gvhfghfghf" />
 
         <TextView
-            android:id="@+id/history_list_seller_id_lbl"
+            android:id="@+id/history_list_seller_name_lbl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="16dp"
-            android:text="Seller Id :"
+            android:text="Seller Id : "
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/history_list_Buyer_id_lbl"
-            app:layout_constraintTop_toBottomOf="@+id/history_list_Buyer_id_lbl" />
+            app:layout_constraintStart_toStartOf="@+id/history_list_buyer_name_lbl"
+            app:layout_constraintTop_toBottomOf="@+id/history_list_buyer_name_lbl" />
 
         <TextView
-            android:id="@+id/history_list_seller_id"
+            android:id="@+id/history_list_seller_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="dsdsfsf"
-            app:layout_constraintBaseline_toBaselineOf="@+id/history_list_seller_id_lbl"
-            app:layout_constraintEnd_toEndOf="@+id/history_list_buyer_id"
+            app:layout_constraintBaseline_toBaselineOf="@+id/history_list_seller_name_lbl"
+            app:layout_constraintEnd_toEndOf="@+id/history_list_buyer_name"
             app:layout_constraintHorizontal_bias="0.155"
-            app:layout_constraintStart_toStartOf="@+id/history_list_buyer_id" />
+            app:layout_constraintStart_toStartOf="@+id/history_list_buyer_name" />
 
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

@@ -176,7 +176,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(false, false, false, true, true,true));
+                            .updateChildren(updateUpdateProgress(false, false, false, true, true, true));
                 }
             } else {
                 if (notification != null) {
@@ -195,7 +195,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(false, false, false, false, true,true));
+                            .updateChildren(updateUpdateProgress(false, false, false, false, true, true));
 
                 }
             }
@@ -213,7 +213,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         if (!progress && !isPurchase && !isCompeted) {
             result.put(Constants.PURCHASED_BY, "");
         }
-        if (isAccepted ) {
+        if (isAccepted) {
             result.put(Constants.CHECK_IF_ORDER_IS_ACCEPTED, isAccepted);
 
         }

@@ -55,16 +55,16 @@ public class BuyerFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @NonNull
+    public static BuyerFragment newInstance() {
+        return new BuyerFragment();
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null)
             getActivity().setTitle("Buyer Fragment");
-    }
-
-    @NonNull
-    public static BuyerFragment newInstance() {
-        return new BuyerFragment();
     }
 
     @Override

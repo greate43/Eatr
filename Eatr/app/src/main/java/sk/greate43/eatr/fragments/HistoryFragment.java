@@ -84,6 +84,9 @@ public class HistoryFragment extends Fragment {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -91,7 +94,7 @@ public class HistoryFragment extends Fragment {
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mDatabaseReference.child(Constants.FOOD).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 

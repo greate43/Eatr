@@ -36,6 +36,8 @@ import sk.greate43.eatr.utils.Constants;
 
 public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private static final String TAG = "DetailFoodFragment";
+    Spinner spNoOfServings;
+    TextView tvPrice;
     private Food food;
     private DatabaseReference mDatabaseReference;
     private FirebaseDatabase database;
@@ -47,7 +49,6 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
         // Required empty public constructor
     }
 
-
     public static DetailFoodFragment newInstance(Food food) {
         DetailFoodFragment fragment = new DetailFoodFragment();
         Bundle args = new Bundle();
@@ -55,8 +56,6 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
         fragment.setArguments(args);
         return fragment;
     }
-
-    Spinner spNoOfServings;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,8 +66,6 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
             food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
         }
     }
-
-    TextView tvPrice;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

@@ -107,6 +107,17 @@ public interface Constants {
     String PAYMENT_DATE = "paymentDate";
     String ACCOUNT = "Account";
 
+    // account end
+
+    /**
+     * {@link sk.greate43.eatr.entities.Review}
+     */
+    String OVER_ALL_FOOD_QUALITY = "overAllFoodQuality";
+    String REVIEW_GIVEN_BY = "reviewGivenBy";
+    String REVIEW_ID = "reviewId";
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_APPEARED = "checkIfReviewDialogShouldBeAppeared";
+    // review end
+
     // Permission and Requests Constants
     int CAMERA_RESULT = 111;
     int GALLERY_RESULT = 222;
