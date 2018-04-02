@@ -240,8 +240,8 @@ public class UserTrackerFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.menu_item_search);
-        search.setVisible(false);
-
+        if (search != null)
+            search.setVisible(false);
         super.onPrepareOptionsMenu(menu);
 
 
