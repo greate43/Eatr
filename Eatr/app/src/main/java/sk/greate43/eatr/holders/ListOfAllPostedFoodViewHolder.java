@@ -92,8 +92,7 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
             tvStatus.setTextColor(Color.BLUE);
             tvStatus.setText("In Progress");
 
-        }
-        else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress() && food.getCheckIfOrderIsCompleted()
+        } else if (!food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress() && food.getCheckIfOrderIsCompleted()
                 ) {
             tvStatus.setTextColor(Color.BLACK);
             tvStatus.setText("Completed");

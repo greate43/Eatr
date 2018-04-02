@@ -86,6 +86,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.activities.BuyerActivity;
+import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Account;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.entities.LiveLocationUpdate;
@@ -180,7 +182,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
 
                 createLocationRequest();
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -241,7 +243,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         return view;
     }
 
-    private void showDataForBuyer(DataSnapshot dataSnapshot) {
+    private void showDataForBuyer(@NotNull DataSnapshot dataSnapshot) {
 
         if (dataSnapshot.getValue() == null) {
             return;
@@ -255,17 +257,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         }
     }
 
-    private void collectFood(Map<String, Object> value) {
-        Food food = new Food();
+    private void collectFood(@NotNull Map<String, Object> value) {
+        Food checkingWhenToCloseTheMap = new Food();
         if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
-            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+            checkingWhenToCloseTheMap.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
 
         if (value.get(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED) != null)
-            food.setCheckIfMapShouldBeClosed((boolean) value.get(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED));
+            checkingWhenToCloseTheMap.setCheckIfMapShouldBeClosed((boolean) value.get(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED));
+
+        checkingWhenToCloseTheMap.setPushId((String) value.get(Constants.PUSH_ID));
 
 
-        if (!food.getCheckIfOrderIsInProgress() && food.getCheckIfFoodIsInDraftMode()) {
-
+        if (!checkingWhenToCloseTheMap.getCheckIfOrderIsInProgress() && checkingWhenToCloseTheMap.getcheckIfMapShouldBeClosed() && checkingWhenToCloseTheMap.getPushId().equals(food.getPushId())) {
+            Log.d("STATE_CHECKING", "collectFood: MAP");
+            if (getActivity() instanceof BuyerActivity) {
+                Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
         }
     }
 
@@ -305,7 +314,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                                 mAlertDialog.dismiss();
 
                             } else if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) <= food.getPrice() * food.getNumberOfServingsPurchased()) {
-                                input.setError("Price Cant be less then PKR " + food.getPrice());
+                                input.setError("Price Cant be less then PKR " + food.getPrice() * food.getNumberOfServingsPurchased());
 
                             } else if (TextUtils.isEmpty(input.getText())) {
                                 input.setError("It cant be empty");
@@ -321,8 +330,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
     private void closeMapForBothUser() {
         mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).updateChildren(updateFood());
-
-
+        if (getActivity() != null) {
+            if (getActivity() instanceof SellerActivity) {
+                Intent intent = new Intent(getActivity(), SellerActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        }
     }
 
     private Map<String, Object> updateFood() {
@@ -342,7 +356,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
     private void updatePaymentForSeller() {
         Account account = new Account();
-        account.setBalance(food.getPrice());
+        account.setBalance(food.getPrice() * food.getNumberOfServingsPurchased());
         account.setOrderId(food.getPushId());
         account.setUserId(user.getUid());
         account.setPaymentDate(ServerValue.TIMESTAMP);
@@ -451,10 +465,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         try {
             return DirectionsApi.newRequest(getGeoContext())
                     .mode(mode)
-                    .origin(origin.latitude + "," + origin.longitude)
-                    .destination(destination.latitude + "," + destination.longitude)
+                    .origin(new com.google.maps.model.LatLng(origin.latitude, origin.longitude))
+                    .destination(new com.google.maps.model.LatLng(destination.latitude, destination.longitude))
                     .departureTime(now)
                     .await();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return null;
         } catch (ApiException e) {
             e.printStackTrace();
             return null;
@@ -465,6 +482,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
             e.printStackTrace();
             return null;
         }
+
     }
 
     @Override

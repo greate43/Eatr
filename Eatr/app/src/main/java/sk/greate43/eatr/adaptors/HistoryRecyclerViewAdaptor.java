@@ -47,8 +47,8 @@ public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryView
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
             holder.tvPurchasedDate.setText("Order History Not Avialable ");
             holder.tvOrderId.setVisibility(View.GONE);
-            holder.tvSellerId.setVisibility(View.GONE);
-            holder.tvBuyerId.setVisibility(View.GONE);
+            holder.tvSellerName.setVisibility(View.GONE);
+            holder.tvBuyerName.setVisibility(View.GONE);
             holder.tvPrice.setVisibility(View.GONE);
 
 
@@ -59,8 +59,8 @@ public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryView
             holder.tvPurchasedDate.setVisibility(View.VISIBLE);
 
             holder.tvOrderId.setVisibility(View.VISIBLE);
-            holder.tvSellerId.setVisibility(View.VISIBLE);
-            holder.tvBuyerId.setVisibility(View.VISIBLE);
+            holder.tvSellerName.setVisibility(View.VISIBLE);
+            holder.tvBuyerName.setVisibility(View.VISIBLE);
             holder.tvPrice.setVisibility(View.VISIBLE);
 
             holder.tvOrderIdLbl.setVisibility(View.VISIBLE);

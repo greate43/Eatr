@@ -61,7 +61,6 @@ public class Food implements Serializable {
     }
 
 
-
     public boolean getcheckIfMapShouldBeClosed() {
         return checkIfMapShouldBeClosed;
     }
