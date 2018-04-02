@@ -56,6 +56,7 @@ import static sk.greate43.eatr.utils.Constants.REQUEST_READ_EXTERNAL_STORAGE_PER
 
 
 public class ProfileFragment extends Fragment {
+    public static final String ALLOW_TO_CHECK_USER_TYPE = "ALLOW_TO_CHECK_USER_TYPE";
     private static final String TAG = "ProfileFragment";
     FirebaseAuth mAuth;
     FirebaseUser user;
@@ -64,6 +65,8 @@ public class ProfileFragment extends Fragment {
     FirebaseStorage mStorage;
     StorageReference storageRef;
     Profile profile;
+    Boolean allowToCheckUserType;
+    View viewSnackBar;
     private TextInputEditText etFirstName;
     private TextInputEditText etLastName;
     private TextInputEditText etEmail;
@@ -72,12 +75,9 @@ public class ProfileFragment extends Fragment {
     private Button btnSaveProfile;
     private Uri imgUri;
     private ProgressDialog mProgressDialog;
-    Boolean allowToCheckUserType;
 
     public ProfileFragment() {
     }
-
-    public static final String ALLOW_TO_CHECK_USER_TYPE = "ALLOW_TO_CHECK_USER_TYPE";
 
     @NonNull
     public static ProfileFragment newInstance() {
@@ -107,8 +107,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    View viewSnackBar;
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -125,8 +123,8 @@ public class ProfileFragment extends Fragment {
         imgProfilePicture = view.findViewById(R.id.fragment_profile_image_view_profile_picture);
         spinnerUserType = view.findViewById(R.id.fragment_profile_spinner_select_user_type);
         btnSaveProfile = view.findViewById(R.id.fragment_profile_button_save_profile);
-        mAuth = FirebaseAuth.getInstance();
 
+        mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         database = FirebaseDatabase.getInstance();
         mStorage = FirebaseStorage.getInstance();
@@ -179,7 +177,14 @@ public class ProfileFragment extends Fragment {
             imgUri = Uri.parse(profile.getProfilePhotoUri());
             etFirstName.setText(profile.getFirstName());
             etLastName.setText(profile.getLastName());
-            etEmail.setText(profile.getEmail());
+
+            if (profile.getEmail() != null && !TextUtils.isEmpty(profile.getEmail())){
+                etEmail.setText(profile.getEmail());
+            }else {
+                etEmail.setText("");
+            }
+
+
             if (imgUri != null)
                 setProfileImage(imgUri);
             if (profile.getUserType() != null && profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {

@@ -28,13 +28,17 @@ public interface Constants {
     String NO_OF_SERVINGS = "numberOfServings";
     String LONGITUDE = "longitude";
     String LATITUDE = "latitude";
-    String CHECK_IF_ORDER_Is_PURCHASED = "checkIfOrderIsPurchased";
+    String CHECK_IF_ORDER_IS_PURCHASED = "checkIfOrderIsPurchased";
     String PURCHASED_BY = "purchasedBy";
     String POSTED_BY = "postedBy";
     String PURCHASED_DATE = "purchasedDate";
     String CHECK_IF_ORDER_IS_IN_PROGRESS = "checkIfOrderIsInProgress";
     String CHECK_IF_ORDER_IS_ACCEPTED = "checkIfOrderIsAccepted";
     String CHECK_IF_ORDERED_IS_BOOKED = "checkIfOrderIsBooked";
+    String CHECK_IF_MAP_SHOULD_BE_CLOSED = "checkIfMapShouldBeClosed";
+    String CHECK_IF_ORDER_IS_COMPLETED = "checkIfOrderIsCompleted";
+    String NO_OF_SERVINGS_PURCHASED = "numberOfServingsPurchased";
+
     //Food Constants
 
 
@@ -53,6 +57,9 @@ public interface Constants {
     String NOTIFICATION_IMAGE = "notificationImage";
     String CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SENT = "checkIfNotificationAlertShouldBeSent";
     String CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN = "checkIfNotificationAlertShouldBeShown";
+    String NOTIFICATION_TYPE = "notificationType";
+    String TYPE_NOTIFICATION_ORDER_REQUEST = "ORDER_REQUEST";
+    String TYEPE_NOTIFICATION_ORDER_COMPLETED = "ORDER_COMPLETED";
     /**
      * {@link sk.greate43.eatr.fragments.AddFoodItemFragment}
      */
@@ -73,8 +80,8 @@ public interface Constants {
      */
     String PROFILE = "Profile";
     String ARGS_PROFILE = "ARGS_PROFILE";
-    String TYPE_SELLER = "SELLER";
-    String TYPE_BUYER = "BUYER";
+    String TYPE_SELLER = "Seller";
+    String TYPE_BUYER = "Buyer";
     String USER_TYPE = "userType";
     String PROFILE_PHOTO_URI = "profilePhotoUri";
     String FIRST_NAME = "firstName";
@@ -84,6 +91,32 @@ public interface Constants {
 
     // profile
 
+    /**
+     * {@link sk.greate43.eatr.entities.LiveLocationUpdate}
+     */
+    String LIVE_LOCATION_UPDATE = "LiveLocationUpdate";
+    String SELLER_ID = "sellerId";
+    String BUYER_ID = "buyerId";
+
+    //Live Location Update end
+
+    /**
+     * {@link sk.greate43.eatr.entities.Account}
+     */
+    String BALANCE = "balance";
+    String PAYMENT_DATE = "paymentDate";
+    String ACCOUNT = "Account";
+
+    // account end
+
+    /**
+     * {@link sk.greate43.eatr.entities.Review}
+     */
+    String OVER_ALL_FOOD_QUALITY = "overAllFoodQuality";
+    String REVIEW_GIVEN_BY = "reviewGivenBy";
+    String REVIEW_ID = "reviewId";
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_APPEARED = "checkIfReviewDialogShouldBeAppeared";
+    // review end
 
     // Permission and Requests Constants
     int CAMERA_RESULT = 111;

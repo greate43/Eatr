@@ -57,6 +57,8 @@ public class NotificationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Notification Fragment");
         if (getArguments() != null) {
 
         }
@@ -83,13 +85,16 @@ public class NotificationFragment extends Fragment {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
 
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);
@@ -132,12 +137,14 @@ public class NotificationFragment extends Fragment {
         notification.setCheckIfNotificationAlertShouldBeShown((boolean) value.get(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN));
         notification.setSenderId(String.valueOf(value.get(Constants.SENDER_ID)));
         notification.setReceiverId(String.valueOf(value.get(Constants.RECEIVER_ID)));
-           if (notification.getReceiverId().equals(user.getUid())&& notification.getCheckIfNotificationAlertShouldBeShown()){
-               notifications.add(notification);
-           }
+        notification.setNotificationType(String.valueOf(value.get(Constants.NOTIFICATION_TYPE)));
+        if (notification.getReceiverId().equals(user.getUid()) && notification.getCheckIfNotificationAlertShouldBeShown()) {
+            notifications.add(notification);
+        }
 
 
     }
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.menu_item_search);

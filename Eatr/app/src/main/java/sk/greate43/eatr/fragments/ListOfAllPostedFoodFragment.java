@@ -59,6 +59,8 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Posted Food Fragment");
         if (getArguments() != null) {
 
         }
@@ -158,10 +160,15 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
         food.setCheckIfOrderIsActive((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((Boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
-        if (value.get(Constants.POSTED_BY) != null) {
-            food.setPostedBy((String) value.get(Constants.POSTED_BY));
-        }
+        food.setCheckIfOrderIsPurchased((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_PURCHASED));
+
+
+        if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
+            food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));
+
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
+            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+
 
         if (value.get(Constants.TIME_STAMP) != null) {
             food.setTime(value.get(Constants.TIME_STAMP).toString());
@@ -171,10 +178,21 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         }
 
 
+        if (value.get(Constants.POSTED_BY) != null) {
+            food.setPostedBy((String) value.get(Constants.POSTED_BY));
+        }
+        if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
+            food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
+        }
+
         if (
                 !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsPurchased()
                         && food.getCheckIfOrderIsActive()
+                        && !food.getCheckIfOrderIsInProgress()
+                        && !food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsCompleted()
+                        && food.getNumberOfServings() > 0
                         && !food.getPostedBy().equals(user.getUid())
                 ) {
 
@@ -218,7 +236,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     public void onSearchCompleted(String searchKeyword) {
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
             retrieveFirebaseData(searchKeyword);
-        }else {
+        } else {
             retrieveFirebaseData("");
         }
     }

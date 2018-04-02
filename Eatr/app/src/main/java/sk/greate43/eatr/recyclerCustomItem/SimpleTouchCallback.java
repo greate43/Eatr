@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.support.v7.widget.helper.ItemTouchHelper.Callback;
 
-import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
+import sk.greate43.eatr.holders.PostedFoodViewHolder;
 import sk.greate43.eatr.interfaces.SwipeListener;
 
 /**
@@ -41,21 +41,21 @@ public class SimpleTouchCallback extends Callback {
 
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        if (viewHolder instanceof PostedFoodRecyclerViewHolder) {
+        if (viewHolder instanceof PostedFoodViewHolder) {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
     }
 
     @Override
     public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        if (viewHolder instanceof PostedFoodRecyclerViewHolder) {
+        if (viewHolder instanceof PostedFoodViewHolder) {
             super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-        if (viewHolder instanceof PostedFoodRecyclerViewHolder) {
+        if (viewHolder instanceof PostedFoodViewHolder) {
             swipeListener.onSwipe(viewHolder.getAdapterPosition());
         }
     }
