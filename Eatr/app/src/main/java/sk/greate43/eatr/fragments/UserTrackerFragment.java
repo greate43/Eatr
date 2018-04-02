@@ -23,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -80,7 +82,7 @@ public class UserTrackerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        setHasOptionsMenu(false);
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_tracker, container, false);
         recyclerView = view.findViewById(R.id.fragment_user_tracker_recycler_view);
@@ -88,8 +90,9 @@ public class UserTrackerFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
+        if (getActivity() != null)
+            adaptor = new TrackUserRecyclerViewAdaptor((AppCompatActivity) getActivity());
 
-        adaptor = new TrackUserRecyclerViewAdaptor((AppCompatActivity) getActivity());
         foods = adaptor.getFoods();
 
 
@@ -137,7 +140,7 @@ public class UserTrackerFragment extends Fragment {
         return view;
     }
 
-    private void showData(DataSnapshot dataSnapshot) {
+    private void showData(@NotNull DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }
@@ -157,7 +160,7 @@ public class UserTrackerFragment extends Fragment {
 
     }
 
-    private void collectFood(Map<String, Object> value) {
+    private void collectFood(@NotNull Map<String, Object> value) {
 
 
 //        //iterate through each user, ignoring their UID

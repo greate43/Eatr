@@ -177,7 +177,14 @@ public class ProfileFragment extends Fragment {
             imgUri = Uri.parse(profile.getProfilePhotoUri());
             etFirstName.setText(profile.getFirstName());
             etLastName.setText(profile.getLastName());
-            etEmail.setText(profile.getEmail());
+
+            if (profile.getEmail() != null && !TextUtils.isEmpty(profile.getEmail())){
+                etEmail.setText(profile.getEmail());
+            }else {
+                etEmail.setText("");
+            }
+
+
             if (imgUri != null)
                 setProfileImage(imgUri);
             if (profile.getUserType() != null && profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
