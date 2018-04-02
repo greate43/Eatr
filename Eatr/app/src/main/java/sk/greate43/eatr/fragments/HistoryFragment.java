@@ -87,6 +87,7 @@ public class HistoryFragment extends Fragment {
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
 
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
