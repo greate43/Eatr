@@ -35,24 +35,24 @@ import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.PostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
-import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
+import sk.greate43.eatr.holders.PostedFoodViewHolder;
 import sk.greate43.eatr.utils.Constants;
 
 
-public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerViewHolder.EditPostedFood {
+public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder.EditPostedFood {
 
     public static final String TAG = "PostedFoodFragment";
     RecyclerView recyclerView;
     ArrayList<Food> foods;
     // ArrayList<Profile> profiles;
     PostedFoodRecyclerViewAdaptor adaptor;
+    String states = "";
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
     private String orderState;
-
 
     public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
@@ -62,12 +62,11 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         return fragment;
     }
 
-    String states = "";
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (getActivity() != null)
+            getActivity().setTitle("Posted Food Fragment");
         if (getArguments() != null) {
             orderState = getArguments().getString(Constants.ORDER_STATE);
             if (orderState != null) {
@@ -172,7 +171,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             if (ds.getValue() != null) {
-                collectSeller((Map<String, Object>) ds.getValue());
+                collectFood((Map<String, Object>) ds.getValue());
             }
         }
 
@@ -192,7 +191,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         super.onStop();
     }
 
-    private void collectSeller(Map<String, Object> value) {
+    private void collectFood(Map<String, Object> value) {
 
 
 //        //iterate through each user, ignoring their UID
@@ -204,9 +203,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 ////                   ,
 //
 //
-//            Log.d(TAG, "collectSeller: " + singleUser);
+//            Log.d(TAG, "collectFood: " + singleUser);
 //
-        Log.d(TAG, "collectSeller: " + value);
+        Log.d(TAG, "collectFood: " + value);
         Food food = new Food();
         food.setPushId((String) value.get(Constants.PUSH_ID));
         food.setDishName((String) value.get(Constants.DISH_NAME));
@@ -223,7 +222,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
         food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
         food.setCheckIfOrderIsActive((boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
         food.setCheckIfFoodIsInDraftMode((boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_Is_PURCHASED));
+        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_IS_PURCHASED));
 
         if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
             food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));
@@ -246,9 +245,12 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
 
 
         if (value.get(Constants.POSTED_BY) != null) {
-            food.setPurchasedBy((String) value.get(Constants.POSTED_BY));
+            food.setPostedBy((String) value.get(Constants.POSTED_BY));
         }
 
+        if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
+            food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
+        }
 
         switch (orderState) {
             case Constants.ALL_ORDERS:
@@ -261,6 +263,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && !food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
+                        && !food.getCheckIfOrderIsCompleted()
+
                         ) {
                     foods.add(food);
                 }
@@ -271,6 +276,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
+                        && food.getCheckIfOrderIsCompleted()
+
                         ) {
                     foods.add(food);
                 }
@@ -282,6 +290,10 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && !food.getCheckIfOrderIsPurchased()
                         && food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
+                        && !food.getCheckIfOrderIsCompleted()
+
+
                         ) {
                     foods.add(food);
                 }
@@ -292,6 +304,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodRecyclerVi
                         && !food.getCheckIfOrderIsPurchased()
                         && !food.getCheckIfFoodIsInDraftMode()
                         && food.getCheckIfOrderIsBooked()
+                        && !food.getCheckIfOrderIsInProgress()
+                        && !food.getCheckIfOrderIsCompleted()
+
                         ) {
                     foods.add(food);
                 }

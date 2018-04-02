@@ -3,6 +3,7 @@ package sk.greate43.eatr.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,11 +21,6 @@ import sk.greate43.eatr.utils.Constants;
 
 public class SellerFragment extends Fragment {
 
-
-    @NonNull
-    public static SellerFragment newInstance(){
-        return new SellerFragment();
-    }
 
     FirebaseAuth mAuth;
     FirebaseUser user;
@@ -61,6 +57,17 @@ public class SellerFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @NonNull
+    public static SellerFragment newInstance() {
+        return new SellerFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Seller Fragment");
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,

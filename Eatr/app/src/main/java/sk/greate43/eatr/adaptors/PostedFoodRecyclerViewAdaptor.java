@@ -13,13 +13,13 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.fragments.PostedFoodFragment;
-import sk.greate43.eatr.holders.PostedFoodRecyclerViewHolder;
+import sk.greate43.eatr.holders.PostedFoodViewHolder;
 
 /**
  * Created by great on 11/12/2017.
  */
 
-public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodRecyclerViewHolder> {
+public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFoodViewHolder> {
 
     private static final String TAG = "SellFoodRecyclerViewAda";
 
@@ -28,6 +28,8 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
     private LayoutInflater inflater;
     private SellerActivity sellerActivity;
     private PostedFoodFragment postedFoodFragment;
+    private String states = "";
+
 
     public PostedFoodRecyclerViewAdaptor(SellerActivity sellerActivity, PostedFoodFragment postedFoodFragment) {
         this.sellerActivity = sellerActivity;
@@ -43,19 +45,19 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
 
     @NonNull
     @Override
-    public PostedFoodRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PostedFoodViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.posted_food_list, parent, false);
 
 
-        return new PostedFoodRecyclerViewHolder(view);
+        return new PostedFoodViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostedFoodRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PostedFoodViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
             holder.imgFoodItem.setVisibility(View.GONE);
-            Log.d(TAG, "onBindViewHolder: "+states);
+            Log.d(TAG, "onBindViewHolder: " + states);
             holder.tvDishName.setText(states);
             holder.tvPrice.setVisibility(View.GONE);
             holder.tvStatus.setVisibility(View.GONE);
@@ -71,8 +73,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
             holder.populate(sellerActivity, foods.get(position), postedFoodFragment, position);
         }
     }
-
-    private String states = "";
 
     public void setStates(String states) {
         this.states = states;
@@ -97,11 +97,6 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
 
             notifyItemRangeRemoved(0, size);
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
     }
 
 

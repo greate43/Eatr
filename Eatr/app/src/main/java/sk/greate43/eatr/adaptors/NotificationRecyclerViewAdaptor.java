@@ -55,7 +55,7 @@ public class NotificationRecyclerViewAdaptor extends RecyclerView.Adapter<Notifi
             holder.no.setVisibility(View.VISIBLE);
             holder.yes.setVisibility(View.VISIBLE);
             holder.img.setVisibility(View.VISIBLE);
-            holder.populate(notifications.get(position),activity );
+            holder.populate(notifications.get(position), activity);
         }
     }
 

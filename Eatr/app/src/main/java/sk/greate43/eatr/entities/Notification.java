@@ -1,6 +1,7 @@
 package sk.greate43.eatr.entities;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by great on 3/22/2018.
@@ -18,6 +19,28 @@ public class Notification implements Serializable {
     private String receiverId;
     private String orderId;
     private String notificationId;
+    private String notificationType;
+    private Map<String, String> timeStamp;
+
+    public Notification() {
+
+    }
+
+    public Map<String, String> getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Map<String, String> timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(String notificationType) {
+        this.notificationType = notificationType;
+    }
 
     public String getNotificationId() {
         return notificationId;
@@ -55,6 +78,10 @@ public class Notification implements Serializable {
         return senderId;
     }
 
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
     public String getOrderId() {
         return orderId;
     }
@@ -63,21 +90,12 @@ public class Notification implements Serializable {
         this.orderId = orderId;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
-    }
-
-
     public String getReceiverId() {
         return receiverId;
     }
 
     public void setReceiverId(String receiverId) {
         this.receiverId = receiverId;
-    }
-
-    public Notification() {
-
     }
 
     public boolean getCheckIfButtonShouldBeEnabled() {

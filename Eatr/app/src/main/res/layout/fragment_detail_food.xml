@@ -73,12 +73,11 @@
             android:text="No Of Servings "
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintBaseline_toBaselineOf="@+id/fragment_detail_food_no_of_servings"
             app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_cuisine_lbl"
             app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_cuisine_lbl" />
 
-        <TextView
-            android:id="@+id/fragment_detail_food_no_of_servings"
+        <Spinner
+            android:id="@+id/fragment_detail_food_spinner_no_of_servings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
@@ -107,9 +106,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_no_of_servings"
-            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_no_of_servings"
-            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_no_of_servings"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_detail_food_spinner_no_of_servings"
+            app:layout_constraintStart_toStartOf="@+id/fragment_detail_food_spinner_no_of_servings"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_detail_food_spinner_no_of_servings"
             tools:text="Sir Syed Colony Street No 7 " />
 
         <TextView

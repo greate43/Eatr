@@ -18,18 +18,17 @@ import sk.greate43.eatr.utils.Constants;
 
 public class AcceptOrderFragment extends Fragment {
 
-    private TextView tvDishName;
-    private TextView tvNoOfServings;
-    private TextView tvWhoWantsToOrder;
     Button yes;
     Button no;
     ImageView imgDishPhoto;
+    Food food;
+    private TextView tvDishName;
+    private TextView tvNoOfServings;
+    private TextView tvWhoWantsToOrder;
 
     public AcceptOrderFragment() {
         // Required empty public constructor
     }
-
-    Food food;
 
     public static AcceptOrderFragment newInstance(Food food) {
         AcceptOrderFragment fragment = new AcceptOrderFragment();
@@ -60,7 +59,7 @@ public class AcceptOrderFragment extends Fragment {
         imgDishPhoto = view.findViewById(R.id.fragment_accept_order_image_view_food_pic);
 
 
-        if (food != null){
+        if (food != null) {
             tvDishName.setText(String.valueOf(food.getDishName()));
             tvNoOfServings.setText(String.valueOf(food.getNumberOfServings()));
             yes.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +84,7 @@ public class AcceptOrderFragment extends Fragment {
         }
 
 
-            return view;
+        return view;
     }
 
 }

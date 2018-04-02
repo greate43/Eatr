@@ -1,5 +1,6 @@
 package sk.greate43.eatr.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -11,12 +12,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -42,6 +50,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.android.PolyUtil;
@@ -50,10 +68,14 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.TravelMode;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -64,6 +86,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.activities.BuyerActivity;
+import sk.greate43.eatr.activities.SellerActivity;
+import sk.greate43.eatr.entities.Account;
+import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.entities.LiveLocationUpdate;
+import sk.greate43.eatr.entities.Notification;
+import sk.greate43.eatr.utils.Constants;
 
 import static android.app.Activity.RESULT_OK;
 import static sk.greate43.eatr.utils.Constants.REQUEST_FINE_LOCATION_PERMISSION;
@@ -72,48 +101,138 @@ import static sk.greate43.eatr.utils.Constants.REQUEST_FINE_LOCATION_PERMISSION;
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener, LocationListener {
     private static final String TAG = "MapFragment";
     private static final int overview = 0;
+    LiveLocationUpdate liveLocationUpdate;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+    DatabaseReference mDatabaseReference;
+    FirebaseDatabase database;
+    FirebaseStorage mStorage;
+    StorageReference storageRef;
+    Marker sellerMaker;
+    Marker buyerMarker;
+    Polyline line;
     private GoogleMap mMap;
     private Location mLastLocation;
     private boolean mLocationUpdateState;
     private LocationRequest mLocationRequest;
-
-
+    private Button btnOrder;
+    private Food food;
     private GoogleApiClient mGoogleApiClient;
     private int REQUEST_CHECK_SETTINGS = 2;
+    private String userType;
+    private String price;
 
     public MapFragment() {
         // Required empty public constructor
     }
 
-    public static MapFragment newInstance() {
+    public static MapFragment newInstance(Food food, String userType) {
         MapFragment fragment = new MapFragment();
-
+        Bundle args = new Bundle();
+        args.putString(Constants.USER_TYPE, userType);
+        args.putSerializable(Constants.ARGS_FOOD, food);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
+        if (getActivity() != null)
+            getActivity().setTitle("Map Fragment");
 
+
+        if (getArguments() != null) {
+            userType = getArguments().getString(Constants.USER_TYPE);
+            food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
+
+            switch (userType) {
+                case Constants.TYPE_SELLER:
+                    liveLocationUpdate = new LiveLocationUpdate();
+                    break;
+            }
         }
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        if (mGoogleApiClient == null) {
-            if (getActivity() != null)
-                mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build();
+        btnOrder = view.findViewById(R.id.fragment_map_btn_end_order);
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        database = FirebaseDatabase.getInstance();
+        mStorage = FirebaseStorage.getInstance();
+        mDatabaseReference = database.getReference();
+        storageRef = mStorage.getReference();
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                if (mGoogleApiClient == null) {
+                    if (getActivity() != null)
+                        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                                .addConnectionCallbacks(this)
+                                .addOnConnectionFailedListener(this)
+                                .addApi(LocationServices.API)
+                                .build();
+                }
+
+
+                createLocationRequest();
+                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        showDataForBuyer(dataSnapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+
+
+                break;
+            case Constants.TYPE_SELLER:
+                mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        showDataForSeller(dataSnapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+
+
+                break;
+
+
         }
-        createLocationRequest();
+
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                btnOrder.setVisibility(View.GONE);
+                break;
+            case Constants.TYPE_SELLER:
+                btnOrder.setBackgroundResource(R.color.red);
+                btnOrder.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAlertDialog();
+                    }
+                });
+                break;
+
+        }
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -124,9 +243,224 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         return view;
     }
 
+    private void showDataForBuyer(@NotNull DataSnapshot dataSnapshot) {
+
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+
+
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            if (ds.getValue() != null) {
+                collectFood((Map<String, Object>) ds.getValue());
+            }
+        }
+    }
+
+    private void collectFood(@NotNull Map<String, Object> value) {
+        Food checkingWhenToCloseTheMap = new Food();
+        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
+            checkingWhenToCloseTheMap.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+
+        if (value.get(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED) != null)
+            checkingWhenToCloseTheMap.setCheckIfMapShouldBeClosed((boolean) value.get(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED));
+
+        checkingWhenToCloseTheMap.setPushId((String) value.get(Constants.PUSH_ID));
+
+
+        if (!checkingWhenToCloseTheMap.getCheckIfOrderIsInProgress() && checkingWhenToCloseTheMap.getcheckIfMapShouldBeClosed() && checkingWhenToCloseTheMap.getPushId().equals(food.getPushId())) {
+            Log.d("STATE_CHECKING", "collectFood: MAP");
+            if (getActivity() instanceof BuyerActivity) {
+                Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        }
+    }
+
+    private void showAlertDialog() {
+        if (getActivity() != null) {
+
+            // Set up the input
+            final EditText input = new EditText(getActivity());
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Enter The amount you were paid");
+            builder.setPositiveButton("Complete Order", null);
+            builder.setNegativeButton("cancel", null);
+            builder.setView(input);
+
+
+            final AlertDialog mAlertDialog = builder.create();
+            mAlertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+                @Override
+                public void onShow(DialogInterface dialog) {
+
+                    Button b = mAlertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    b.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View view) {
+                            if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) >= food.getPrice() * food.getNumberOfServingsPurchased()) {
+                                price = input.getText().toString();
+                                updatePaymentForSeller();
+                                sendNotification();
+                                closeMapForBothUser();
+                                Toast.makeText(getActivity(), "Price " + food.getPrice() * food.getNumberOfServingsPurchased(), Toast.LENGTH_LONG).show();
+
+                                mAlertDialog.dismiss();
+
+                            } else if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) <= food.getPrice() * food.getNumberOfServingsPurchased()) {
+                                input.setError("Price Cant be less then PKR " + food.getPrice() * food.getNumberOfServingsPurchased());
+
+                            } else if (TextUtils.isEmpty(input.getText())) {
+                                input.setError("It cant be empty");
+
+                            }
+                        }
+                    });
+                }
+            });
+            mAlertDialog.show();
+        }
+    }
+
+    private void closeMapForBothUser() {
+        mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).updateChildren(updateFood());
+        if (getActivity() != null) {
+            if (getActivity() instanceof SellerActivity) {
+                Intent intent = new Intent(getActivity(), SellerActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+            }
+        }
+    }
+
+    private Map<String, Object> updateFood() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, false);
+        result.put(Constants.CHECK_IF_MAP_SHOULD_BE_CLOSED, true);
+        result.put(Constants.CHECK_IF_ORDER_IS_COMPLETED, true);
+
+        result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, false);
+        result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, false);
+        result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, false);
+        result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
+
+
+        return result;
+    }
+
+    private void updatePaymentForSeller() {
+        Account account = new Account();
+        account.setBalance(food.getPrice() * food.getNumberOfServingsPurchased());
+        account.setOrderId(food.getPushId());
+        account.setUserId(user.getUid());
+        account.setPaymentDate(ServerValue.TIMESTAMP);
+        mDatabaseReference.child(Constants.ACCOUNT).push().setValue(account);
+    }
+
+    private void sendNotification() {
+        String notificationId = mDatabaseReference.push().getKey();
+        Notification notification = null;
+
+        notification = new Notification();
+        notification.setTitle("Order Complete");
+        notification.setMessage("Seller has marked the order Complete? If you have gotten your order ? Press yes. ");
+        notification.setSenderId(user.getUid());
+        notification.setReceiverId(food.getPurchasedBy());
+        notification.setOrderId(food.getPushId());
+        notification.setCheckIfButtonShouldBeEnabled(true);
+        notification.setCheckIfNotificationAlertShouldBeShown(true);
+        notification.setCheckIfNotificationAlertShouldBeSent(true);
+        notification.setNotificationId(notificationId);
+        notification.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+        notification.setTimeStamp(ServerValue.TIMESTAMP);
+
+
+        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notification);
+    }
+
+    private void showDataForSeller(@NotNull DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+
+
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            if (ds.getValue() != null) {
+                collectUpdateUserLocation((Map<String, Object>) ds.getValue());
+            }
+        }
+
+
+    }
+
+    private void collectUpdateUserLocation(@NotNull Map<String, Object> value) {
+        Log.d(TAG, "collectUpdateUserLocation: " + value);
+
+        liveLocationUpdate.setBuyerId(String.valueOf(value.get(Constants.BUYER_ID)));
+        liveLocationUpdate.setSellerId(String.valueOf(value.get(Constants.SELLER_ID)));
+        liveLocationUpdate.setOrderID(String.valueOf(value.get(Constants.ORDER_ID)));
+        liveLocationUpdate.setLatitude((double) value.get(Constants.LATITUDE));
+        liveLocationUpdate.setLongitude((double) value.get(Constants.LONGITUDE));
+
+        if (mMap != null) {
+            updateMapUiForSeller(mMap, new LatLng(food.getLatitude(), food.getLongitude()), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()));
+        }
+    }
+
+    private void updateMapUiForSeller(GoogleMap googleMap, LatLng origin, LatLng destination) {
+        DirectionsResult results;
+        results = getDirectionsDetails(origin, destination, TravelMode.DRIVING);
+
+        try {
+            Log.d(TAG, "updateMapUiForSeller: " + results);
+            if (results != null) {
+                setUpSellerMaker(results, googleMap);
+
+                positionSellerCamera(results.routes[overview], googleMap);
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void positionSellerCamera(@NotNull DirectionsRoute route, @NotNull GoogleMap mMap) {
+        try {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void setUpSellerMaker(@NotNull DirectionsResult results, @NotNull GoogleMap mMap) {
+        try {
+            if (sellerMaker == null) {
+
+                sellerMaker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress));
+            }
+
+
+            if (buyerMarker == null) {
+                buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
+            } else {
+
+                animateMarker(buyerMarker, buyerMarker.getPosition(), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()), false, results);
+
+                // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            }
+
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     @Nullable
-    private DirectionsResult getDirectionsDetails(LatLng origin, LatLng destination, TravelMode mode) {
-        Log.d(TAG, "getDirectionsDetails: origin " + origin.latitude);
+    private DirectionsResult getDirectionsDetails(@NotNull LatLng origin, @NotNull LatLng destination, @NotNull TravelMode mode) {
         DateTime now = new DateTime();
         try {
             return DirectionsApi.newRequest(getGeoContext())
@@ -135,6 +469,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                     .destination(new com.google.maps.model.LatLng(destination.latitude, destination.longitude))
                     .departureTime(now)
                     .await();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            return null;
         } catch (ApiException e) {
             e.printStackTrace();
             return null;
@@ -145,27 +482,56 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
             e.printStackTrace();
             return null;
         }
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         setupGoogleMapScreenSettings(googleMap);
-        //    updateMapUi(googleMap, new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        //    updateMapUiForBuyer(googleMap, new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+        switch (userType) {
+            case Constants.TYPE_BUYER:
 
-    }
+                break;
+            case Constants.TYPE_SELLER:
 
-    private void updateMapUi(GoogleMap googleMap, LatLng origin) {
-        DirectionsResult results;
-        results = getDirectionsDetails(origin, new LatLng(34.1992910, 73.2319881), TravelMode.DRIVING);
-        if (results != null) {
-            addPolyline(results, googleMap);
-            positionCamera(results.routes[overview], googleMap);
-            addMarkersToMap(results, googleMap);
+                break;
+
+
         }
     }
 
-    private void setupGoogleMapScreenSettings(GoogleMap mMap) {
+    private void updateMapUiForBuyer(GoogleMap googleMap, LatLng origin, LatLng destination) {
+        mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).child(food.getPushId()).updateChildren(updateLocation(origin));
+        DirectionsResult results = null;
+        results = getDirectionsDetails(origin, destination, TravelMode.DRIVING);
+
+        Log.d(TAG, "updateMapUiForBuyer: " + results);
+        try {
+
+            if (results != null) {
+                addBuyerPolyline(results, googleMap);
+                positionBuyerCamera(results.routes[overview], googleMap);
+                addBuyerMarkersToMap(results, googleMap);
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private Map<String, Object> updateLocation(@NotNull LatLng origin) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.ORDER_ID, food.getPushId());
+        result.put(Constants.SELLER_ID, food.getPostedBy());
+        Log.d(TAG, "updateLocation: " + food.getPostedBy());
+        result.put(Constants.BUYER_ID, food.getPurchasedBy());
+        result.put(Constants.LATITUDE, origin.latitude);
+        result.put(Constants.LONGITUDE, origin.longitude);
+        return result;
+    }
+
+    private void setupGoogleMapScreenSettings(@NotNull GoogleMap mMap) {
         mMap.setBuildingsEnabled(true);
         mMap.setIndoorEnabled(false);
         mMap.setTrafficEnabled(false);
@@ -179,25 +545,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         mUiSettings.setRotateGesturesEnabled(true);
     }
 
-    Marker myPosition;
-    Marker myDestination;
+    private void addBuyerMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+        try {
+//        if (myPosition == null) {
+//            myPosition = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
+//        } else {
+//            animateMarker(myPosition, myPosition.getPosition(), new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), false);
+//
+//            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+//        }
+            // animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
+            if (buyerMarker == null) {
+                buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+            }
 
-    private void addMarkersToMap(DirectionsResult results, GoogleMap mMap) {
-        if (myPosition == null) {
-            myPosition = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
-        } else {
-            animateMarker(myPosition, myPosition.getPosition(), new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), false);
-
-            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-        }
-        // animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
-        if (myDestination == null) {
-            myDestination = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
         }
     }
 
     public void animateMarker(final Marker marker, final LatLng startPosition, final LatLng toPosition,
-                              final boolean hideMarker) {
+                              final boolean hideMarker, final DirectionsResult results) {
 
 
         final Handler handler = new Handler();
@@ -216,9 +584,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                         * startPosition.longitude;
                 double lat = t * toPosition.latitude + (1 - t)
                         * startPosition.latitude;
+                try {
 
-                marker.setPosition(new LatLng(lat, lng));
 
+                    marker.setPosition(new LatLng(lat, lng));
+                    marker.setTitle(results.routes[overview].legs[overview].startAddress);
+                    marker.setSnippet(getEndLocationTitle(results));
+
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    ex.printStackTrace();
+                }
                 if (t < 1.0) {
                     // Post again 16ms later.
                     handler.postDelayed(this, 16);
@@ -233,22 +608,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         });
     }
 
-    private void positionCamera(DirectionsRoute route, GoogleMap mMap) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 18));
-    }
-
-    Polyline line;
-
-    private void addPolyline(DirectionsResult results, GoogleMap mMap) {
-        List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
-        if (line == null) {
-            line = mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
-        } else {
-            line.setPoints(decodedPath);
+    private void positionBuyerCamera(@NotNull DirectionsRoute route, @NotNull GoogleMap mMap) {
+        try {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
         }
     }
 
-    private String getEndLocationTitle(DirectionsResult results) {
+    private void addBuyerPolyline(@NotNull DirectionsResult results, @NotNull GoogleMap mMap) {
+        try {
+            List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
+            if (line == null) {
+                line = mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
+            } else {
+                line.setPoints(decodedPath);
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @NonNull
+    @Contract(pure = true)
+    private String getEndLocationTitle(@NotNull DirectionsResult results) {
         return "Time :" + results.routes[overview].legs[overview].duration.humanReadable + " Distance :" + results.routes[overview].legs[overview].distance.humanReadable;
     }
 
@@ -257,9 +640,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         return geoApiContext
                 .setQueryRateLimit(6)
                 .setApiKey(getString(R.string.directionsApiKey))
-                .setConnectTimeout(2, TimeUnit.SECONDS)
-                .setReadTimeout(2, TimeUnit.SECONDS)
-                .setWriteTimeout(2, TimeUnit.SECONDS);
+                .setConnectTimeout(3, TimeUnit.SECONDS)
+                .setReadTimeout(3, TimeUnit.SECONDS)
+                .setWriteTimeout(3, TimeUnit.SECONDS);
     }
 
 
@@ -287,7 +670,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         Log.d(TAG, "onLocationChanged: " + location.getLatitude());
         if (mLastLocation != null) {
 
-            updateMapUiOnBackgroundThread(mLastLocation);
+            if (food != null && mMap != null) {
+                updateMapUiForBuyer(mMap, new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(food.getLatitude(), food.getLongitude()));
+            }
+
 
             calculateDistanceBetweenTwoPointsOnBackgroundThread();
 
@@ -295,40 +681,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         }
     }
 
-    private void updateMapUiOnBackgroundThread(final Location mLastLocation) {
-        Observable<Location> observable = Observable.create(new ObservableOnSubscribe<Location>() {
-            @Override
-            public void subscribe(ObservableEmitter<Location> emitter) throws Exception {
-                emitter.onNext(mLastLocation);
-            }
-        });
-
-        Observer<Location> observer = new Observer<Location>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-            }
-
-            @Override
-            public void onNext(Location location) {
-                updateMapUi(mMap, new LatLng(location.getLatitude(), location.getLongitude()));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        };
-
-        observable
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer);
-    }
 
     private void calculateDistanceBetweenTwoPointsOnBackgroundThread() {
         Observable<Boolean> observable = Observable.create(new ObservableOnSubscribe<Boolean>() {
@@ -372,7 +724,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
     private boolean calculateDistanceBetweenTwoPoints() {
         float[] results = new float[1];
-        Location.distanceBetween(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 34.1992910, 73.2319881, results);
+        if (food != null)
+            Location.distanceBetween(mLastLocation.getLatitude(), mLastLocation.getLongitude(), food.getLatitude(), food.getLongitude(), results);
 
         Log.d(TAG, "onLocationChanged: p0 " + results[0]);
         return results[0] < 50;
@@ -387,15 +740,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     public void onStart() {
         super.onStart();
         // 2
-        mGoogleApiClient.connect();
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                mGoogleApiClient.connect();
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
+        }
+
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.disconnect();
+                }
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
         }
+
+
     }
 
     private void setUpMap() {
@@ -416,10 +792,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         if (locationAvailability != null && locationAvailability.isLocationAvailable()) {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (mLastLocation != null) {
-              //  LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
-                //        .getLongitude());
-               // updateMapUi(mMap, currentLocation);
-                updateMapUiOnBackgroundThread(mLastLocation);
+                LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
+                        .getLongitude());
+                Log.d(TAG, "setUpMap: " + food);
+                if (food != null && mMap != null) {
+                    Log.d(TAG, "onNext: lat " + food.getLatitude() + " lng" + food.getLongitude());
+                    updateMapUiForBuyer(mMap, currentLocation, new LatLng(food.getLatitude(), food.getLongitude()));
+                }
             }
         }
     }
@@ -506,16 +885,47 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public void onPause() {
         super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mGoogleApiClient.isConnected() && !mLocationUpdateState) {
-            startLocationUpdates();
+
+        switch (userType) {
+            case Constants.TYPE_BUYER:
+                if (mGoogleApiClient.isConnected() && !mLocationUpdateState) {
+                    startLocationUpdates();
+                }
+                break;
+            case Constants.TYPE_SELLER:
+
+                break;
+
+
         }
+
+
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
+
+
+    }
 
 }

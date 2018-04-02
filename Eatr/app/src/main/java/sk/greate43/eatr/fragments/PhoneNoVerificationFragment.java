@@ -76,7 +76,8 @@ public class PhoneNoVerificationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (getActivity() != null)
+            getActivity().setTitle("Phone No Verification Fragment");
         if (getArguments() != null) {
             mPhoneNo = getArguments().getString(ARG_PHONE_NO);
             Log.d(TAG, "onCreate: " + mPhoneNo);
