@@ -37,6 +37,7 @@ public interface Constants {
     String CHECK_IF_ORDERED_IS_BOOKED = "checkIfOrderIsBooked";
     String CHECK_IF_MAP_SHOULD_BE_CLOSED = "checkIfMapShouldBeClosed";
     String CHECK_IF_ORDER_IS_COMPLETED = "checkIfOrderIsCompleted";
+    String NO_OF_SERVINGS_PURCHASED = "numberOfServingsPurchased";
 
     //Food Constants
 
@@ -79,8 +80,8 @@ public interface Constants {
      */
     String PROFILE = "Profile";
     String ARGS_PROFILE = "ARGS_PROFILE";
-    String TYPE_SELLER = "SELLER";
-    String TYPE_BUYER = "BUYER";
+    String TYPE_SELLER = "Seller";
+    String TYPE_BUYER = "Buyer";
     String USER_TYPE = "userType";
     String PROFILE_PHOTO_URI = "profilePhotoUri";
     String FIRST_NAME = "firstName";

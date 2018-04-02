@@ -1,9 +1,12 @@
 package sk.greate43.eatr.holders;
 
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
@@ -40,14 +43,13 @@ public class HistoryViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void populate(Food food) {
-        tvPrice.setText(String.valueOf("PKR " + food.getPrice()));
+        tvPrice.setText(String.valueOf("PKR " + food.getPrice() * food.getNumberOfServingsPurchased()));
         tvOrderId.setText(String.valueOf(food.getPushId()));
         tvSellerId.setText(String.valueOf(food.getPostedBy()));
         tvBuyerId.setText(String.valueOf(food.getPurchasedBy()));
-        tvPurchasedDate.setText(DateUtils
-                .getRelativeTimeSpanString(food.getPurchasedDate(),
-                        System.currentTimeMillis(),
-                        DateUtils.FORMAT_ABBREV_ALL,
-                        0));
+
+        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.US);
+        tvPurchasedDate.setText(sfd.format(new Date(food.getPurchasedDate())));
+
     }
 }

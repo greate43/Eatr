@@ -105,6 +105,7 @@ public class NotificationJobService extends JobService {
         notification.setCheckIfNotificationAlertShouldBeShown((boolean) value.get(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN));
         notification.setSenderId(String.valueOf(value.get(Constants.SENDER_ID)));
         notification.setReceiverId(String.valueOf(value.get(Constants.RECEIVER_ID)));
+        notification.setNotificationType(String.valueOf(value.get(Constants.NOTIFICATION_TYPE)));
         if (notification.getReceiverId().equalsIgnoreCase(user.getUid()) && notification.getCheckIfNotificationAlertShouldBeSent()) {
 
             sendNotificationData(notification.getTitle(), notification.getMessage());

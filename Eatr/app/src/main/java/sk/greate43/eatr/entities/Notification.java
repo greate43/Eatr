@@ -1,6 +1,7 @@
 package sk.greate43.eatr.entities;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by great on 3/22/2018.
@@ -19,9 +20,18 @@ public class Notification implements Serializable {
     private String orderId;
     private String notificationId;
     private String notificationType;
+    private Map<String, String> timeStamp;
 
     public Notification() {
 
+    }
+
+    public Map<String, String> getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Map<String, String> timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public String getNotificationType() {

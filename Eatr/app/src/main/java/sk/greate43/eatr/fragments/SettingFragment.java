@@ -28,6 +28,8 @@ public class SettingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Settings Fragment");
         if (getArguments() != null) {
 
         }

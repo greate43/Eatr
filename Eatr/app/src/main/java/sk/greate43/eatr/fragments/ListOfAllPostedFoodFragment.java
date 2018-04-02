@@ -59,6 +59,8 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Posted Food Fragment");
         if (getArguments() != null) {
 
         }
@@ -189,7 +191,8 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
                         && food.getCheckIfOrderIsActive()
                         && !food.getCheckIfOrderIsInProgress()
                         && !food.getCheckIfOrderIsBooked()
-                        && !food.getcheckIfOrderIsCompleted()
+                        && !food.getCheckIfOrderIsCompleted()
+                        && food.getNumberOfServings() > 0
                         && !food.getPostedBy().equals(user.getUid())
                 ) {
 
