@@ -57,6 +57,8 @@ public class NotificationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Notification Fragment");
         if (getArguments() != null) {
 
         }
@@ -89,7 +91,7 @@ public class NotificationFragment extends Fragment {
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);

@@ -67,7 +67,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (getActivity() != null)
+            getActivity().setTitle("Posted Food Fragment");
         if (getArguments() != null) {
             orderState = getArguments().getString(Constants.ORDER_STATE);
             if (orderState != null) {
@@ -265,7 +266,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
-                        && !food.getcheckIfOrderIsCompleted()
+                        && !food.getCheckIfOrderIsCompleted()
 
                         ) {
                     foods.add(food);
@@ -278,7 +279,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && !food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
-                        && food.getcheckIfOrderIsCompleted()
+                        && food.getCheckIfOrderIsCompleted()
 
                         ) {
                     foods.add(food);
@@ -292,7 +293,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && food.getCheckIfFoodIsInDraftMode()
                         && !food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
-                        && !food.getcheckIfOrderIsCompleted()
+                        && !food.getCheckIfOrderIsCompleted()
 
 
                         ) {
@@ -306,7 +307,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         && !food.getCheckIfFoodIsInDraftMode()
                         && food.getCheckIfOrderIsBooked()
                         && !food.getCheckIfOrderIsInProgress()
-                        && !food.getcheckIfOrderIsCompleted()
+                        && !food.getCheckIfOrderIsCompleted()
 
                         ) {
                     foods.add(food);

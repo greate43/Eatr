@@ -24,6 +24,7 @@ public class Food implements Serializable {
     private long expiryTime;
     private long price;
     private long numberOfServings;
+    private long numberOfServingsPurchased;
     private Uri image;
     private double longitude;
     private double latitude;
@@ -39,7 +40,19 @@ public class Food implements Serializable {
     private boolean checkIfMapShouldBeClosed;
     private boolean checkIfOrderIsCompleted;
 
-    public boolean getcheckIfOrderIsCompleted() {
+    public Food() {
+        // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+    public long getNumberOfServingsPurchased() {
+        return numberOfServingsPurchased;
+    }
+
+    public void setNumberOfServingsPurchased(long numberOfServingsPurchased) {
+        this.numberOfServingsPurchased = numberOfServingsPurchased;
+    }
+
+    public boolean getCheckIfOrderIsCompleted() {
         return checkIfOrderIsCompleted;
     }
 
@@ -47,9 +60,7 @@ public class Food implements Serializable {
         this.checkIfOrderIsCompleted = checkIfOrderIsCompleted;
     }
 
-    public Food() {
-        // Default constructor required for calls to DataSnapshot.getValue(Food.class)
-    }
+
 
     public boolean getcheckIfMapShouldBeClosed() {
         return checkIfMapShouldBeClosed;

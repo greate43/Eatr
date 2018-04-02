@@ -16,6 +16,8 @@ import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -51,9 +53,16 @@ public class DrawerUtil implements UpdateData {
     private Drawer result;
     private UpdateData updateData = this;
     private Profile profile;
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabaseReference;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     private DrawerUtil() {
-
+        mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        mDatabaseReference = database.getReference();
+        user = mAuth.getCurrentUser();
     }
 
     public static DrawerUtil getInstance() {
@@ -149,6 +158,8 @@ public class DrawerUtil implements UpdateData {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+
+
                         if (drawerItem.getIdentifier() == 1 && (activity instanceof SellerActivity)) {
                             // load tournament screen
 //                            Intent intent = new Intent(activity, MainActivity.class);
@@ -219,6 +230,19 @@ public class DrawerUtil implements UpdateData {
                             FragmentManager fragment = activity.getSupportFragmentManager();
                             fragment.beginTransaction().replace(R.id.content_buyer_container, UserTrackerFragment.newInstance(Constants.TYPE_BUYER)).commit();
 
+                        } else if (drawerItem.getIdentifier() == 8 && activity instanceof SellerActivity) {
+
+                            mDatabaseReference.child(Constants.PROFILE).child(profile.getUserId()).child(Constants.USER_TYPE).setValue(Constants.TYPE_BUYER);
+                            Intent intent = new Intent(activity, MainActivity.class);
+                            activity.startActivity(intent);
+                            activity.finish();
+
+                        } else if (drawerItem.getIdentifier() == 8 && activity instanceof BuyerActivity) {
+                            mDatabaseReference.child(Constants.PROFILE).child(profile.getUserId()).child(Constants.USER_TYPE).setValue(Constants.TYPE_SELLER);
+                            Intent intent = new Intent(activity, MainActivity.class);
+                            activity.startActivity(intent);
+                            activity.finish();
+
                         }
 
 
@@ -232,9 +256,16 @@ public class DrawerUtil implements UpdateData {
 
         result.setSelection(1, true);
 
-       // result.addStickyFooterItem(new PrimaryDrawerItem().withName("StickyFooterItem"));
+        if (activity instanceof SellerActivity) {
 
+            result.addStickyFooterItem(new PrimaryDrawerItem().withName("Buy Food").withIdentifier(8));
+        } else if (activity instanceof BuyerActivity) {
+
+            result.addStickyFooterItem(new PrimaryDrawerItem().withName("Sell Food").withIdentifier(8));
+
+        }
     }
+
 
     private void closeDrawer() {
         result.closeDrawer();

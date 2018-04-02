@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.activities.BuyerActivity;
+import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.TrackUserRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.utils.Constants;
@@ -60,6 +64,14 @@ public class UserTrackerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null) {
+            if (getActivity() instanceof SellerActivity) {
+                getActivity().setTitle("Track Buyer Fragment");
+            } else if (getActivity() instanceof BuyerActivity){
+                getActivity().setTitle("Pick Up Point Fragment");
+
+            }
+        }
         if (getArguments() != null) {
             userType = getArguments().getString(Constants.USER_TYPE);
         }
@@ -68,6 +80,7 @@ public class UserTrackerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(false);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_tracker, container, false);
         recyclerView = view.findViewById(R.id.fragment_user_tracker_recycler_view);
@@ -200,7 +213,9 @@ public class UserTrackerFragment extends Fragment {
         if (value.get(Constants.POSTED_BY) != null) {
             food.setPostedBy((String) value.get(Constants.POSTED_BY));
         }
-
+        if (value.get(Constants.NO_OF_SERVINGS_PURCHASED) != null) {
+            food.setNumberOfServingsPurchased((long) value.get(Constants.NO_OF_SERVINGS_PURCHASED));
+        }
 
         if (!food.getCheckIfOrderIsActive()
                 && !food.getCheckIfOrderIsPurchased()
@@ -219,5 +234,13 @@ public class UserTrackerFragment extends Fragment {
 
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
 
+        super.onPrepareOptionsMenu(menu);
+
+
+    }
 }

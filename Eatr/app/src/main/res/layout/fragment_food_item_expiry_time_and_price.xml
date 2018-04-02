@@ -144,6 +144,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Show Preview"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
         app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
         app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_results" />

@@ -57,6 +57,8 @@ public class HistoryFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("History Fragment");
         if (getArguments() != null) {
             userType = getArguments().getString(Constants.USER_TYPE);
             Log.d(TAG, "onCreate: " + userType);
@@ -76,8 +78,8 @@ public class HistoryFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
-
-        adaptor = new HistoryRecyclerViewAdaptor(getActivity());
+        if (getActivity() != null)
+            adaptor = new HistoryRecyclerViewAdaptor(getActivity());
         foods = adaptor.getFoods();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -175,7 +177,9 @@ public class HistoryFragment extends Fragment {
         if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
             food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
         }
-
+        if (value.get(Constants.NO_OF_SERVINGS_PURCHASED) != null) {
+            food.setNumberOfServingsPurchased((long) value.get(Constants.NO_OF_SERVINGS_PURCHASED));
+        }
 
         switch (userType) {
             case Constants.TYPE_BUYER:
@@ -188,7 +192,7 @@ public class HistoryFragment extends Fragment {
                                 && !food.getCheckIfFoodIsInDraftMode()
                                 && !food.getCheckIfOrderIsBooked()
                                 && !food.getCheckIfOrderIsInProgress()
-                                && food.getcheckIfOrderIsCompleted()
+                                && food.getCheckIfOrderIsCompleted()
                                 && food.getPurchasedBy().equals(user.getUid())
                         ) {
 
@@ -203,7 +207,7 @@ public class HistoryFragment extends Fragment {
                                 && !food.getCheckIfFoodIsInDraftMode()
                                 && !food.getCheckIfOrderIsBooked()
                                 && !food.getCheckIfOrderIsInProgress()
-                                && food.getcheckIfOrderIsCompleted()
+                                && food.getCheckIfOrderIsCompleted()
                                 && food.getPostedBy().equals(user.getUid())
                         ) {
 

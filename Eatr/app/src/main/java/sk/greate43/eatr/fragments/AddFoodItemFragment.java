@@ -124,6 +124,10 @@ public class AddFoodItemFragment extends Fragment implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getActivity() != null)
+            getActivity().setTitle("Add Food Item Fragment");
+
         if (getArguments() != null) {
             food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
         }
@@ -544,6 +548,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsAccepted(false);
                 food.setCheckIfOrderIsBooked(false);
                 food.setCheckIfOrderIsCompleted(false);
+                food.setCheckIfMapShouldBeClosed(false);
 
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
@@ -588,6 +593,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsAccepted(false);
                 food.setCheckIfOrderIsBooked(false);
                 food.setCheckIfOrderIsCompleted(false);
+                food.setCheckIfMapShouldBeClosed(false);
 
 
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);

@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -128,10 +129,11 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(true, false, false, false,false));
+                            .updateChildren(updateUpdateProgress(true, false, false, false, false, false));
 
                 }
             } else {
@@ -147,10 +149,11 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(false, false, true, false,false));
+                            .updateChildren(updateUpdateProgress(false, false, false, false, false, false));
 
                 }
             }
@@ -169,10 +172,11 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
 
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(false, false, false, true,true));
+                            .updateChildren(updateUpdateProgress(false, false, false, true, true,true));
                 }
             } else {
                 if (notification != null) {
@@ -187,9 +191,11 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
-                            .updateChildren(updateUpdateProgress(false, false, false, false,true));
+                            .updateChildren(updateUpdateProgress(false, false, false, false, true,true));
 
                 }
             }
@@ -199,13 +205,17 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
     }
 
-    private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive, boolean isPurchase, boolean isCompeted) {
+    private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive, boolean isPurchase, boolean isCompeted, boolean isAccepted) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
         result.put(Constants.CHECK_IF_ORDERED_IS_BOOKED, booked);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, isActive);
         if (!progress && !isPurchase && !isCompeted) {
             result.put(Constants.PURCHASED_BY, "");
+        }
+        if (isAccepted ) {
+            result.put(Constants.CHECK_IF_ORDER_IS_ACCEPTED, isAccepted);
+
         }
         if (isPurchase) {
             result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, isPurchase);

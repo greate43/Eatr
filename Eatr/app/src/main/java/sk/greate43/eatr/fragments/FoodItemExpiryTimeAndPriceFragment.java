@@ -72,6 +72,8 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Price And Expiry Time Fragment");
         if (getArguments() != null) {
             food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
         }

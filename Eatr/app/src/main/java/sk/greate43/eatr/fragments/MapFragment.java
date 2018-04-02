@@ -17,6 +17,8 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
@@ -67,6 +69,7 @@ import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.TravelMode;
 
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -133,6 +136,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() != null)
+            getActivity().setTitle("Map Fragment");
+
+
         if (getArguments() != null) {
             userType = getArguments().getString(Constants.USER_TYPE);
             food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
@@ -148,6 +155,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -287,16 +295,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
                         @Override
                         public void onClick(View view) {
-                            if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) >= food.getPrice()) {
+                            if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) >= food.getPrice() * food.getNumberOfServingsPurchased()) {
                                 price = input.getText().toString();
                                 updatePaymentForSeller();
                                 sendNotification();
                                 closeMapForBothUser();
-                                Toast.makeText(getActivity(), "Price " + food.getPrice(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), "Price " + food.getPrice() * food.getNumberOfServingsPurchased(), Toast.LENGTH_LONG).show();
 
                                 mAlertDialog.dismiss();
 
-                            } else if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) <= food.getPrice()) {
+                            } else if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) <= food.getPrice() * food.getNumberOfServingsPurchased()) {
                                 input.setError("Price Cant be less then PKR " + food.getPrice());
 
                             } else if (TextUtils.isEmpty(input.getText())) {
@@ -356,12 +364,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         notification.setCheckIfNotificationAlertShouldBeSent(true);
         notification.setNotificationId(notificationId);
         notification.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+        notification.setTimeStamp(ServerValue.TIMESTAMP);
 
 
         mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notification);
     }
 
-    private void showDataForSeller(DataSnapshot dataSnapshot) {
+    private void showDataForSeller(@NotNull DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }
@@ -376,7 +385,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
     }
 
-    private void collectUpdateUserLocation(Map<String, Object> value) {
+    private void collectUpdateUserLocation(@NotNull Map<String, Object> value) {
         Log.d(TAG, "collectUpdateUserLocation: " + value);
 
         liveLocationUpdate.setBuyerId(String.valueOf(value.get(Constants.BUYER_ID)));
@@ -393,41 +402,57 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     private void updateMapUiForSeller(GoogleMap googleMap, LatLng origin, LatLng destination) {
         DirectionsResult results;
         results = getDirectionsDetails(origin, destination, TravelMode.DRIVING);
-        if (results != null) {
-            setUpSellerMaker(results, googleMap);
-            positionSellerCamera(results.routes[overview], googleMap);
+
+        try {
+            Log.d(TAG, "updateMapUiForSeller: " + results);
+            if (results != null) {
+                setUpSellerMaker(results, googleMap);
+
+                positionSellerCamera(results.routes[overview], googleMap);
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
         }
     }
 
-    private void positionSellerCamera(DirectionsRoute route, GoogleMap mMap) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
+    private void positionSellerCamera(@NotNull DirectionsRoute route, @NotNull GoogleMap mMap) {
+        try {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    private void setUpSellerMaker(DirectionsResult results, GoogleMap mMap) {
-        if (sellerMaker == null) {
-            sellerMaker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress));
-        }
+    private void setUpSellerMaker(@NotNull DirectionsResult results, @NotNull GoogleMap mMap) {
+        try {
+            if (sellerMaker == null) {
+
+                sellerMaker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress));
+            }
 
 
-        if (buyerMarker == null) {
-            buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
-        } else {
+            if (buyerMarker == null) {
+                buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
+            } else {
 
-            animateMarker(buyerMarker, buyerMarker.getPosition(), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()), false, results);
+                animateMarker(buyerMarker, buyerMarker.getPosition(), new LatLng(liveLocationUpdate.getLatitude(), liveLocationUpdate.getLongitude()), false, results);
 
-            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+                // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            }
+
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
         }
     }
 
     @Nullable
-    private DirectionsResult getDirectionsDetails(LatLng origin, LatLng destination, TravelMode mode) {
-        Log.d(TAG, "getDirectionsDetails: origin " + origin.latitude);
+    private DirectionsResult getDirectionsDetails(@NotNull LatLng origin, @NotNull LatLng destination, @NotNull TravelMode mode) {
         DateTime now = new DateTime();
         try {
             return DirectionsApi.newRequest(getGeoContext())
                     .mode(mode)
-                    .origin(new com.google.maps.model.LatLng(origin.latitude, origin.longitude))
-                    .destination(new com.google.maps.model.LatLng(destination.latitude, destination.longitude))
+                    .origin(origin.latitude + "," + origin.longitude)
+                    .destination(destination.latitude + "," + destination.longitude)
                     .departureTime(now)
                     .await();
         } catch (ApiException e) {
@@ -461,16 +486,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
     private void updateMapUiForBuyer(GoogleMap googleMap, LatLng origin, LatLng destination) {
         mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).child(food.getPushId()).updateChildren(updateLocation(origin));
-        DirectionsResult results;
+        DirectionsResult results = null;
         results = getDirectionsDetails(origin, destination, TravelMode.DRIVING);
-        if (results != null) {
-            addBuyerPolyline(results, googleMap);
-            positionBuyerCamera(results.routes[overview], googleMap);
-            addBuyerMarkersToMap(results, googleMap);
+
+        Log.d(TAG, "updateMapUiForBuyer: " + results);
+        try {
+
+            if (results != null) {
+                addBuyerPolyline(results, googleMap);
+                positionBuyerCamera(results.routes[overview], googleMap);
+                addBuyerMarkersToMap(results, googleMap);
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
         }
     }
 
-    private Map<String, Object> updateLocation(LatLng origin) {
+    private Map<String, Object> updateLocation(@NotNull LatLng origin) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.ORDER_ID, food.getPushId());
         result.put(Constants.SELLER_ID, food.getPostedBy());
@@ -481,7 +513,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         return result;
     }
 
-    private void setupGoogleMapScreenSettings(GoogleMap mMap) {
+    private void setupGoogleMapScreenSettings(@NotNull GoogleMap mMap) {
         mMap.setBuildingsEnabled(true);
         mMap.setIndoorEnabled(false);
         mMap.setTrafficEnabled(false);
@@ -496,6 +528,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     }
 
     private void addBuyerMarkersToMap(DirectionsResult results, GoogleMap mMap) {
+        try {
 //        if (myPosition == null) {
 //            myPosition = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].startLocation.lat, results.routes[overview].legs[overview].startLocation.lng)).title(results.routes[overview].legs[overview].startAddress).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_local_taxi_black_24dp)));
 //        } else {
@@ -503,9 +536,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 //
 //            // myPosition.setPosition(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
 //        }
-        // animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
-        if (buyerMarker == null) {
-            buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+            // animateMarker(marker,marker.getPosition(),new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()),false);
+            if (buyerMarker == null) {
+                buyerMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(results.routes[overview].legs[overview].endLocation.lat, results.routes[overview].legs[overview].endLocation.lng)).title(results.routes[overview].legs[overview].startAddress).snippet(getEndLocationTitle(results)));
+            }
+
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -529,11 +566,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                         * startPosition.longitude;
                 double lat = t * toPosition.latitude + (1 - t)
                         * startPosition.latitude;
+                try {
 
-                marker.setPosition(new LatLng(lat, lng));
-                marker.setTitle(results.routes[overview].legs[overview].startAddress);
-                marker.setSnippet(getEndLocationTitle(results));
 
+                    marker.setPosition(new LatLng(lat, lng));
+                    marker.setTitle(results.routes[overview].legs[overview].startAddress);
+                    marker.setSnippet(getEndLocationTitle(results));
+
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    ex.printStackTrace();
+                }
                 if (t < 1.0) {
                     // Post again 16ms later.
                     handler.postDelayed(this, 16);
@@ -548,22 +590,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         });
     }
 
-    private void positionBuyerCamera(DirectionsRoute route, GoogleMap mMap) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
+    private void positionBuyerCamera(@NotNull DirectionsRoute route, @NotNull GoogleMap mMap) {
+        try {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(route.legs[overview].startLocation.lat, route.legs[overview].startLocation.lng), 16));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    private void addBuyerPolyline(DirectionsResult results, GoogleMap mMap) {
-        List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
-        if (line == null) {
-            line = mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
-        } else {
-            line.setPoints(decodedPath);
+    private void addBuyerPolyline(@NotNull DirectionsResult results, @NotNull GoogleMap mMap) {
+        try {
+            List<LatLng> decodedPath = PolyUtil.decode(results.routes[overview].overviewPolyline.getEncodedPath());
+            if (line == null) {
+                line = mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
+            } else {
+                line.setPoints(decodedPath);
+            }
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
         }
     }
 
     @NonNull
     @Contract(pure = true)
-    private String getEndLocationTitle(DirectionsResult results) {
+    private String getEndLocationTitle(@NotNull DirectionsResult results) {
         return "Time :" + results.routes[overview].legs[overview].duration.humanReadable + " Distance :" + results.routes[overview].legs[overview].distance.humanReadable;
     }
 
@@ -572,9 +622,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         return geoApiContext
                 .setQueryRateLimit(6)
                 .setApiKey(getString(R.string.directionsApiKey))
-                .setConnectTimeout(2, TimeUnit.SECONDS)
-                .setReadTimeout(2, TimeUnit.SECONDS)
-                .setWriteTimeout(2, TimeUnit.SECONDS);
+                .setConnectTimeout(3, TimeUnit.SECONDS)
+                .setReadTimeout(3, TimeUnit.SECONDS)
+                .setWriteTimeout(3, TimeUnit.SECONDS);
     }
 
 
@@ -602,7 +652,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         Log.d(TAG, "onLocationChanged: " + location.getLatitude());
         if (mLastLocation != null) {
 
-            if (food != null) {
+            if (food != null && mMap != null) {
                 updateMapUiForBuyer(mMap, new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(food.getLatitude(), food.getLongitude()));
             }
 
@@ -727,7 +777,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                 LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
                         .getLongitude());
                 Log.d(TAG, "setUpMap: " + food);
-                if (food != null) {
+                if (food != null && mMap != null) {
                     Log.d(TAG, "onNext: lat " + food.getLatitude() + " lng" + food.getLongitude());
                     updateMapUiForBuyer(mMap, currentLocation, new LatLng(food.getLatitude(), food.getLongitude()));
                 }
@@ -850,5 +900,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem search = menu.findItem(R.id.menu_item_search);
+        search.setVisible(false);
+
+        super.onPrepareOptionsMenu(menu);
+
+
+    }
 
 }
