@@ -235,7 +235,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     @Override
     public void onSearchCompleted(String searchKeyword) {
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
-            retrieveFirebaseData(searchKeyword);
+            retrieveFirebaseData(searchKeyword.toLowerCase());
         } else {
             retrieveFirebaseData("");
         }
