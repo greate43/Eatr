@@ -679,7 +679,7 @@ public class AddFoodItemFragment extends Fragment implements
 
                     writeSellerData(
                             pushId
-                            , etDishName.getText().toString()
+                            , etDishName.getText().toString().toLowerCase()
                             , etCuisine.getText().toString()
                             , etIncidentsTags.getTagList().toString()
                             , etPickLocation.getText().toString()
