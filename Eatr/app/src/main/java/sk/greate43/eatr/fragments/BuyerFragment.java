@@ -77,7 +77,7 @@ public class BuyerFragment extends Fragment {
         user = mAuth.getCurrentUser();
         FragmentManager fragmentManager = getChildFragmentManager();
         fragmentManager.beginTransaction()
-                .add(R.id.fragment_buyer_container, ListOfAllPostedFoodFragment.newInstance())
+                .replace(R.id.fragment_buyer_container, ListOfAllPostedFoodFragment.newInstance())
                 .commit();
 
         BottomNavigationView navigation = view.findViewById(R.id.activity_buyer_navigation);

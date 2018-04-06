@@ -22,6 +22,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -75,7 +77,8 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         initialize();
 
         recyclerView = view.findViewById(R.id.fragment_list_of_all_posted_food_recycler_view);
-        adaptor = new ListOfAllPostedFoodRecyclerViewAdaptor((BuyerActivity) getActivity());
+        if (getActivity() != null)
+            adaptor = new ListOfAllPostedFoodRecyclerViewAdaptor((BuyerActivity) getActivity());
 
         foods = adaptor.getFoods();
 
@@ -103,25 +106,40 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
     private void retrieveFirebaseData(String searchKeyword) {
         if (mDatabaseReference != null) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+            if (!searchKeyword.isEmpty()) {
+                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    showData(dataSnapshot);
-                }
+                        showData(dataSnapshot);
+                    }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    System.out.println("The read failed: " + databaseError.getCode());
-                }
-            });
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+            } else {
+                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        showData(dataSnapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+            }
         } else {
             initialize();
         }
     }
 
 
-    private void showData(DataSnapshot dataSnapshot) {
+    private void showData(@NotNull DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }

@@ -25,9 +25,10 @@ import java.util.Map;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.interfaces.Search;
-import sk.greate43.eatr.interfaces.UpdateData;
+import sk.greate43.eatr.interfaces.UpdateProfile;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
+import sk.greate43.eatr.utils.ReviewUtils;
 
 public class BuyerActivity extends AppCompatActivity {
     private static final String TAG = "BuyerActivity";
@@ -37,7 +38,7 @@ public class BuyerActivity extends AppCompatActivity {
     FirebaseDatabase database;
     FirebaseStorage mStorage;
     StorageReference storageRef;
-    UpdateData updateData;
+    UpdateProfile updateProfile;
     private Search search;
 
     @Override
@@ -47,7 +48,9 @@ public class BuyerActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.activity_buyer_toolbar);
         setSupportActionBar(toolbar);
 
-        updateData = DrawerUtil.getInstance().getCallback();
+
+
+        updateProfile = DrawerUtil.getInstance().getCallback();
 
         DrawerUtil.getInstance().getDrawer(this, toolbar);
 
@@ -74,6 +77,7 @@ public class BuyerActivity extends AppCompatActivity {
             }
         });
 
+        ReviewUtils.getInstance().reviewTheUser(this,Constants.TYPE_BUYER);
 
     }
 
@@ -159,10 +163,12 @@ public class BuyerActivity extends AppCompatActivity {
             profile.setEmail(String.valueOf(value.get(Constants.EMAIL)));
         }
         profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));
-        if (updateData != null) {
-            updateData.onNavDrawerDataUpdated(profile);
+        if (updateProfile != null) {
+            updateProfile.onNavDrawerDataUpdated(profile);
         }
 
 
     }
+
+
 }

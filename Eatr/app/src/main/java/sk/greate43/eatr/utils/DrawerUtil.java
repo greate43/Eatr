@@ -31,6 +31,8 @@ import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.Contract;
+
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.MainActivity;
@@ -42,16 +44,16 @@ import sk.greate43.eatr.fragments.ProfileFragment;
 import sk.greate43.eatr.fragments.SellerFragment;
 import sk.greate43.eatr.fragments.SettingFragment;
 import sk.greate43.eatr.fragments.UserTrackerFragment;
-import sk.greate43.eatr.interfaces.UpdateData;
+import sk.greate43.eatr.interfaces.UpdateProfile;
 
 
-public class DrawerUtil implements UpdateData {
+public class DrawerUtil implements UpdateProfile {
 
     private static final DrawerUtil drawer = new DrawerUtil();
     private static final String TAG = "DrawerUtil";
     private AccountHeader headerResult;
     private Drawer result;
-    private UpdateData updateData = this;
+    private UpdateProfile updateProfile = this;
     private Profile profile;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
@@ -65,6 +67,7 @@ public class DrawerUtil implements UpdateData {
         user = mAuth.getCurrentUser();
     }
 
+    @Contract(pure = true)
     public static DrawerUtil getInstance() {
         return drawer;
     }
@@ -166,23 +169,23 @@ public class DrawerUtil implements UpdateData {
 //                            view.getContext().startActivity(intent);
 
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_seller_container, SellerFragment.newInstance()).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, SellerFragment.newInstance()).commit();
                         } else if (drawerItem.getIdentifier() == 1 && (activity instanceof BuyerActivity)) {
                             // load tournament screen
 //                            Intent intent = new Intent(activity, MainActivity.class);
 //                            view.getContext().startActivity(intent);
 
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_buyer_container, BuyerFragment.newInstance()).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, BuyerFragment.newInstance()).commit();
                         } else if (drawerItem.getIdentifier() == 2 && (activity instanceof SellerActivity)) {
 
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_seller_container, SettingFragment.newInstance()).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, SettingFragment.newInstance()).commit();
 
                         } else if (drawerItem.getIdentifier() == 2 && (activity instanceof BuyerActivity)) {
 
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_buyer_container, SettingFragment.newInstance()).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, SettingFragment.newInstance()).commit();
 
                         } else if (drawerItem.getIdentifier() == 3) {
                             FirebaseAuth mAuth;
@@ -199,11 +202,11 @@ public class DrawerUtil implements UpdateData {
 
                         } else if (drawerItem.getIdentifier() == 4 && activity instanceof SellerActivity) {
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_seller_container, ProfileFragment.newInstance(profile)).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, ProfileFragment.newInstance(profile)).commit();
                         } else if (drawerItem.getIdentifier() == 4 && activity instanceof BuyerActivity) {
                             if (profile != null) {
                                 FragmentManager fragment = activity.getSupportFragmentManager();
-                                fragment.beginTransaction().replace(R.id.content_buyer_container, ProfileFragment.newInstance(profile)).commit();
+                                fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, ProfileFragment.newInstance(profile)).commit();
                             }
                         }
 
@@ -216,19 +219,19 @@ public class DrawerUtil implements UpdateData {
 
                         else if (drawerItem.getIdentifier() == 6 && activity instanceof SellerActivity) {
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_seller_container, NotificationFragment.newInstance()).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, NotificationFragment.newInstance()).commit();
 
                         } else if (drawerItem.getIdentifier() == 6 && activity instanceof BuyerActivity) {
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_buyer_container, NotificationFragment.newInstance()).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, NotificationFragment.newInstance()).commit();
 
                         } else if (drawerItem.getIdentifier() == 7 && activity instanceof SellerActivity) {
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_seller_container, UserTrackerFragment.newInstance(Constants.TYPE_SELLER)).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, UserTrackerFragment.newInstance(Constants.TYPE_SELLER)).commit();
 
                         } else if (drawerItem.getIdentifier() == 7 && activity instanceof BuyerActivity) {
                             FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().replace(R.id.content_buyer_container, UserTrackerFragment.newInstance(Constants.TYPE_BUYER)).commit();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, UserTrackerFragment.newInstance(Constants.TYPE_BUYER)).commit();
 
                         } else if (drawerItem.getIdentifier() == 8 && activity instanceof SellerActivity) {
 
@@ -271,8 +274,8 @@ public class DrawerUtil implements UpdateData {
         result.closeDrawer();
     }
 
-    public UpdateData getCallback() {
-        return updateData;
+    public UpdateProfile getCallback() {
+        return updateProfile;
     }
 
     @Override

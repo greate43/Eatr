@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -86,15 +87,19 @@ public class PhoneNoVerificationFragment extends Fragment {
 
     }
 
+    View v;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_phone_no_verification, container, false);
+
+        v = view;
+
         tvTimer = view.findViewById(R.id.fragment_phone_no_verification_text_view_time_left_to_resend);
         etVerification = view.findViewById(R.id.fragment_phone_no_verfification_et_verification_code);
         Button btnVerify = view.findViewById(R.id.fragment_phone_no_verfification_button_verify);
-
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
@@ -222,13 +227,15 @@ public class PhoneNoVerificationFragment extends Fragment {
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
                     // ...
-                    if (getActivity() != null)
-                        Toast.makeText(getActivity().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    if (v != null) {
+                        Log.d(TAG, "onVerificationFailed: "+v);
+                        Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_LONG).show();
+                    }
                 } else if (e instanceof FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
                     // ...
-                    if (getActivity() != null)
-                        Toast.makeText(getActivity().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    if (v != null)
+                        Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_LONG).show();
 
                 }
 

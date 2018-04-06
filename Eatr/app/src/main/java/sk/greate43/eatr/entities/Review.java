@@ -9,25 +9,8 @@ public class Review implements Serializable{
     private String reviewId;
     private String userId;
     private String orderId;
-    private boolean checkIfReviewDialogShouldBeAppeared;
 
     public Review() {
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    public boolean getCheckIfReviewDialogShouldBeAppeared() {
-        return checkIfReviewDialogShouldBeAppeared;
-    }
-
-    public void setCheckIfReviewDialogShouldBeAppeared(boolean checkIfReviewDialogShouldBeAppeared) {
-        this.checkIfReviewDialogShouldBeAppeared = checkIfReviewDialogShouldBeAppeared;
     }
 
     public double getOverAllFoodQuality() {
@@ -60,5 +43,13 @@ public class Review implements Serializable{
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }
