@@ -27,6 +27,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -123,8 +125,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                 startActivity(intent);
             }
         });
-
-        adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), this);
+        if (getActivity() != null)
+            adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), this);
         adaptor.setStates(states);
         foods = adaptor.getFoods();
 
@@ -160,7 +162,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     }
 
 
-    private void showData(DataSnapshot dataSnapshot) {
+    private void showData(@NotNull DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }
@@ -191,7 +193,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         super.onStop();
     }
 
-    private void collectFood(Map<String, Object> value) {
+    private void collectFood(@NotNull Map<String, Object> value) {
 
 
 //        //iterate through each user, ignoring their UID

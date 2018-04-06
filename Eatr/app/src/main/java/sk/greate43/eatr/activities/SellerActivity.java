@@ -19,13 +19,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Profile;
-import sk.greate43.eatr.interfaces.UpdateData;
+import sk.greate43.eatr.interfaces.UpdateProfile;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
+import sk.greate43.eatr.utils.ReviewUtils;
 
 public class SellerActivity extends AppCompatActivity {
     private static final String TAG = "SellerActivity";
@@ -35,7 +38,7 @@ public class SellerActivity extends AppCompatActivity {
     FirebaseDatabase database;
     FirebaseStorage mStorage;
     StorageReference storageRef;
-    UpdateData updateData;
+    UpdateProfile updateProfile;
 //
 //    TextView tvFullName;
 //    TextView tvUserType;
@@ -49,8 +52,11 @@ public class SellerActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.activity_seller_toolbar);
         setSupportActionBar(toolbar);
 
+        //Util.ScheduleExpireOrder(this);
 
-        updateData = DrawerUtil.getInstance().getCallback();
+        ReviewUtils.getInstance().reviewTheUser(this,Constants.TYPE_SELLER);
+
+        updateProfile = DrawerUtil.getInstance().getCallback();
 
         DrawerUtil.getInstance().getDrawer(this, toolbar);
 
@@ -132,7 +138,7 @@ public class SellerActivity extends AppCompatActivity {
 
     }
 
-    private void collectProfile(Map<String, Object> value) {
+    private void collectProfile(@NotNull Map<String, Object> value) {
         Profile profile = new Profile();
         profile.setUserId(String.valueOf(value.get(Constants.USER_ID)));
         profile.setFirstName(String.valueOf(value.get(Constants.FIRST_NAME)));
@@ -143,8 +149,8 @@ public class SellerActivity extends AppCompatActivity {
         }
         profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));
 
-        if (updateData != null) {
-            updateData.onNavDrawerDataUpdated(profile);
+        if (updateProfile != null) {
+            updateProfile.onNavDrawerDataUpdated(profile);
         }
 
 

@@ -39,9 +39,18 @@ public class Food implements Serializable {
     private boolean checkIfOrderIsBooked;
     private boolean checkIfMapShouldBeClosed;
     private boolean checkIfOrderIsCompleted;
+    private boolean checkIfReviewDialogShouldBeShown;
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+    public boolean getCheckIfReviewDialogShouldBeShown() {
+        return checkIfReviewDialogShouldBeShown;
+    }
+
+    public void setCheckIfReviewDialogShouldBeShown(boolean checkIfReviewDialogShouldBeShown) {
+        this.checkIfReviewDialogShouldBeShown = checkIfReviewDialogShouldBeShown;
     }
 
     public long getNumberOfServingsPurchased() {
