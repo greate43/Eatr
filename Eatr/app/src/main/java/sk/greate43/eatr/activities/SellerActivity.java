@@ -29,6 +29,7 @@ import sk.greate43.eatr.interfaces.UpdateProfile;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
 import sk.greate43.eatr.utils.ReviewUtils;
+import sk.greate43.eatr.utils.Util;
 
 public class SellerActivity extends AppCompatActivity {
     private static final String TAG = "SellerActivity";
@@ -52,9 +53,9 @@ public class SellerActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.activity_seller_toolbar);
         setSupportActionBar(toolbar);
 
-        //Util.ScheduleExpireOrder(this);
+        Util.ScheduleNotification(this);
 
-        ReviewUtils.getInstance().reviewTheUser(this,Constants.TYPE_SELLER);
+        ReviewUtils.getInstance().reviewTheUser(this, Constants.TYPE_SELLER);
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -121,7 +122,13 @@ public class SellerActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.menu_item_search);
-        search.setVisible(false);
+        if (search != null)
+            search.setVisible(false);
+
+        MenuItem map = menu.findItem(R.id.menu_item_map);
+        if (map != null)
+            map.setVisible(false);
+
 
         super.onPrepareOptionsMenu(menu);
 

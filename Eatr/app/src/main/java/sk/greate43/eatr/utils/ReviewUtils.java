@@ -1,6 +1,7 @@
 package sk.greate43.eatr.utils;
 
 import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -155,16 +156,31 @@ public class ReviewUtils {
                 ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, food);
 
                 FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
+
+                Fragment prev =((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
+
                 ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
 
             } else if (activity != null && activity instanceof BuyerActivity && food.getCheckIfReviewDialogShouldBeShownForBuyer()) {
                 ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, food);
 
                 FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
+
+                Fragment prev =((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+
+
                 ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
 
 
-                //  reviewDialogFragment.show(ft, "dialog");
             }
         }
     }
