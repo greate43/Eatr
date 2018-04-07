@@ -38,7 +38,8 @@ public interface Constants {
     String CHECK_IF_MAP_SHOULD_BE_CLOSED = "checkIfMapShouldBeClosed";
     String CHECK_IF_ORDER_IS_COMPLETED = "checkIfOrderIsCompleted";
     String NO_OF_SERVINGS_PURCHASED = "numberOfServingsPurchased";
-    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN = "checkIfReviewDialogShouldBeShown";
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER = "checkIfReviewDialogShouldBeShownForBuyer";
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER = "checkIfReviewDialogShouldBeShownForSeller";
 
     //Food Constants
 
@@ -113,6 +114,7 @@ public interface Constants {
     /**
      * {@link sk.greate43.eatr.entities.Review}
      */
+    String REVIEW="Review";
     String OVER_ALL_FOOD_QUALITY = "overAllFoodQuality";
     String REVIEW_GIVEN_BY = "reviewGivenBy";
     String REVIEW_ID = "reviewId";

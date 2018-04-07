@@ -1,7 +1,6 @@
 package sk.greate43.eatr.utils;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -136,8 +135,12 @@ public class ReviewUtils {
         if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
             food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
         }
-        if (value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN) != null) {
-            food.setCheckIfReviewDialogShouldBeShown((boolean) value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN));
+        if (value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER) != null) {
+            food.setCheckIfReviewDialogShouldBeShownForBuyer((boolean) value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER));
+        }
+
+        if (value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER) != null) {
+            food.setCheckIfReviewDialogShouldBeShownForSeller((boolean) value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER));
         }
 
         if (!food.getCheckIfOrderIsActive()
@@ -146,33 +149,22 @@ public class ReviewUtils {
                 && !food.getCheckIfOrderIsBooked()
                 && !food.getCheckIfOrderIsInProgress()
                 && food.getCheckIfOrderIsCompleted()
-                && food.getCheckIfReviewDialogShouldBeShown()
                 ) {
 
-            if (activity != null && activity instanceof SellerActivity) {
+            if (activity != null && activity instanceof SellerActivity && food.getCheckIfReviewDialogShouldBeShownForSeller()) {
+                ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, food);
+
                 FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
-                Fragment prev = ((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag("dialog");
-                if (prev != null) {
-                    ft.remove(prev);
-                }
-                ft.addToBackStack(null);
+                ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
 
-
+            } else if (activity != null && activity instanceof BuyerActivity && food.getCheckIfReviewDialogShouldBeShownForBuyer()) {
                 ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, food);
 
-                reviewDialogFragment.show(ft, "dialog");
-            } else if (activity != null && activity instanceof BuyerActivity) {
                 FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
-                Fragment prev = ((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag("dialog");
-                if (prev != null) {
-                    ft.remove(prev);
-                }
-                ft.addToBackStack(null);
+                ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
 
 
-                ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, food);
-
-                reviewDialogFragment.show(ft, "dialog");
+                //  reviewDialogFragment.show(ft, "dialog");
             }
         }
     }

@@ -81,6 +81,7 @@ public class BuyerActivity extends AppCompatActivity {
 
     }
 
+
     public void setCallbackListener(Search search) {
         this.search = search;
     }
