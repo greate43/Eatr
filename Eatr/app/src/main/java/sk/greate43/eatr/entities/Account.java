@@ -10,7 +10,6 @@ import java.util.Map;
  */
 
 public class Account implements Serializable{
-    private static long serialVersionUID = 5L;
 
     private String userId;
     private double balance;

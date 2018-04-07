@@ -7,7 +7,6 @@ import java.io.Serializable;
  */
 
 public class LiveLocationUpdate implements Serializable {
-    private static long serialVersionUID = 4L;
     private String buyerId;
     private String sellerId;
     private String OrderID;

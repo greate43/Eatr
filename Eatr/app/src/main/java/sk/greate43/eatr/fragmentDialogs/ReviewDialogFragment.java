@@ -28,6 +28,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.entities.Profile;
+import sk.greate43.eatr.entities.Review;
 import sk.greate43.eatr.utils.Constants;
 
 
@@ -44,6 +45,7 @@ public class ReviewDialogFragment extends DialogFragment {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private Button btnSubmit;
+    public String TAG_FRAGMENT ="ReviewDialogFragment";
 
     public ReviewDialogFragment() {
         // Required empty public constructor
@@ -76,7 +78,7 @@ public class ReviewDialogFragment extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment__dialog_review, container, false);
+        View view = inflater.inflate(R.layout.fragment_dialog_review, container, false);
         tv = view.findViewById(R.id.fragment_dialog_review_text_view);
         imgUserPic = view.findViewById(R.id.fragment_dialog_review_circleImageView_user_image);
         rbReview = view.findViewById(R.id.fragment_dialog_review_ratingBar);
@@ -96,12 +98,14 @@ public class ReviewDialogFragment extends DialogFragment {
             }
         });
 
+
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
 
         if (food != null && userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+
             mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(food.getPostedBy()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -116,6 +120,9 @@ public class ReviewDialogFragment extends DialogFragment {
                     System.out.println("The read failed: " + databaseError.getCode());
                 }
             });
+
+            tv.setText("How Much Would You Rate Order Overall Food Quality?");
+
         } else if (food != null && userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
             mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(food.getPurchasedBy()).addValueEventListener(new ValueEventListener() {
                 @Override
@@ -131,9 +138,45 @@ public class ReviewDialogFragment extends DialogFragment {
                     System.out.println("The read failed: " + databaseError.getCode());
                 }
             });
+
+
+            tv.setText("How Much Would You Rate Buyer ?");
+
         }
 
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String reviewId = mDatabaseReference.push().getKey();
 
+                Review review = new Review();
+                if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
+                    review.setReviewId(reviewId);
+                    review.setOrderId(food.getPushId());
+                    review.setOverAllFoodQuality(ratingValue);
+                    review.setReviewGivenBy(food.getPostedBy());
+                    review.setUserId(food.getPurchasedBy());
+                    mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER).setValue(false);
+
+
+
+
+
+
+                } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+                    review.setReviewId(reviewId);
+                    review.setOrderId(food.getPushId());
+                    review.setOverAllFoodQuality(ratingValue);
+                    review.setReviewGivenBy(food.getPurchasedBy());
+                    review.setUserId(food.getPostedBy());
+                    mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER).setValue(false);
+                }
+                mDatabaseReference.child(Constants.REVIEW).child(reviewId).setValue(review);
+
+
+                dismiss();
+            }
+        });
         return view;
     }
 

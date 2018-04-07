@@ -3,7 +3,6 @@ package sk.greate43.eatr.entities;
 import java.io.Serializable;
 
 public class Review implements Serializable{
-    private static long serialVersionUID = 4L;
     private double overAllFoodQuality;
     private String reviewGivenBy;
     private String reviewId;
