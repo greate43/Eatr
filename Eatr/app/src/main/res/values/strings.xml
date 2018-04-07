@@ -67,6 +67,7 @@
     <string name="directionsApiKey">AIzaSyDV8vDgl7OvDxzkQoeQsuK0uBQKK8-erCo</string>
     <string name="channel_name">Food</string>
     <string name="channel_description">Food Alert</string>
+    <string name="title_activity_lost_of_all_posted_foods_maps">All Foods On Map</string>
     <!--
       map fragment end
       -->

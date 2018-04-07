@@ -29,6 +29,7 @@ import sk.greate43.eatr.interfaces.UpdateProfile;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
 import sk.greate43.eatr.utils.ReviewUtils;
+import sk.greate43.eatr.utils.Util;
 
 public class BuyerActivity extends AppCompatActivity {
     private static final String TAG = "BuyerActivity";
@@ -48,6 +49,7 @@ public class BuyerActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.activity_buyer_toolbar);
         setSupportActionBar(toolbar);
 
+        Util.ScheduleNotification(this);
 
 
         updateProfile = DrawerUtil.getInstance().getCallback();
@@ -136,6 +138,12 @@ public class BuyerActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 }
+                return true;
+
+            case R.id.menu_item_map:
+                Intent intent=new Intent(BuyerActivity.this,ListOfAllPostedFoodsMapsActivity.class);
+                startActivity(intent);
+
                 return true;
 
             default:
