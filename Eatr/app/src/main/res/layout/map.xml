@@ -8,4 +8,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="sk.greate43.eatr.fragments.MapFragment"
-    tools:showIn="@layout/fragment_map" />
+    tools:showIn="@layout/fragment_map"
+
+    />

@@ -141,7 +141,7 @@ public class BuyerActivity extends AppCompatActivity {
                 return true;
 
             case R.id.menu_item_map:
-                Intent intent=new Intent(BuyerActivity.this,ListOfAllPostedFoodsMapsActivity.class);
+                Intent intent=new Intent(BuyerActivity.this,ListOfAllPostedFoodsContainerMapActivity.class);
                 startActivity(intent);
 
                 return true;
