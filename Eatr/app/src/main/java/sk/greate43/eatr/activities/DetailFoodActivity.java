@@ -23,7 +23,7 @@ public class DetailFoodActivity extends AppCompatActivity {
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .add(R.id.activity_detail_food_fragment_container, DetailFoodFragment.newInstance(food))
+                    .replace(R.id.activity_detail_food_fragment_container, DetailFoodFragment.newInstance(food))
                     .commit();
 
         }

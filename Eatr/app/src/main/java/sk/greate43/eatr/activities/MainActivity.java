@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements ReplaceFragment {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .add(R.id.actvivity_main_frame_layout_fragment_container, AuthenticationFragment.newInstance())
+                .replace(R.id.actvivity_main_frame_layout_fragment_container, AuthenticationFragment.newInstance())
                 .commit();
 
 

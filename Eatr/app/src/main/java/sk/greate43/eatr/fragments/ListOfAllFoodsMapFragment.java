@@ -1,13 +1,19 @@
-package sk.greate43.eatr.activities;
+package sk.greate43.eatr.fragments;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -17,7 +23,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,16 +39,28 @@ import com.google.firebase.storage.StorageReference;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.schedulers.Schedulers;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.interfaces.ReplaceFragment;
 import sk.greate43.eatr.utils.Constants;
 
 import static sk.greate43.eatr.utils.Constants.REQUEST_FINE_LOCATION_PERMISSION;
 
-public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implements  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback {
-    private static final String TAG = "ListOfAllPostedFoodsMap";
+public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+    private static final String TAG = "ListOfAllFoodsMapFragme";
     private GoogleMap mMap;
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
@@ -48,22 +69,48 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_of_all_posted_foods_maps);
+    ArrayList<Food> foods;
+    private ReplaceFragment replaceFragment;
 
+
+    public ListOfAllFoodsMapFragment() {
+        // Required empty public constructor
+    }
+
+
+    public static ListOfAllFoodsMapFragment newInstance() {
+        ListOfAllFoodsMapFragment fragment = new ListOfAllFoodsMapFragment();
+
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_list_of_all_foods_map, container, false);
+
+        foods = new ArrayList<>();
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
 
         if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
+            if (getActivity() != null)
+                mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
         }
 
         mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(new ValueEventListener() {
@@ -80,19 +127,20 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
         });
 
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.fragment_map);
 
 
-
         mapFragment.getMapAsync(this);
+
+
+        return view;
     }
 
     private void showData(@NotNull DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }
-
 
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
@@ -103,11 +151,14 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
             }
         }
     }
+
+    Food food;
+
     private void collectFood(Map<String, Object> value) {
 
 
         Log.d(TAG, "collectSeller: " + value);
-        Food food = new Food();
+        food = new Food();
         food.setPushId((String) value.get(Constants.PUSH_ID));
         food.setDishName((String) value.get(Constants.DISH_NAME));
         food.setCuisine((String) value.get(Constants.CUISINE));
@@ -159,23 +210,113 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
                         && !food.getPostedBy().equals(user.getUid())
                 ) {
 
-
-          mMap.addMarker(new MarkerOptions().position(new LatLng(food.getLatitude(), food.getLongitude())).title(food.getPickUpLocation()));
-
+            downLoadImage(food.getImageUri(), food);
 
         }
+
 
     }
 
-    private void setUpMap() {
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    Marker marker;
+
+    private void downLoadImage(final String url, final Food food) {
+        Observable<Bitmap> bitmapObservable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
+            @Override
+            public void subscribe(ObservableEmitter<Bitmap> emitter) throws Exception {
+                emitter.onNext(convertUrlToBitMap(url));
+                emitter.onComplete();
+            }
+        });
+        Observable<Food> foodObservable = Observable.create(new ObservableOnSubscribe<Food>() {
+            @Override
+            public void subscribe(ObservableEmitter<Food> emitter) throws Exception {
+                emitter.onNext(food);
+                emitter.onComplete();
+            }
+        });
 
 
-            ActivityCompat.requestPermissions(this, new String[]
-                    {android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
-            return;
+        Observer<Object[]> observer = new Observer<Object[]>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Object[] objects) {
+
+                if (objects[0] instanceof Food && objects[1] instanceof Bitmap) {
+                    Food food = (Food) objects[0];
+                    Bitmap bitmap = (Bitmap) objects[1];
+                    if (mMap != null) {
+                        marker = mMap.addMarker(new MarkerOptions().position(new LatLng(food.getLatitude(), food.getLongitude())).title(food.getDishName()).snippet(food.getPickUpLocation()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                        marker.setTag(food.getPushId());
+                    }
+                    foods.add(food);
+
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG, "onError: " + e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+
+        Observable.zip(foodObservable, bitmapObservable, new BiFunction<Food, Bitmap, Object[]>() {
+            @Override
+            public Object[] apply(Food food, Bitmap bitmap) throws Exception {
+                Object[] objects = new Object[2];
+                objects[0] = food;
+                objects[1] = bitmap;
+
+
+                return objects;
+            }
+        }) // Run on a background thread
+                .subscribeOn(Schedulers.newThread())
+                // Be notified on the main thread
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+        ;
+
+
+    }
+
+
+    private Bitmap convertUrlToBitMap(String url) {
+        Bitmap bitmap;
+        Bitmap resized = null;
+        try {
+            InputStream inputStream = new URL(url).openStream();   // Download Image from URL
+            bitmap = BitmapFactory.decodeStream(inputStream);       // Decode Bitmap
+            resized = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+
+            inputStream.close();
+        } catch (Exception e) {
+            Log.d(TAG, "Exception 1, Something went wrong!");
+            e.printStackTrace();
         }
+        return resized;
+    }
+
+
+    private void setUpMap() {
+        if (getActivity() != null)
+            if (ActivityCompat.checkSelfPermission(getActivity(),
+                    android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+
+                requestPermissions(new String[]
+                        {android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
+                return;
+            }
 
         mMap.setMyLocationEnabled(true);
 
@@ -187,7 +328,7 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
                 LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation
                         .getLongitude());
                 // updateMapUiForBuyer(mMap, currentLocation, new LatLng(food.getLatitude(), food.getLongitude()));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new  LatLng(mLastLocation.getLatitude(), mLastLocation
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation
                         .getLongitude()), 16));
             }
         }
@@ -206,9 +347,25 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.setOnMarkerClickListener(this);
+        setupGoogleMapScreenSettings(mMap);
 //        // Add a marker in Sydney and move the camera
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+    }
+
+    private void setupGoogleMapScreenSettings(@NotNull GoogleMap mMap) {
+        mMap.setBuildingsEnabled(true);
+        mMap.setIndoorEnabled(false);
+        mMap.setTrafficEnabled(false);
+        UiSettings mUiSettings = mMap.getUiSettings();
+        mUiSettings.setZoomControlsEnabled(true);
+        mUiSettings.setCompassEnabled(true);
+        mUiSettings.setMyLocationButtonEnabled(true);
+        mUiSettings.setScrollGesturesEnabled(true);
+        mUiSettings.setZoomGesturesEnabled(true);
+        mUiSettings.setTiltGesturesEnabled(true);
+        mUiSettings.setRotateGesturesEnabled(true);
     }
 
     @Override
@@ -229,14 +386,14 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
 
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
@@ -257,4 +414,46 @@ public class ListOfAllPostedFoodsMapsActivity extends FragmentActivity implement
         }
 
     }
+
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        Log.d(TAG, "onMarkerClick: " + marker.getTag());
+        for (Food food : foods) {
+            if (food.getPushId().equals(marker.getTag())) {
+                Log.d(TAG, "onMarkerClick: " + food.getDishName());
+                if (replaceFragment != null) {
+
+
+                    replaceFragment.onFragmentReplaced(DetailFoodFragment.newInstance(food));
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        if (context instanceof ReplaceFragment) {
+            replaceFragment = (ReplaceFragment) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement ReplaceFragment");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        replaceFragment = null;
+
+    }
+
+
 }
