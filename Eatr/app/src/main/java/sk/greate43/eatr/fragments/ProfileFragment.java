@@ -1,11 +1,15 @@
 package sk.greate43.eatr.fragments;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -37,6 +41,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import sk.greate43.eatr.R;
@@ -361,7 +366,43 @@ public class ProfileFragment extends Fragment {
         }
 
 
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Profile Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+        imgUri = getActivity().getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            intent.setClipData(ClipData.newRawUri("", imgUri));
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            ClipData clip =
+                    ClipData.newUri(getActivity().getContentResolver(), "", imgUri);
+
+            intent.setClipData(clip);
+            getActivity().grantUriPermission(getActivity().getPackageName(), imgUri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            List<ResolveInfo> resInfoList =
+                    getActivity().getPackageManager()
+                            .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+            for (ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                getActivity().grantUriPermission(packageName, imgUri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+        }
+
+
         startActivityForResult(intent, CAMERA_RESULT);
     }
 
@@ -391,11 +432,11 @@ public class ProfileFragment extends Fragment {
             }
 
         } else if (requestCode == CAMERA_RESULT) {
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            assert getActivity() != null;
-            String pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
-
-            imgUri = Uri.parse(pathOfBmp);
+//            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+//            assert getActivity() != null;
+//            String pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
+//
+//            imgUri = Uri.parse(pathOfBmp);
             setProfileImage(imgUri);
         }
 
