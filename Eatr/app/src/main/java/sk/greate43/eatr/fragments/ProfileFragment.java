@@ -466,6 +466,7 @@ public class ProfileFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.menu_item_search);
 
+        if (search != null)
             search.setVisible(false);
 
         super.onPrepareOptionsMenu(menu);
