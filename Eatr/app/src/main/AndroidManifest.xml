@@ -79,8 +79,23 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
+        <service
+            android:name=".service.ExpiryJobService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
 
-
+        <activity
+            android:name=".activities.ListOfAllPostedFoodsContainerMapActivity"
+            android:label="@string/title_activity_lost_of_all_posted_foods_maps"
+            android:screenOrientation="portrait"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="sk.greate43.eatr.activities.BuyerActivity" />
+        </activity>
     </application>
 
 </manifest>

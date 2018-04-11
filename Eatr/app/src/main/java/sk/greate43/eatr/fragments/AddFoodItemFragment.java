@@ -1,16 +1,20 @@
 package sk.greate43.eatr.fragments;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -319,7 +323,43 @@ public class AddFoodItemFragment extends Fragment implements
             }
 
 
-            Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.TITLE, "Food Picture");
+            values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+            imgUri = getActivity().getContentResolver().insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
+
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+                intent.setClipData(ClipData.newRawUri("", imgUri));
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                ClipData clip =
+                        ClipData.newUri(getActivity().getContentResolver(), "", imgUri);
+
+                intent.setClipData(clip);
+                getActivity().grantUriPermission(getActivity().getPackageName(), imgUri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else {
+                List<ResolveInfo> resInfoList =
+                       getActivity().getPackageManager()
+                                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    getActivity().grantUriPermission(packageName, imgUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+            }
+
+
             startActivityForResult(intent, CAMERA_RESULT);
         }
     }
@@ -343,15 +383,29 @@ public class AddFoodItemFragment extends Fragment implements
             }
 
         } else if (requestCode == CAMERA_RESULT) {
-            String pathOfBmp = null;
+            //  String pathOfBmp = null;
             if (resultCode == RESULT_OK && data != null) {
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                if (getActivity() != null) {
-                    pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
-                }
-                imgUri = Uri.parse(pathOfBmp);
+//                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+//                if (getActivity() != null) {
+//                    pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
+//                }
+//                imgUri = Uri.parse(pathOfBmp);
 
-                setImage(imgUri);
+
+                try {
+                    if (getActivity() != null) {
+
+
+                        // Bitmap thumbnail = MediaStore.Images.Media.getBitmap(
+                        //  getActivity().getContentResolver(), imgUri);
+                        //  String imageUrl = getRealPathFromURI(imgUri);
+                        Log.d(TAG, "onActivityResult: " + imgUri);
+                        setImage(imgUri);
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 Log.d(TAG, "onActivityResult:  2 " + imgUri);
             }
 
@@ -371,6 +425,14 @@ public class AddFoodItemFragment extends Fragment implements
 
     }
 
+    //    public String getRealPathFromURI(Uri contentUri) {
+//        String[] proj = { MediaStore.Images.Media.DATA };
+//        Cursor cursor = getActivity().managedQuery(contentUri, proj, null, null, null);
+//        int column_index = cursor
+//                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+//        cursor.moveToFirst();
+//        return cursor.getString(column_index);
+//    }
     public void setImage(Uri uri) {
         if (uri != null)
             Picasso.with(getActivity())
@@ -679,7 +741,7 @@ public class AddFoodItemFragment extends Fragment implements
 
                     writeSellerData(
                             pushId
-                            , etDishName.getText().toString()
+                            , etDishName.getText().toString().toLowerCase()
                             , etCuisine.getText().toString()
                             , etIncidentsTags.getTagList().toString()
                             , etPickLocation.getText().toString()

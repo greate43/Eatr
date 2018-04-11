@@ -9,7 +9,6 @@ import java.io.Serializable;
  */
 
 public class Profile implements Serializable {
-    private static long serialVersionUID = 2L;
     private String userId;
     private String firstName;
     private String lastName;

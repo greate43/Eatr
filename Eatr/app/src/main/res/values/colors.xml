@@ -11,6 +11,7 @@
     <color name="divider">#BDBDBD</color>
 
     <color name="red">#f21212</color>
+    <color name="bg_dialog">#8c217eaa</color>
 
 
     <color name="customBlue">#4b9aba</color>

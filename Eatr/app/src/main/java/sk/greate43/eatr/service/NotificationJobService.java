@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +81,7 @@ public class NotificationJobService extends JobService {
     }
 
 
-    private void showData(DataSnapshot dataSnapshot) {
+    private void showData(@NotNull DataSnapshot dataSnapshot) {
 
 
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
@@ -91,7 +93,7 @@ public class NotificationJobService extends JobService {
 
     }
 
-    private void collectNotification(Map<String, Object> value) {
+    private void collectNotification(@NotNull Map<String, Object> value) {
         Notification notification = new Notification();
         notification.setOrderId(String.valueOf(value.get(Constants.ORDER_ID)));
         notification.setNotificationId(String.valueOf(value.get(Constants.NOTIFICATION_ID)));

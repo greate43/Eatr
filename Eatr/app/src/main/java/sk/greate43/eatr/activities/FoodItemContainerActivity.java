@@ -28,13 +28,13 @@ public class FoodItemContainerActivity extends AppCompatActivity implements Repl
         if (food != null) {
             Log.d(TAG, "onCreate: " + food.getPushId());
             fragmentManager.beginTransaction()
-                    .add(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance(food))
+                    .replace(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance(food))
                     .commit();
         } else {
             Log.d(TAG, "onCreate: new data added");
 
             fragmentManager.beginTransaction()
-                    .add(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance())
+                    .replace(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance())
                     .commit();
         }
     }
