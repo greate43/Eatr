@@ -85,7 +85,7 @@ public class SellerFragment extends Fragment {
         FragmentManager fragmentManager = getChildFragmentManager();
 
         fragmentManager.beginTransaction()
-                .add(R.id.fragment_seller_container, PostedFoodPagerFragment.newInstance())
+                .replace(R.id.fragment_seller_container, PostedFoodPagerFragment.newInstance())
                 .commit();
 
         return view;

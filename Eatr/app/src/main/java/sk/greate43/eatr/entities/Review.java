@@ -3,31 +3,13 @@ package sk.greate43.eatr.entities;
 import java.io.Serializable;
 
 public class Review implements Serializable{
-    private static long serialVersionUID = 4L;
     private double overAllFoodQuality;
     private String reviewGivenBy;
     private String reviewId;
     private String userId;
     private String orderId;
-    private boolean checkIfReviewDialogShouldBeAppeared;
 
     public Review() {
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    public boolean getCheckIfReviewDialogShouldBeAppeared() {
-        return checkIfReviewDialogShouldBeAppeared;
-    }
-
-    public void setCheckIfReviewDialogShouldBeAppeared(boolean checkIfReviewDialogShouldBeAppeared) {
-        this.checkIfReviewDialogShouldBeAppeared = checkIfReviewDialogShouldBeAppeared;
     }
 
     public double getOverAllFoodQuality() {
@@ -60,5 +42,13 @@ public class Review implements Serializable{
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

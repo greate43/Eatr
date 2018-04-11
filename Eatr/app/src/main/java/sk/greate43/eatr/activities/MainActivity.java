@@ -16,7 +16,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.fragments.AuthenticationFragment;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
-import sk.greate43.eatr.utils.Util;
 
 
 public class MainActivity extends AppCompatActivity implements ReplaceFragment {
@@ -29,14 +28,13 @@ public class MainActivity extends AppCompatActivity implements ReplaceFragment {
         if (isGooglePlayServicesAvailable(this)) {
 
             Log.d(TAG, "onCreate: google service available and up to date");
-            Util.ScheduleNotification(this);
 
         }
 
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .add(R.id.actvivity_main_frame_layout_fragment_container, AuthenticationFragment.newInstance())
+                .replace(R.id.actvivity_main_frame_layout_fragment_container, AuthenticationFragment.newInstance())
                 .commit();
 
 

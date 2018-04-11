@@ -220,6 +220,13 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         if (isPurchase) {
             result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, isPurchase);
         }
+        if (isPurchase && isCompeted) {
+            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER, true);
+            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER, true);
+
+        }
+
+
         return result;
     }
 

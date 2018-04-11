@@ -8,7 +8,6 @@ import java.util.Map;
  */
 
 public class Notification implements Serializable {
-    private static long serialVersionUID = 3L;
     private boolean checkIfButtonShouldBeEnabled;
     private boolean checkIfNotificationAlertShouldBeSent;
     private boolean checkIfNotificationAlertShouldBeShown;

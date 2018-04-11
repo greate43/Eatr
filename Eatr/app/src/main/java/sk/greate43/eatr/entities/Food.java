@@ -12,7 +12,6 @@ import java.util.Map;
  */
 public class Food implements Serializable {
     private static final String TAG = "Food";
-    private static long serialVersionUID = 1L;
     private String dishName;
     private String cuisine;
     private String ingredientsTags;
@@ -39,9 +38,28 @@ public class Food implements Serializable {
     private boolean checkIfOrderIsBooked;
     private boolean checkIfMapShouldBeClosed;
     private boolean checkIfOrderIsCompleted;
+    private boolean checkIfReviewDialogShouldBeShownForBuyer;
+    private boolean checkIfReviewDialogShouldBeShownForSeller;
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
+    }
+
+
+    public boolean getCheckIfReviewDialogShouldBeShownForBuyer() {
+        return checkIfReviewDialogShouldBeShownForBuyer;
+    }
+
+    public void setCheckIfReviewDialogShouldBeShownForBuyer(boolean checkIfReviewDialogShouldBeShownForBuyer) {
+        this.checkIfReviewDialogShouldBeShownForBuyer = checkIfReviewDialogShouldBeShownForBuyer;
+    }
+
+    public boolean getCheckIfReviewDialogShouldBeShownForSeller() {
+        return checkIfReviewDialogShouldBeShownForSeller;
+    }
+
+    public void setCheckIfReviewDialogShouldBeShownForSeller(boolean checkIfReviewDialogShouldBeShownForSeller) {
+        this.checkIfReviewDialogShouldBeShownForSeller = checkIfReviewDialogShouldBeShownForSeller;
     }
 
     public long getNumberOfServingsPurchased() {
