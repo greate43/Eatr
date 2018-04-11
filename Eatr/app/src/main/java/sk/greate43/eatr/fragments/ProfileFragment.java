@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -80,6 +81,7 @@ public class ProfileFragment extends Fragment {
     private Button btnSaveProfile;
     private Uri imgUri;
     private ProgressDialog mProgressDialog;
+    private View view;
 
     public ProfileFragment() {
     }
@@ -183,9 +185,9 @@ public class ProfileFragment extends Fragment {
             etFirstName.setText(profile.getFirstName());
             etLastName.setText(profile.getLastName());
 
-            if (profile.getEmail() != null && !TextUtils.isEmpty(profile.getEmail())){
+            if (profile.getEmail() != null && !TextUtils.isEmpty(profile.getEmail())) {
                 etEmail.setText(profile.getEmail());
-            }else {
+            } else {
                 etEmail.setText("");
             }
 
@@ -365,45 +367,53 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
-
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "Profile Picture");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-        imgUri = getActivity().getContentResolver().insert(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            intent.setClipData(ClipData.newRawUri("", imgUri));
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }
+        try {
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            ClipData clip =
-                    ClipData.newUri(getActivity().getContentResolver(), "", imgUri);
-
-            intent.setClipData(clip);
-            getActivity().grantUriPermission(getActivity().getPackageName(), imgUri,
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        } else {
-            List<ResolveInfo> resInfoList =
-                    getActivity().getPackageManager()
-                            .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-
-            for (ResolveInfo resolveInfo : resInfoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                getActivity().grantUriPermission(packageName, imgUri,
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.TITLE, "Profile Picture");
+            values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+            if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                imgUri = getActivity().getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            } else {
+                imgUri = getActivity().getContentResolver().insert(
+                        MediaStore.Images.Media.INTERNAL_CONTENT_URI, values);
+                Log.d(TAG, "takePhotoFromCamera: unMounted");
             }
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                ClipData clip =
+                        ClipData.newUri(getActivity().getContentResolver(), "", imgUri);
+
+                intent.setClipData(clip);
+                getActivity().grantUriPermission(getActivity().getPackageName(), imgUri,
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else {
+                List<ResolveInfo> resInfoList =
+                        getActivity().getPackageManager()
+                                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    getActivity().grantUriPermission(packageName, imgUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+            }
+
+
+            startActivityForResult(intent, CAMERA_RESULT);
+        } catch (Exception ex) {
+            Snackbar.make(view, ex.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
         }
-
-
-        startActivityForResult(intent, CAMERA_RESULT);
     }
 
     @Override
