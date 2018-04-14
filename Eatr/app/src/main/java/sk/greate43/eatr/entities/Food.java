@@ -18,7 +18,7 @@ public class Food implements Serializable {
     private String pickUpLocation;
     private String imageUri;
     private Map<String, String> timeStamp;
-    private String time;
+    private long time;
     private boolean checkIfOrderIsActive;
     private long expiryTime;
     private long price;
@@ -268,12 +268,12 @@ public class Food implements Serializable {
 
 
     @Exclude
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
     @Exclude
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
