@@ -1,6 +1,5 @@
 package sk.greate43.eatr.holders;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -70,12 +69,11 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
 
     }
 
-    @SuppressLint("SetTextI18n")
     public void populate(Context context, Food food, PostedFoodFragment postedFoodFragment, int position) {
         itemView.setTag(food);
         this.food = food;
         this.position = position;
-        Log.d(TAG, "populate: " + food.getImageUri());
+        Log.d(TAG, "populate: " + food.getTime());
         editPostedFood = postedFoodFragment;
         if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
             Picasso.with(context)
@@ -133,15 +131,12 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         }
         tvPrice.setText(String.valueOf("Rs : " + food.getPrice()));
         tvLocation.setText(food.getPickUpLocation());
-        if (food.getTime() != null && !food.getTime().isEmpty()) {
             tvTimeStamp.setText(DateUtils
-                    .getRelativeTimeSpanString(Long.parseLong(food.getTime()),
+                    .getRelativeTimeSpanString(food.getTime(),
                             System.currentTimeMillis(),
                             DateUtils.MINUTE_IN_MILLIS,
                             0));
-        } else {
-            tvTimeStamp.setText("");
-        }
+
         tvDishName.setText(food.getDishName());
     }
 

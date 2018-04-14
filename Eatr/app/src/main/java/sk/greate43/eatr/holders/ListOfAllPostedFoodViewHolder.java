@@ -64,15 +64,12 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
                     });
         }
 
-        if (food.getTime() != null && !food.getTime().isEmpty()) {
             tvTimeStamp.setText(DateUtils
-                    .getRelativeTimeSpanString(Long.parseLong(food.getTime()),
+                    .getRelativeTimeSpanString(food.getTime(),
                             System.currentTimeMillis(),
                             DateUtils.MINUTE_IN_MILLIS,
                             0));
-        } else {
-            tvTimeStamp.setText("");
-        }
+
 
         if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress() && !food.getCheckIfOrderIsCompleted()
                 ) {

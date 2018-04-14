@@ -61,6 +61,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
     private static final int TOTAL_ITEMS_TO_LOAD = 15;
     private int mCurrentPage = 1;
+
     public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
         Bundle args = new Bundle();
@@ -90,7 +91,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         break;
                     case Constants.ORDER_PURCHASED:
 
-                        states = "No Ordered Purchased Yet";
+                        states = "No Ordered Sold Yet";
 
 
                         break;
@@ -101,7 +102,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                         break;
                     case Constants.ORDERED_BOOKED:
 
-                        states = "No Order Is Booked";
+                        states = "No Order Is Reserved";
 
                         break;
                     default:
@@ -142,7 +143,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         foods = adaptor.getFoods();
 
 
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -172,7 +172,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     }
 
     private void loadFirebaseData() {
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage*TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -222,7 +222,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     }
 
     private void collectFood(@NotNull Map<String, Object> value) {
-
+      //  Log.d(TAG, "collectFood: "+value);
 
 //        //iterate through each user, ignoring their UID
 //        for (Map.Entry<String, Object> entry : value.entrySet()) {
@@ -235,7 +235,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 //
 //            Log.d(TAG, "collectFood: " + singleUser);
 //
-        Log.d(TAG, "collectFood: " + value);
+  //      Log.d(TAG, "collectFood: " + value);
         Food food = new Food();
         food.setPushId((String) value.get(Constants.PUSH_ID));
         food.setDishName((String) value.get(Constants.DISH_NAME));
@@ -262,10 +262,11 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime(value.get(Constants.TIME_STAMP).toString());
+            Log.d(TAG, "collectFood: XYZ "+value.get(Constants.TIME_STAMP));
+            food.setTime((long)value.get(Constants.TIME_STAMP));
         }
         if (value.get(Constants.PURCHASED_BY) != null) {
-            food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
+            food.setPurchasedBy(String.valueOf(value.get(Constants.PURCHASED_BY)));
         }
 
 
