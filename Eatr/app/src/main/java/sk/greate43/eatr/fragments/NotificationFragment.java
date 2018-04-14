@@ -7,11 +7,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,11 +24,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.adaptors.NotificationRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Notification;
+import sk.greate43.eatr.recyclerCustomItem.EndlessRecyclerViewScrollListener;
 import sk.greate43.eatr.utils.Constants;
 
 
@@ -64,6 +68,10 @@ public class NotificationFragment extends Fragment {
         }
     }
 
+    private ProgressBar progressBar;
+    private static final int TOTAL_ITEMS_TO_LOAD = 15;
+    private int mCurrentPage = 1;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -71,6 +79,8 @@ public class NotificationFragment extends Fragment {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_notication, container, false);
         recyclerView = view.findViewById(R.id.fragment_notification_recycler_view);
+        progressBar = view.findViewById(R.id.loading_more_progress);
+
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
@@ -78,15 +88,19 @@ public class NotificationFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
 
         mDatabaseReference = database.getReference();
-        adaptor = new NotificationRecyclerViewAdaptor(getActivity());
+        if (getActivity() != null)
+            adaptor = new NotificationRecyclerViewAdaptor(getActivity());
+
+        progressBar.setVisibility(View.GONE);
+
+        recyclerView.setHasFixedSize(true);
 
         notifications = adaptor.getNotifications();
 
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
+
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
@@ -94,7 +108,26 @@ public class NotificationFragment extends Fragment {
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).addValueEventListener(new ValueEventListener() {
+        loadFirebaseData();
+
+
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
+
+                mCurrentPage = page;
+                progressBar.setVisibility(View.VISIBLE);
+                loadFirebaseData();
+            }
+        });
+
+
+        return view;
+    }
+
+    private void loadFirebaseData(){
+        mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);
@@ -105,9 +138,7 @@ public class NotificationFragment extends Fragment {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
-        return view;
     }
-
     private void showData(DataSnapshot dataSnapshot) {
         if (adaptor != null) {
             adaptor.clear();
@@ -120,7 +151,8 @@ public class NotificationFragment extends Fragment {
         }
         adaptor.notifyDataSetChanged();
 
-
+        Collections.reverse(notifications);
+        progressBar.setVisibility(View.GONE);
     }
 
     private void collectNotification(Map<String, Object> value) {

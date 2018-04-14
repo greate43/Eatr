@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,6 +39,7 @@ import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.adaptors.PostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.holders.PostedFoodViewHolder;
+import sk.greate43.eatr.recyclerCustomItem.EndlessRecyclerViewScrollListener;
 import sk.greate43.eatr.utils.Constants;
 
 
@@ -55,7 +57,10 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     private FirebaseUser user;
     private StorageReference storageReference;
     private String orderState;
+    private ProgressBar progressBar;
 
+    private static final int TOTAL_ITEMS_TO_LOAD = 15;
+    private int mCurrentPage = 1;
     public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
         Bundle args = new Bundle();
@@ -112,10 +117,16 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_posted_food, container, false);
         recyclerView = view.findViewById(R.id.fragment_posted_food_recycler_view);
+        progressBar = view.findViewById(R.id.loading_more_progress);
+
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
+
+        progressBar.setVisibility(View.GONE);
+
+        recyclerView.setHasFixedSize(true);
 
         FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_posted_food_add_food_item_btn);
         addFoodItem.setOnClickListener(new View.OnClickListener() {
@@ -131,6 +142,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         foods = adaptor.getFoods();
 
 
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -143,8 +155,24 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 //        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleTouchCallback);
 //        itemTouchHelper.attachToRecyclerView(recyclerView);
 
+        loadFirebaseData();
 
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
+
+                mCurrentPage = page;
+                progressBar.setVisibility(View.VISIBLE);
+                loadFirebaseData();
+            }
+        });
+        return view;
+    }
+
+    private void loadFirebaseData() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage*TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -158,7 +186,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         });
 
 
-        return view;
     }
 
 
@@ -179,6 +206,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
         adaptor.notifyDataSetChanged();
 
+        progressBar.setVisibility(View.GONE);
 
     }
 
