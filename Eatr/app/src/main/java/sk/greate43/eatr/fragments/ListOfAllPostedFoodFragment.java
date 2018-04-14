@@ -231,8 +231,9 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime(Long.parseLong(String.valueOf(value.get(Constants.TIME_STAMP))));
+            food.setTime((long)value.get(Constants.TIME_STAMP));
         }
+
         if (value.get(Constants.PURCHASED_BY) != null) {
             food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
         }
