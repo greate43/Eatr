@@ -10,6 +10,8 @@
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:icon">@color/icons</item>
         <item name="android:divider">@color/divider</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -21,7 +23,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="DialogThemeCustom" parent="Theme.AppCompat.Dialog" >
+    <style name="DialogThemeCustom" parent="Theme.AppCompat.Dialog">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:windowBackground">@android:color/transparent</item>

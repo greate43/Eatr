@@ -60,6 +60,16 @@
 
     <!--fragment profile end-->
 
+    <!--
+ settings fragment
+    -->
+
+    <string-array name="pref_payment_method">
+        <item>In Cash</item>
+    </string-array>
+    <string-array name="pref_entries_payment_method">
+        <item>In Cash</item>
+    </string-array>
 
     <!--
     map fragment start
@@ -68,6 +78,7 @@
     <string name="channel_name">Food</string>
     <string name="channel_description">Food Alert</string>
     <string name="title_activity_lost_of_all_posted_foods_maps">All Foods On Map</string>
+    <string name="pref_payment_method_title">Payment Method</string>
     <!--
       map fragment end
       -->

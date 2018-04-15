@@ -52,7 +52,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
 
 
     public RatingBar ratingBar;
-
+    public ProgressBar progressBar;
     Food food;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
@@ -61,7 +61,6 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
     private StorageReference storageReference;
     //ADD AN ONMENUITEM LISTENER TO EXECUTE COMMANDS ONCLICK OF CONTEXT MENU TASK
     private EditPostedFood editPostedFood;
-    public ProgressBar progressBar;
     private int position;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override
@@ -99,7 +98,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         //ratingBar.setEnabled(false);
         tvPostedByLbl = itemView.findViewById(R.id.posted_food_list_posted_by_lbl);
         tvRatingBarLbl = itemView.findViewById(R.id.posted_food_list_rating_bar_lbl);
-        progressBar =  itemView.findViewById(R.id.posted_food_list_progress_bar);
+        progressBar = itemView.findViewById(R.id.posted_food_list_progress_bar);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -193,12 +192,6 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         Delete.setOnMenuItemClickListener(onEditMenu);
     }
 
-    public interface EditPostedFood {
-        void onEdit(Food food, int position);
-
-        void onDelete(Food food, int position);
-    }
-
     private void getSellerDetailsAndReview(String postedBy, String orderId) {
         if (postedBy != null) {
             mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addValueEventListener(new ValueEventListener() {
@@ -253,10 +246,12 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
 
         if (review.getReviewType() != null
                 && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)
+                && !food.getCheckIfOrderIsActive()
                 && food.getCheckIfOrderIsPurchased()
-                && food.getCheckIfOrderIsCompleted()
-                )
-                 {
+                && !food.getCheckIfFoodIsInDraftMode()
+                && !food.getCheckIfOrderIsBooked()
+                && !food.getCheckIfOrderIsInProgress()
+                && food.getCheckIfOrderIsCompleted()) {
 
             ratingBar.setRating((float) review.getOverAllFoodQuality());
 
@@ -280,6 +275,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         profile.setFirstName(String.valueOf(value.get(Constants.FIRST_NAME)));
         profile.setLastName(String.valueOf(value.get(Constants.LAST_NAME)));
         profile.setProfilePhotoUri(String.valueOf(value.get(Constants.PROFILE_PHOTO_URI)));
+
         if (String.valueOf(value.get(Constants.EMAIL)) != null) {
             profile.setEmail(String.valueOf(value.get(Constants.EMAIL)));
         }
@@ -288,6 +284,12 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
 
         tvPostedbyName.setText(String.valueOf(profile.getFullname()));
 
+    }
+
+    public interface EditPostedFood {
+        void onEdit(Food food, int position);
+
+        void onDelete(Food food, int position);
     }
 
 }

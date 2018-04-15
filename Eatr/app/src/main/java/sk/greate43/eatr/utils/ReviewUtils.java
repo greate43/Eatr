@@ -3,7 +3,6 @@ package sk.greate43.eatr.utils;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,11 +29,7 @@ public class ReviewUtils {
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-
-    @Contract(pure = true)
-    public static ReviewUtils getInstance() {
-        return ourInstance;
-    }
+    private String userType = "";
 
     private ReviewUtils() {
         mAuth = FirebaseAuth.getInstance();
@@ -43,7 +38,10 @@ public class ReviewUtils {
         user = mAuth.getCurrentUser();
     }
 
-    private String userType = "";
+    @Contract(pure = true)
+    public static ReviewUtils getInstance() {
+        return ourInstance;
+    }
 
     public void reviewTheUser(final Activity activity, String typeOfUser) {
         //activityReview = activity;
@@ -158,7 +156,7 @@ public class ReviewUtils {
 
                 FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
 
-                Fragment prev =((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
+                Fragment prev = ((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
                 if (prev != null) {
                     ft.remove(prev);
                 }
@@ -172,7 +170,7 @@ public class ReviewUtils {
 
                 FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
 
-                Fragment prev =((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
+                Fragment prev = ((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
                 if (prev != null) {
                     ft.remove(prev);
                 }

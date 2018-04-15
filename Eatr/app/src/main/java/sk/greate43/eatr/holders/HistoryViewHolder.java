@@ -28,21 +28,18 @@ import sk.greate43.eatr.utils.Constants;
 
 public class HistoryViewHolder extends RecyclerView.ViewHolder {
     private static final String TAG = "HistoryRecyclerViewHold";
-    private FirebaseDatabase database;
-    private DatabaseReference mDatabaseReference;
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
-
     public TextView tvPurchasedDate;
     public TextView tvOrderId;
     public TextView tvSellerName;
     public TextView tvBuyerName;
     public TextView tvPrice;
-
-
     public TextView tvOrderIdLbl;
     public TextView tvSellerIdLbl;
     public TextView tvBuyerIdLbl;
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabaseReference;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     public HistoryViewHolder(View itemView) {
         super(itemView);
@@ -110,9 +107,9 @@ public class HistoryViewHolder extends RecyclerView.ViewHolder {
         if (dataSnapshot.getValue() == null) {
             return;
         }
-         for (DataSnapshot ds:dataSnapshot.getChildren()) {
-             collectProfile((Map<String, Object>) ds.getValue(), userType);
-         }
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            collectProfile((Map<String, Object>) ds.getValue(), userType);
+        }
     }
 
     private void collectProfile(Map<String, Object> value, String userType) {
