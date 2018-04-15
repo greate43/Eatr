@@ -46,6 +46,10 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
     public TextView tvTimeStamp;
     public TextView tvPrice;
     public TextView tvPostedbyName;
+    public TextView tvPostedByLbl;
+    public TextView tvRatingBarLbl;
+
+
     public RatingBar ratingBar;
 
     Food food;
@@ -91,6 +95,8 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         tvPostedbyName = itemView.findViewById(R.id.posted_food_list_posted_by_name);
         ratingBar = itemView.findViewById(R.id.posted_food_list_ratingBar);
         //ratingBar.setEnabled(false);
+        tvPostedByLbl = itemView.findViewById(R.id.posted_food_list_posted_by_lbl);
+        tvRatingBarLbl = itemView.findViewById(R.id.posted_food_list_rating_bar_lbl);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -243,7 +249,10 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
 
         if (review.getReviewType() != null
                 && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)
-                ) {
+                && food.getCheckIfOrderIsPurchased()
+                && food.getCheckIfOrderIsCompleted()
+                )
+                 {
 
             ratingBar.setRating((float) review.getOverAllFoodQuality());
 

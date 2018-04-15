@@ -22,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import sk.greate43.eatr.R;
@@ -41,7 +40,6 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    ArrayList<Review> reviews;
 
     private static final String TAG = "ListOfAllPostedFoodView";
     public ImageView imgFoodItem;
@@ -52,7 +50,8 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
     public TextView tvPrice;
     public TextView tvPostedbyName;
     public RatingBar ratingBar;
-
+    public TextView tvPostedByLbl;
+    public TextView tvRatingBarLbl;
     public ListOfAllPostedFoodViewHolder(View itemView) {
         super(itemView);
         tvStatus = itemView.findViewById(R.id.posted_food_list_status_text_view);
@@ -63,8 +62,8 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         tvPrice = itemView.findViewById(R.id.posted_food_list_item_price_text_view);
         tvPostedbyName = itemView.findViewById(R.id.posted_food_list_posted_by_name);
         ratingBar = itemView.findViewById(R.id.posted_food_list_ratingBar);
-
-        reviews = new ArrayList<>();
+        tvPostedByLbl = itemView.findViewById(R.id.posted_food_list_posted_by_lbl);
+        tvRatingBarLbl = itemView.findViewById(R.id.posted_food_list_rating_bar_lbl);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -182,26 +181,27 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
 
     }
-
+   private long itemCount = 0;
     private void showReviewData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }
-        reviews.clear();
+
+      ;
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             collectReview((Map<String, Object>) ds.getValue());
         }
 
-        for (Review review : reviews) {
-            ratingAvg = (float) ((ratingAvg + review.getOverAllFoodQuality()) / reviews.size());
-            Log.d(TAG, "collectReview: avg rating " + ratingAvg);
-            ratingBar.setRating(ratingAvg);
-        }
+        ratingAvg = ratingAvg / itemCount;
+        Log.d(TAG, "showReviewData: itemcount "+ itemCount);
+        Log.d(TAG, "showReviewData: avg "+ratingAvg);
+        ratingBar.setRating(ratingAvg);
+        ratingAvg = 0;
+        itemCount = 0;
 
     }
 
     private float ratingAvg = 0;
-
 
 
     private void collectReview(Map<String, Object> value) {
@@ -214,9 +214,12 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         review.setReviewType((String) value.get(Constants.REVIEW_TYPE));
 
 
-        if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)
-                ) {
-            reviews.add(review);
+        if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)) {
+            // reviews.add(review);
+            Log.d(TAG, "collectReview: rating "+review.getOverAllFoodQuality());
+            ratingAvg += (float) (review.getOverAllFoodQuality());
+            Log.d(TAG, "collectReview: total "+ratingAvg);
+             itemCount ++;
         }
 
 

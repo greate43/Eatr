@@ -61,10 +61,13 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
             holder.tvStatus.setVisibility(View.GONE);
             holder.tvTimeStamp.setVisibility(View.GONE);
             holder.tvLocation.setVisibility(View.GONE);
-            holder.tvPostedbyName.setText(states);
+            holder.tvPostedByLbl.setText(states);
+            holder.tvPostedbyName.setVisibility(View.GONE);
+            holder.tvRatingBarLbl.setVisibility(View.GONE);
             holder.ratingBar.setVisibility(View.GONE);
-
         } else {
+            holder.tvPostedbyName.setVisibility(View.VISIBLE);
+            holder.tvRatingBarLbl.setVisibility(View.VISIBLE);
             holder.tvPostedbyName.setVisibility(View.VISIBLE);
             holder.ratingBar.setVisibility(View.VISIBLE);
             holder.imgFoodItem.setVisibility(View.VISIBLE);
@@ -73,6 +76,9 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
             holder.tvStatus.setVisibility(View.VISIBLE);
             holder.tvTimeStamp.setVisibility(View.VISIBLE);
             holder.tvLocation.setVisibility(View.VISIBLE);
+            holder.tvPostedByLbl.setText("Posted By : ");
+
+            holder.tvRatingBarLbl.setText("Order Rating");
             holder.populate(sellerActivity, foods.get(position), postedFoodFragment, position);
         }
     }
