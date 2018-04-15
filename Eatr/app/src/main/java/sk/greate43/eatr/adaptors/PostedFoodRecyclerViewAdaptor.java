@@ -2,7 +2,6 @@ package sk.greate43.eatr.adaptors;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,13 +56,17 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
             holder.imgFoodItem.setVisibility(View.GONE);
-            Log.d(TAG, "onBindViewHolder: " + states);
-            holder.tvDishName.setText(states);
+            holder.tvDishName.setVisibility(View.GONE);
             holder.tvPrice.setVisibility(View.GONE);
             holder.tvStatus.setVisibility(View.GONE);
-            holder.tvLocation.setVisibility(View.GONE);
             holder.tvTimeStamp.setVisibility(View.GONE);
+            holder.tvLocation.setVisibility(View.GONE);
+            holder.tvPostedbyName.setText(states);
+            holder.ratingBar.setVisibility(View.GONE);
+
         } else {
+            holder.tvPostedbyName.setVisibility(View.VISIBLE);
+            holder.ratingBar.setVisibility(View.VISIBLE);
             holder.imgFoodItem.setVisibility(View.VISIBLE);
             holder.tvDishName.setVisibility(View.VISIBLE);
             holder.tvPrice.setVisibility(View.VISIBLE);

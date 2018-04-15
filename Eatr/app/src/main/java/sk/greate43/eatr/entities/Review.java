@@ -8,8 +8,17 @@ public class Review implements Serializable{
     private String reviewId;
     private String userId;
     private String orderId;
+    private String reviewType;
 
     public Review() {
+    }
+
+    public String getReviewType() {
+        return reviewType;
+    }
+
+    public void setReviewType(String reviewType) {
+        this.reviewType = reviewType;
     }
 
     public double getOverAllFoodQuality() {

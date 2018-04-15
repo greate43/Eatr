@@ -156,6 +156,7 @@ public class ReviewDialogFragment extends DialogFragment {
                     review.setOverAllFoodQuality(ratingValue);
                     review.setReviewGivenBy(food.getPostedBy());
                     review.setUserId(food.getPurchasedBy());
+                    review.setReviewType(Constants.REVIEW_FROM_SELLER);
                     mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER).setValue(false);
 
 
@@ -169,6 +170,8 @@ public class ReviewDialogFragment extends DialogFragment {
                     review.setOverAllFoodQuality(ratingValue);
                     review.setReviewGivenBy(food.getPurchasedBy());
                     review.setUserId(food.getPostedBy());
+                    review.setReviewType(Constants.REVIEW_FROM_BUYER);
+
                     mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER).setValue(false);
                 }
                 mDatabaseReference.child(Constants.REVIEW).child(reviewId).setValue(review);
