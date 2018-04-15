@@ -51,10 +51,14 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
             holder.tvStatus.setVisibility(View.GONE);
             holder.tvTimeStamp.setVisibility(View.GONE);
             holder.tvLocation.setVisibility(View.GONE);
-            holder.tvPostedbyName.setText("No Food Item Posted");
+            holder.tvPostedByLbl.setText("No Foods Posted");
+            holder.tvPostedbyName.setVisibility(View.GONE);
+            holder.tvRatingBarLbl.setVisibility(View.GONE);
             holder.ratingBar.setVisibility(View.GONE);
 
         } else {
+            holder.tvPostedbyName.setVisibility(View.VISIBLE);
+            holder.tvRatingBarLbl.setVisibility(View.VISIBLE);
             holder.tvPostedbyName.setVisibility(View.VISIBLE);
             holder.ratingBar.setVisibility(View.VISIBLE);
             holder.imgFoodItem.setVisibility(View.VISIBLE);
@@ -63,6 +67,8 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
             holder.tvStatus.setVisibility(View.VISIBLE);
             holder.tvTimeStamp.setVisibility(View.VISIBLE);
             holder.tvLocation.setVisibility(View.VISIBLE);
+            holder.tvPostedByLbl.setText("Posted By : ");
+            holder.tvRatingBarLbl.setText("Average Rating Of This Seller");
             holder.populate(buyerActivity, foods.get(position));
         }
     }
