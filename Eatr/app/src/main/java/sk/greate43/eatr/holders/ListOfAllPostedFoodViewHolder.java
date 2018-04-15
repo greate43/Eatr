@@ -8,6 +8,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -52,6 +53,8 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
     public RatingBar ratingBar;
     public TextView tvPostedByLbl;
     public TextView tvRatingBarLbl;
+    public ProgressBar progressBar;
+
     public ListOfAllPostedFoodViewHolder(View itemView) {
         super(itemView);
         tvStatus = itemView.findViewById(R.id.posted_food_list_status_text_view);
@@ -64,6 +67,7 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         ratingBar = itemView.findViewById(R.id.posted_food_list_ratingBar);
         tvPostedByLbl = itemView.findViewById(R.id.posted_food_list_posted_by_lbl);
         tvRatingBarLbl = itemView.findViewById(R.id.posted_food_list_rating_bar_lbl);
+        progressBar =  itemView.findViewById(R.id.posted_food_list_progress_bar);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -85,6 +89,8 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
                         @Override
                         public void onSuccess() {
                             Log.d(TAG, "onSuccess: ");
+                            progressBar.setVisibility(View.GONE);
+
                         }
 
                         @Override

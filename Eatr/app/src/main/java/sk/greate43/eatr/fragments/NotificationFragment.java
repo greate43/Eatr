@@ -4,6 +4,7 @@ package sk.greate43.eatr.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -43,6 +44,7 @@ public class NotificationFragment extends Fragment {
     private NotificationRecyclerViewAdaptor adaptor;
     private RecyclerView recyclerView;
     private ArrayList<Notification> notifications;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     public NotificationFragment() {
@@ -80,6 +82,8 @@ public class NotificationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_notication, container, false);
         recyclerView = view.findViewById(R.id.fragment_notification_recycler_view);
         progressBar = view.findViewById(R.id.loading_more_progress);
+        swipeRefreshLayout = view.findViewById(R.id.fragment_notification_swipe_refresh_layout);
+
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -110,7 +114,12 @@ public class NotificationFragment extends Fragment {
 
         loadFirebaseData();
 
-
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadFirebaseData();
+            }
+        });
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -126,7 +135,7 @@ public class NotificationFragment extends Fragment {
         return view;
     }
 
-    private void loadFirebaseData(){
+    private void loadFirebaseData() {
         mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -139,6 +148,7 @@ public class NotificationFragment extends Fragment {
             }
         });
     }
+
     private void showData(DataSnapshot dataSnapshot) {
         if (adaptor != null) {
             adaptor.clear();
@@ -153,6 +163,7 @@ public class NotificationFragment extends Fragment {
 
         Collections.reverse(notifications);
         progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void collectNotification(Map<String, Object> value) {

@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -60,6 +61,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
     private StorageReference storageReference;
     //ADD AN ONMENUITEM LISTENER TO EXECUTE COMMANDS ONCLICK OF CONTEXT MENU TASK
     private EditPostedFood editPostedFood;
+    public ProgressBar progressBar;
     private int position;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override
@@ -97,6 +99,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         //ratingBar.setEnabled(false);
         tvPostedByLbl = itemView.findViewById(R.id.posted_food_list_posted_by_lbl);
         tvRatingBarLbl = itemView.findViewById(R.id.posted_food_list_rating_bar_lbl);
+        progressBar =  itemView.findViewById(R.id.posted_food_list_progress_bar);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -119,6 +122,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
                         @Override
                         public void onSuccess() {
                             Log.d(TAG, "onSuccess: ");
+                            progressBar.setVisibility(View.GONE);
                         }
 
                         @Override
