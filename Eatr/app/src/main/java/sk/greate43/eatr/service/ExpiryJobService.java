@@ -141,7 +141,7 @@ public class ExpiryJobService extends JobService {
                 ) {
 
 
-            if (isExpiryNeeded( food.getTime(),food.getExpiryTime())) {
+            if (isExpiryNeeded(food.getTime(), food.getExpiryTime())) {
                 Log.d(TAG, "collectFood: ");
                 mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).updateChildren(updateFood());
             }
@@ -160,6 +160,7 @@ public class ExpiryJobService extends JobService {
         }
 
     }
+
     private Map<String, Object> updateFood() {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, false);

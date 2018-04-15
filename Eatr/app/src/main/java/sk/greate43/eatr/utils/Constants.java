@@ -114,13 +114,13 @@ public interface Constants {
     /**
      * {@link sk.greate43.eatr.entities.Review}
      */
-    String REVIEW="Review";
+    String REVIEW = "Review";
     String OVER_ALL_FOOD_QUALITY = "overAllFoodQuality";
     String REVIEW_GIVEN_BY = "reviewGivenBy";
     String REVIEW_ID = "reviewId";
     String REVIEW_FROM_BUYER = "REVIEW_FROM_BUYER";
     String REVIEW_FROM_SELLER = "REVIEW_FROM_SELLER";
-    String REVIEW_TYPE ="reviewType" ;
+    String REVIEW_TYPE = "reviewType";
 
     // review end
 

@@ -37,11 +37,6 @@ import sk.greate43.eatr.utils.Constants;
 
 public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
-    private FirebaseDatabase database;
-    private DatabaseReference mDatabaseReference;
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
-
     private static final String TAG = "ListOfAllPostedFoodView";
     public ImageView imgFoodItem;
     public TextView tvStatus;
@@ -54,6 +49,13 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
     public TextView tvPostedByLbl;
     public TextView tvRatingBarLbl;
     public ProgressBar progressBar;
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabaseReference;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private long itemCount = 0;
+    private float ratingAvg = 0;
+
 
     public ListOfAllPostedFoodViewHolder(View itemView) {
         super(itemView);
@@ -67,14 +69,13 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         ratingBar = itemView.findViewById(R.id.posted_food_list_ratingBar);
         tvPostedByLbl = itemView.findViewById(R.id.posted_food_list_posted_by_lbl);
         tvRatingBarLbl = itemView.findViewById(R.id.posted_food_list_rating_bar_lbl);
-        progressBar =  itemView.findViewById(R.id.posted_food_list_progress_bar);
+        progressBar = itemView.findViewById(R.id.posted_food_list_progress_bar);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
     }
-
 
     @SuppressLint("SetTextI18n")
     public void populate(Context context, Food food) {
@@ -150,7 +151,6 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         getSellerDetailsAndReview(food.getPostedBy());
     }
 
-
     private void getSellerDetailsAndReview(String postedBy) {
         if (postedBy != null) {
             mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addValueEventListener(new ValueEventListener() {
@@ -187,28 +187,25 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
 
     }
-   private long itemCount = 0;
+
     private void showReviewData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
         }
 
-      ;
+        ;
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             collectReview((Map<String, Object>) ds.getValue());
         }
 
         ratingAvg = ratingAvg / itemCount;
-        Log.d(TAG, "showReviewData: itemcount "+ itemCount);
-        Log.d(TAG, "showReviewData: avg "+ratingAvg);
+        Log.d(TAG, "showReviewData: itemcount " + itemCount);
+        Log.d(TAG, "showReviewData: avg " + ratingAvg);
         ratingBar.setRating(ratingAvg);
         ratingAvg = 0;
         itemCount = 0;
 
     }
-
-    private float ratingAvg = 0;
-
 
     private void collectReview(Map<String, Object> value) {
         Review review = new Review();
@@ -222,10 +219,10 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
         if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)) {
             // reviews.add(review);
-            Log.d(TAG, "collectReview: rating "+review.getOverAllFoodQuality());
+            Log.d(TAG, "collectReview: rating " + review.getOverAllFoodQuality());
             ratingAvg += (float) (review.getOverAllFoodQuality());
-            Log.d(TAG, "collectReview: total "+ratingAvg);
-             itemCount ++;
+            Log.d(TAG, "collectReview: total " + ratingAvg);
+            itemCount++;
         }
 
 

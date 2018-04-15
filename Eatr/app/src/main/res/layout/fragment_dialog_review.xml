@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="sk.greate43.eatr.fragmentDialogs.ReviewDialogFragment"
     android:background="@color/bg_dialog"
+    tools:context="sk.greate43.eatr.fragmentDialogs.ReviewDialogFragment"
 
     >
 
@@ -50,10 +50,10 @@
         android:layout_height="20dp"
         android:layout_marginTop="24dp"
         android:text="How Much Would You Rate Order Overall Quality?"
+        android:textAlignment="center"
         android:textAllCaps="false"
         android:textColor="@android:color/background_light"
         android:textSize="15sp"
-        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_circleImageView_user_image"
         app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_circleImageView_user_image"
         app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_circleImageView_user_image" />
