@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,6 +54,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     private int mCurrentPage = 1;
     private ProgressBar progressBar;
     LinearLayoutManager layoutManager;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     public ListOfAllPostedFoodFragment() {
         // Required empty public constructor
@@ -84,6 +86,8 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         initialize();
         recyclerView = view.findViewById(R.id.fragment_list_of_all_posted_food_recycler_view);
         progressBar = view.findViewById(R.id.loading_more_progress);
+        swipeRefreshLayout = view.findViewById(R.id.fragment_list_of_all_posted_food_swipe_refresh_layout);
+
         if (getActivity() != null)
             adaptor = new ListOfAllPostedFoodRecyclerViewAdaptor((BuyerActivity) getActivity());
 
@@ -113,6 +117,14 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 //            }
 //        });
 
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                retrieveFirebaseData("");
+
+            }
+        });
+
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -129,7 +141,6 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
         return view;
     }
-
 
 
     private void initialize() {
@@ -197,6 +208,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         }
         adaptor.notifyDataSetChanged();
         progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
 
     }
 
@@ -231,7 +243,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime((long)value.get(Constants.TIME_STAMP));
+            food.setTime((long) value.get(Constants.TIME_STAMP));
         }
 
         if (value.get(Constants.PURCHASED_BY) != null) {

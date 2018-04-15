@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -70,6 +71,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         return fragment;
     }
 
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +122,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         View view = inflater.inflate(R.layout.fragment_posted_food, container, false);
         recyclerView = view.findViewById(R.id.fragment_posted_food_recycler_view);
         progressBar = view.findViewById(R.id.loading_more_progress);
+        swipeRefreshLayout = view.findViewById(R.id.fragment_posted_food_swipe_refresh_layout);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -156,7 +160,12 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 //        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         loadFirebaseData();
-
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadFirebaseData();
+            }
+        });
 
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
@@ -207,6 +216,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         adaptor.notifyDataSetChanged();
 
         progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
 
     }
 
@@ -222,7 +232,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     }
 
     private void collectFood(@NotNull Map<String, Object> value) {
-      //  Log.d(TAG, "collectFood: "+value);
+        //  Log.d(TAG, "collectFood: "+value);
 
 //        //iterate through each user, ignoring their UID
 //        for (Map.Entry<String, Object> entry : value.entrySet()) {
@@ -235,7 +245,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 //
 //            Log.d(TAG, "collectFood: " + singleUser);
 //
-  //      Log.d(TAG, "collectFood: " + value);
+        //      Log.d(TAG, "collectFood: " + value);
         Food food = new Food();
         food.setPushId((String) value.get(Constants.PUSH_ID));
         food.setDishName((String) value.get(Constants.DISH_NAME));
@@ -262,8 +272,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            Log.d(TAG, "collectFood: XYZ "+value.get(Constants.TIME_STAMP));
-            food.setTime((long)value.get(Constants.TIME_STAMP));
+            Log.d(TAG, "collectFood: XYZ " + value.get(Constants.TIME_STAMP));
+            food.setTime((long) value.get(Constants.TIME_STAMP));
         }
         if (value.get(Constants.PURCHASED_BY) != null) {
             food.setPurchasedBy(String.valueOf(value.get(Constants.PURCHASED_BY)));

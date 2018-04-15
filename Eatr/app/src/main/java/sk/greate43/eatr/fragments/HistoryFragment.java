@@ -3,6 +3,7 @@ package sk.greate43.eatr.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +39,7 @@ public class HistoryFragment extends Fragment {
     RecyclerView recyclerView;
     ArrayList<Food> foods;
     HistoryRecyclerViewAdaptor adaptor;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
@@ -82,6 +84,7 @@ public class HistoryFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.fragment_history_recycler_view);
         progressBar = view.findViewById(R.id.loading_more_progress);
+        swipeRefreshLayout = view.findViewById(R.id.fragment_history_swipe_refresh_layout);
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -110,7 +113,12 @@ public class HistoryFragment extends Fragment {
 
         loadFirebaseData();
 
-
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadFirebaseData();
+            }
+        });
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -167,6 +175,7 @@ public class HistoryFragment extends Fragment {
         adaptor.notifyDataSetChanged();
         Collections.reverse(foods);
         progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
 
     }
 
