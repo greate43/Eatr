@@ -16,71 +16,70 @@
         <ImageView
             android:id="@+id/posted_food_list_food_item_image_view"
             android:layout_width="0dp"
-            android:layout_height="293dp"
+            android:layout_height="205dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:contentDescription="@string/todo"
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/posted_food_list_food_item_dish_name"
-            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_food_item_dish_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_launcher_background" />
-
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.7" />
 
         <TextView
             android:id="@+id/posted_food_list_status_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:textColor="@android:color/holo_green_dark"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/posted_food_list_food_item_image_view"
-            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_food_item_image_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_ratingBar"
             tools:text="Active" />
 
         <TextView
             android:id="@+id/posted_food_list_location_text_view"
             android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_marginBottom="4dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
+            android:gravity="center"
             android:lines="4"
             android:maxLines="4"
-            android:textAlignment="viewStart"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/posted_food_list_food_item_timeStamp"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/posted_food_list_status_text_view"
-            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_food_item_image_view"
-            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_ratingBar"
             tools:text="Location is shown here" />
 
         <TextView
             android:id="@+id/posted_food_list_food_item_dish_name"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
             android:layout_marginTop="8dp"
+            android:capitalize="characters"
             android:gravity="start"
             android:textAlignment="viewStart"
+            android:textAllCaps="false"
             android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/posted_food_list_food_item_image_view"
+            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_food_item_image_view"
             tools:text="Food Item Name" />
 
         <TextView
@@ -88,26 +87,56 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginTop="8dp"
             android:textSize="12sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/posted_food_list_food_item_image_view"
-            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_food_item_image_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_ratingBar"
             tools:text="time Stamp" />
 
         <TextView
             android:id="@+id/posted_food_list_item_price_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            android:textSize="18sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/posted_food_list_food_item_dish_name"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/md_green_500"
+            android:textSize="24sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_food_item_dish_name"
             tools:text="RS : 20" />
+
+        <TextView
+            android:id="@+id/posted_food_list_posted_by_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Salman Khan"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_food_item_image_view" />
+
+
+
+        <android.support.v7.widget.AppCompatRatingBar
+            android:id="@+id/posted_food_list_ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            style="?android:attr/ratingBarStyle"
+
+            android:isIndicator="true"
+            android:numStars="5"
+            android:stepSize="0.1"
+            app:layout_constraintStart_toStartOf="@+id/posted_food_list_posted_by_name"
+            app:layout_constraintTop_toBottomOf="@+id/posted_food_list_posted_by_name" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

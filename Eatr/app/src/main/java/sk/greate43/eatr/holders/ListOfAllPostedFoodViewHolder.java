@@ -8,13 +8,28 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.entities.Profile;
+import sk.greate43.eatr.entities.Review;
+import sk.greate43.eatr.utils.Constants;
 
 /**
  * Created by great on 2/19/2018.
@@ -22,6 +37,11 @@ import sk.greate43.eatr.entities.Food;
 
 public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabaseReference;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    ArrayList<Review> reviews;
 
     private static final String TAG = "ListOfAllPostedFoodView";
     public ImageView imgFoodItem;
@@ -30,6 +50,8 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
     public TextView tvDishName;
     public TextView tvTimeStamp;
     public TextView tvPrice;
+    public TextView tvPostedbyName;
+    public RatingBar ratingBar;
 
     public ListOfAllPostedFoodViewHolder(View itemView) {
         super(itemView);
@@ -39,6 +61,15 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         tvDishName = itemView.findViewById(R.id.posted_food_list_food_item_dish_name);
         tvTimeStamp = itemView.findViewById(R.id.posted_food_list_food_item_timeStamp);
         tvPrice = itemView.findViewById(R.id.posted_food_list_item_price_text_view);
+        tvPostedbyName = itemView.findViewById(R.id.posted_food_list_posted_by_name);
+        ratingBar = itemView.findViewById(R.id.posted_food_list_ratingBar);
+
+        reviews = new ArrayList<>();
+
+        mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        mDatabaseReference = database.getReference();
+        user = mAuth.getCurrentUser();
     }
 
 
@@ -64,11 +95,11 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
                     });
         }
 
-            tvTimeStamp.setText(DateUtils
-                    .getRelativeTimeSpanString(food.getTime(),
-                            System.currentTimeMillis(),
-                            DateUtils.MINUTE_IN_MILLIS,
-                            0));
+        tvTimeStamp.setText(DateUtils
+                .getRelativeTimeSpanString(food.getTime(),
+                        System.currentTimeMillis(),
+                        DateUtils.MINUTE_IN_MILLIS,
+                        0));
 
 
         if (food.getCheckIfFoodIsInDraftMode() && !food.getCheckIfOrderIsActive() && !food.getCheckIfOrderIsPurchased() && !food.getCheckIfOrderIsBooked() && !food.getCheckIfOrderIsInProgress() && !food.getCheckIfOrderIsCompleted()
@@ -110,5 +141,111 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         tvLocation.setText(food.getPickUpLocation());
 
         tvDishName.setText(food.getDishName());
+
+        getSellerDetailsAndReview(food.getPostedBy());
     }
+
+
+    private void getSellerDetailsAndReview(String postedBy) {
+        if (postedBy != null) {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    showProfileData(dataSnapshot);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
+            });
+        }
+
+        if (postedBy != null) {
+            DatabaseReference reviewRef = mDatabaseReference.child(Constants.REVIEW);
+            Query query = reviewRef.orderByChild(Constants.USER_ID).equalTo(postedBy);
+
+            query.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    showReviewData(dataSnapshot);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
+            });
+        }
+
+
+    }
+
+    private void showReviewData(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+        reviews.clear();
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            collectReview((Map<String, Object>) ds.getValue());
+        }
+
+        for (Review review : reviews) {
+            ratingAvg = (float) ((ratingAvg + review.getOverAllFoodQuality()) / reviews.size());
+            Log.d(TAG, "collectReview: avg rating " + ratingAvg);
+            ratingBar.setRating(ratingAvg);
+        }
+
+    }
+
+    private float ratingAvg = 0;
+
+
+
+    private void collectReview(Map<String, Object> value) {
+        Review review = new Review();
+        review.setReviewId((String) value.get(Constants.RECEIVER_ID));
+        review.setOrderId((String) value.get(Constants.ORDER_ID));
+        review.setOverAllFoodQuality(Double.parseDouble(String.valueOf(value.get(Constants.OVER_ALL_FOOD_QUALITY))));
+        review.setReviewGivenBy((String) value.get(Constants.REVIEW_GIVEN_BY));
+        review.setUserId((String) value.get(Constants.USER_ID));
+        review.setReviewType((String) value.get(Constants.REVIEW_TYPE));
+
+
+        if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)
+                ) {
+            reviews.add(review);
+        }
+
+
+    }
+
+    private void showProfileData(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            collectProfile((Map<String, Object>) ds.getValue());
+        }
+    }
+
+    private void collectProfile(Map<String, Object> value) {
+        Profile profile = new Profile();
+        profile.setUserId(String.valueOf(value.get(Constants.USER_ID)));
+        profile.setFirstName(String.valueOf(value.get(Constants.FIRST_NAME)));
+        profile.setLastName(String.valueOf(value.get(Constants.LAST_NAME)));
+        profile.setProfilePhotoUri(String.valueOf(value.get(Constants.PROFILE_PHOTO_URI)));
+        if (String.valueOf(value.get(Constants.EMAIL)) != null) {
+            profile.setEmail(String.valueOf(value.get(Constants.EMAIL)));
+        }
+        profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));
+
+
+        tvPostedbyName.setText(String.valueOf(profile.getFullname()));
+
+    }
+
+
 }
