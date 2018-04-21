@@ -151,7 +151,7 @@ public class SellerActivity extends AppCompatActivity {
         profile.setFirstName(String.valueOf(value.get(Constants.FIRST_NAME)));
         profile.setLastName(String.valueOf(value.get(Constants.LAST_NAME)));
         profile.setProfilePhotoUri(String.valueOf(value.get(Constants.PROFILE_PHOTO_URI)));
-        if (String.valueOf(value.get(Constants.EMAIL)) != null) {
+        if (value.get(Constants.EMAIL) != null) {
             profile.setEmail(String.valueOf(value.get(Constants.EMAIL)));
         }
         profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));

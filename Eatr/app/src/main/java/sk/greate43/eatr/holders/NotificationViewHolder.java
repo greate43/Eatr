@@ -221,12 +221,32 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
             result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, isPurchase);
         }
         if (isPurchase && isCompeted) {
-            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER, true);
-            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER, true);
+            showReviewDialog();
+
 
         }
 
 
+        return result;
+    }
+
+    private void showReviewDialog() {
+        mDatabaseReference.child(Constants.SELLER_REVIEW).child(notification.getOrderId()).updateChildren(reviewUpdate(true));
+        mDatabaseReference.child(Constants.BUYER_REVIEW).child(notification.getOrderId()).updateChildren(reviewUpdate(false));
+
+    }
+
+    private Map<String, Object> reviewUpdate(boolean isSeller) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.ORDER_ID, notification.getOrderId());
+        result.put(Constants.POSTED_BY,notification.getSenderId());
+        result.put(Constants.PURCHASED_BY,notification.getReceiverId());
+        if (isSeller) {
+
+            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER, true);
+        } else {
+            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER, true);
+        }
         return result;
     }
 

@@ -49,6 +49,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
     public TextView tvPostedbyName;
     public TextView tvPostedByLbl;
     public TextView tvRatingBarLbl;
+    private TextView tvNoReviewGiven;
 
 
     public RatingBar ratingBar;
@@ -95,7 +96,9 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         tvPrice = itemView.findViewById(R.id.posted_food_list_item_price_text_view);
         tvPostedbyName = itemView.findViewById(R.id.posted_food_list_posted_by_name);
         ratingBar = itemView.findViewById(R.id.posted_food_list_ratingBar);
+        tvNoReviewGiven = itemView.findViewById(R.id.posted_food_list_no_review_given);
         //ratingBar.setEnabled(false);
+
         tvPostedByLbl = itemView.findViewById(R.id.posted_food_list_posted_by_lbl);
         tvRatingBarLbl = itemView.findViewById(R.id.posted_food_list_rating_bar_lbl);
         progressBar = itemView.findViewById(R.id.posted_food_list_progress_bar);
@@ -243,6 +246,9 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         review.setReviewGivenBy((String) value.get(Constants.REVIEW_GIVEN_BY));
         review.setUserId((String) value.get(Constants.USER_ID));
         review.setReviewType((String) value.get(Constants.REVIEW_TYPE));
+//        ratingBar.setVisibility(View.VISIBLE);
+//        tvNoReviewGiven.setVisibility(View.GONE);
+
 
         if (review.getReviewType() != null
                 && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)
@@ -251,7 +257,9 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
                 && !food.getCheckIfFoodIsInDraftMode()
                 && !food.getCheckIfOrderIsBooked()
                 && !food.getCheckIfOrderIsInProgress()
-                && food.getCheckIfOrderIsCompleted()) {
+                && food.getCheckIfOrderIsCompleted()
+                && review.getOverAllFoodQuality() > 0
+                ) {
 
             ratingBar.setRating((float) review.getOverAllFoodQuality());
 

@@ -38,8 +38,7 @@ public interface Constants {
     String CHECK_IF_MAP_SHOULD_BE_CLOSED = "checkIfMapShouldBeClosed";
     String CHECK_IF_ORDER_IS_COMPLETED = "checkIfOrderIsCompleted";
     String NO_OF_SERVINGS_PURCHASED = "numberOfServingsPurchased";
-    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER = "checkIfReviewDialogShouldBeShownForBuyer";
-    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER = "checkIfReviewDialogShouldBeShownForSeller";
+
 
     //Food Constants
 
@@ -123,6 +122,14 @@ public interface Constants {
     String REVIEW_TYPE = "reviewType";
 
     // review end
+// Ask for review
+    String ARGS_ASK_FOR_REVIEW ="ARGS_ASK_FOR_REVIEW";
+    String BUYER_REVIEW = "AskBuyerForReview";
+    String SELLER_REVIEW = "AskSellerForReview";
+
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER = "checkIfReviewDialogShouldBeShownForBuyer";
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER = "checkIfReviewDialogShouldBeShownForSeller";
+// end ask for review
 
     // Permission and Requests Constants
     int CAMERA_RESULT = 111;
