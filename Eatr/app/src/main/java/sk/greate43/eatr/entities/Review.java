@@ -2,15 +2,60 @@ package sk.greate43.eatr.entities;
 
 import java.io.Serializable;
 
-public class Review implements Serializable{
-    private double overAllFoodQuality;
+public class Review implements Serializable {
     private String reviewGivenBy;
     private String reviewId;
     private String userId;
     private String orderId;
     private String reviewType;
+    private String questionOne;
+    private String questionTwo;
+    private String questionThree;
+    private double questionOneAnswer;
+    private double questionTwoAnswer;
+    private double questionThreeAnswer;
 
     public Review() {
+    }
+
+    public String getQuestionOne() {
+        return questionOne;
+    }
+
+    public void setQuestionOne(String questionOne) {
+        this.questionOne = questionOne;
+    }
+
+    public String getQuestionTwo() {
+        return questionTwo;
+    }
+
+    public void setQuestionTwo(String questionTwo) {
+        this.questionTwo = questionTwo;
+    }
+
+    public String getQuestionThree() {
+        return questionThree;
+    }
+
+    public void setQuestionThree(String questionThree) {
+        this.questionThree = questionThree;
+    }
+
+    public double getQuestionTwoAnswer() {
+        return questionTwoAnswer;
+    }
+
+    public void setQuestionTwoAnswer(double questionTwoAnswer) {
+        this.questionTwoAnswer = questionTwoAnswer;
+    }
+
+    public double getQuestionThreeAnswer() {
+        return questionThreeAnswer;
+    }
+
+    public void setQuestionThreeAnswer(double questionThreeAnswer) {
+        this.questionThreeAnswer = questionThreeAnswer;
     }
 
     public String getReviewType() {
@@ -21,12 +66,12 @@ public class Review implements Serializable{
         this.reviewType = reviewType;
     }
 
-    public double getOverAllFoodQuality() {
-        return overAllFoodQuality;
+    public double getQuestionOneAnswer() {
+        return questionOneAnswer;
     }
 
-    public void setOverAllFoodQuality(double overAllFoodQuality) {
-        this.overAllFoodQuality = overAllFoodQuality;
+    public void setQuestionOneAnswer(double questionOneAnswer) {
+        this.questionOneAnswer = questionOneAnswer;
     }
 
     public String getReviewGivenBy() {
