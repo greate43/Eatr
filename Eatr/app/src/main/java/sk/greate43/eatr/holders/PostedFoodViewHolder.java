@@ -39,7 +39,7 @@ import sk.greate43.eatr.utils.Constants;
  */
 
 public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
-    private static final String TAG = "SellFoodRecyclerView";
+    private static final String TAG = "PostedFoodViewHolder";
     public ImageView imgFoodItem;
     public TextView tvStatus;
     public TextView tvLocation;
@@ -211,7 +211,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
             });
         }
 
-        if (postedBy != null) {
+        if (orderId != null) {
             mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.ORDER_ID).equalTo(orderId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -237,6 +237,8 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         }
 
     }
+
+    float avgReview = 0;
 
     private void collectReview(Map<String, Object> value) {
         Review review = new Review();
@@ -267,10 +269,13 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
                 && !food.getCheckIfOrderIsInProgress()
                 && food.getCheckIfOrderIsCompleted()
                 ) {
-
-            ratingBar.setRating((float) review.getQuestionOneAnswer());
+            avgReview = (float)( (review.getQuestionOneAnswer() + review.getQuestionTwoAnswer() + review.getQuestionThreeAnswer())/3);
+            Log.d(TAG, "collectReview: "+avgReview);
+            ratingBar.setRating(avgReview);
 
         }
+
+        avgReview = 0;
 
 
     }
