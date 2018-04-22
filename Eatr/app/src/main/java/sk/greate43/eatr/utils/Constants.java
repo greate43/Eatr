@@ -114,7 +114,24 @@ public interface Constants {
      * {@link sk.greate43.eatr.entities.Review}
      */
     String REVIEW = "Review";
-    String OVER_ALL_FOOD_QUALITY = "overAllFoodQuality";
+
+    String QUESTION_ONE = "questionOne";
+    String QUESTION_TWO = "questionTwo";
+    String QUESTION_THREE = "questionThree";
+
+    String QUESTION_ONE_ANSWER = "questionOneAnswer";
+    String QUESTION_TWO_ANSWER = "questionTwoAnswer";
+    String QUESTION_THREE_ANSWER = "questionThreeAnswer";
+
+
+    String BUYER_QUESTION_ONE = "How Much Would You Rate Order Overall Food Quality ?";
+    String BUYER_QUESTION_TWO = "Would You Recommend This Seller ?";
+    String BUYER_QUESTION_THREE = "Was The Service As Described ?";
+
+    String SELLER_QUESTION_ONE = "How Much Would You Rate Buyer ?";
+    String SELLER_QUESTION_TWO = "Would You Recommend this Buyer ?";
+    String SELLER_QUESTION_THREE = "Was The Service As Described ?";
+
     String REVIEW_GIVEN_BY = "reviewGivenBy";
     String REVIEW_ID = "reviewId";
     String REVIEW_FROM_BUYER = "REVIEW_FROM_BUYER";
@@ -123,7 +140,7 @@ public interface Constants {
 
     // review end
 // Ask for review
-    String ARGS_ASK_FOR_REVIEW ="ARGS_ASK_FOR_REVIEW";
+    String ARGS_ASK_FOR_REVIEW = "ARGS_ASK_FOR_REVIEW";
     String BUYER_REVIEW = "AskBuyerForReview";
     String SELLER_REVIEW = "AskSellerForReview";
 

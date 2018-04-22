@@ -35,8 +35,11 @@ import sk.greate43.eatr.utils.Constants;
 public class ReviewDialogFragment extends DialogFragment {
 
     private static final String TAG = "ReviewDialogFragment";
-    TextView tv;
-    RatingBar rbReview;
+    public String TAG_FRAGMENT = "ReviewDialogFragment";
+    private TextView tvQuestionOne;
+    private TextView tvQuestionTwo;
+    private TextView tvQuestionThree;
+
     CircleImageView imgUserPic;
     AskForReview askForReview;
     String userType;
@@ -45,7 +48,15 @@ public class ReviewDialogFragment extends DialogFragment {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private Button btnSubmit;
-    public String TAG_FRAGMENT = "ReviewDialogFragment";
+    private boolean isQuestionOneAnswered = false;
+    private boolean isQuestionTwoAnswered = false;
+    private boolean isQuestionThreeAnswered = false;
+    private RatingBar rbReviewAnswerOne;
+    private RatingBar rbReviewAnswerThree;
+    private RatingBar rbReviewAnswerTwo;
+    private float ratingValueForAnswerOne;
+    private float ratingValueForAnswerTwo;
+    private float ratingValueForAnswerThree;
 
     public ReviewDialogFragment() {
         // Required empty public constructor
@@ -72,33 +83,66 @@ public class ReviewDialogFragment extends DialogFragment {
         }
     }
 
-    float ratingValue;
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dialog_review, container, false);
-        tv = view.findViewById(R.id.fragment_dialog_review_text_view);
+        tvQuestionOne = view.findViewById(R.id.fragment_dialog_review_text_view_question_one);
+        tvQuestionTwo = view.findViewById(R.id.fragment_dialog_review_text_view_question_two);
+        tvQuestionThree = view.findViewById(R.id.fragment_dialog_review_text_view_question_three);
+
         imgUserPic = view.findViewById(R.id.fragment_dialog_review_circleImageView_user_image);
-        rbReview = view.findViewById(R.id.fragment_dialog_review_ratingBar);
+
+        rbReviewAnswerOne = view.findViewById(R.id.fragment_dialog_review_ratingBar_question_one_answer);
+        rbReviewAnswerTwo = view.findViewById(R.id.fragment_dialog_review_ratingBar_question_two_answer);
+        rbReviewAnswerThree = view.findViewById(R.id.fragment_dialog_review_ratingBar_question_three_answer);
+
         btnSubmit = view.findViewById(R.id.fragment_dialog_button_submit_review);
 
         btnSubmit.setEnabled(false);
         btnSubmit.setAlpha(0.3f);
 
 
-        rbReview.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+        rbReviewAnswerOne.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                btnSubmit.setEnabled(true);
-                btnSubmit.setAlpha(1f);
-                ratingValue = rating;
+                if (rating < 1) {
+                    rbReviewAnswerOne.setRating(1);
+                }
 
+
+                ratingValueForAnswerOne = rating;
+                isQuestionOneAnswered = true;
+
+                checkIfSubmitButtonShouldBeEnabled();
             }
         });
 
+        rbReviewAnswerTwo.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (rating < 1) {
+                    rbReviewAnswerTwo.setRating(1);
+                }
+                ratingValueForAnswerTwo = rating;
+                isQuestionTwoAnswered = true;
 
+                checkIfSubmitButtonShouldBeEnabled();
+            }
+        });
+        rbReviewAnswerThree.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (rating < 1) {
+                    rbReviewAnswerThree.setRating(1);
+                }
+                ratingValueForAnswerThree = rating;
+                isQuestionThreeAnswered = true;
+
+                checkIfSubmitButtonShouldBeEnabled();
+            }
+        });
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
@@ -121,10 +165,12 @@ public class ReviewDialogFragment extends DialogFragment {
                 }
             });
 
-            tv.setText("How Much Would You Rate Order Overall Food Quality?");
+            tvQuestionOne.setText(Constants.BUYER_QUESTION_ONE);
+            tvQuestionTwo.setText(Constants.BUYER_QUESTION_TWO);
+            tvQuestionThree.setText(Constants.BUYER_QUESTION_THREE);
 
         } else if (askForReview != null && userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
-            Log.d(TAG, "onCreateView: "+askForReview.getPurchasedBy());
+            Log.d(TAG, "onCreateView: " + askForReview.getPurchasedBy());
             mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(askForReview.getPurchasedBy()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -141,7 +187,10 @@ public class ReviewDialogFragment extends DialogFragment {
             });
 
 
-            tv.setText("How Much Would You Rate Buyer ?");
+            tvQuestionOne.setText(Constants.SELLER_QUESTION_ONE);
+            tvQuestionTwo.setText(Constants.SELLER_QUESTION_TWO);
+            tvQuestionThree.setText(Constants.SELLER_QUESTION_THREE);
+
 
         }
 
@@ -154,7 +203,15 @@ public class ReviewDialogFragment extends DialogFragment {
                 if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
                     review.setReviewId(reviewId);
                     review.setOrderId(askForReview.getOrderId());
-                    review.setOverAllFoodQuality(ratingValue);
+
+                    review.setQuestionOne(Constants.SELLER_QUESTION_ONE);
+                    review.setQuestionTwo(Constants.SELLER_QUESTION_TWO);
+                    review.setQuestionThree(Constants.SELLER_QUESTION_THREE);
+
+                    review.setQuestionOneAnswer(ratingValueForAnswerOne);
+                    review.setQuestionTwoAnswer(ratingValueForAnswerTwo);
+                    review.setQuestionThreeAnswer(ratingValueForAnswerThree);
+
                     review.setReviewGivenBy(askForReview.getPostedBy());
                     review.setUserId(askForReview.getPurchasedBy());
                     review.setReviewType(Constants.REVIEW_FROM_SELLER);
@@ -164,13 +221,25 @@ public class ReviewDialogFragment extends DialogFragment {
                 } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
                     review.setReviewId(reviewId);
                     review.setOrderId(askForReview.getOrderId());
-                    review.setOverAllFoodQuality(ratingValue);
+
+                    review.setQuestionOne(Constants.BUYER_QUESTION_ONE);
+                    review.setQuestionTwo(Constants.BUYER_QUESTION_TWO);
+                    review.setQuestionThree(Constants.BUYER_QUESTION_THREE);
+
+                    review.setQuestionOneAnswer(ratingValueForAnswerOne);
+                    review.setQuestionTwoAnswer(ratingValueForAnswerTwo);
+                    review.setQuestionThreeAnswer(ratingValueForAnswerThree);
+
                     review.setReviewGivenBy(askForReview.getPurchasedBy());
                     review.setUserId(askForReview.getPostedBy());
                     review.setReviewType(Constants.REVIEW_FROM_BUYER);
 
+
+
                     mDatabaseReference.child(Constants.BUYER_REVIEW).child(askForReview.getOrderId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER).setValue(false);
                 }
+
+
                 mDatabaseReference.child(Constants.REVIEW).child(reviewId).setValue(review);
 
 
@@ -178,6 +247,13 @@ public class ReviewDialogFragment extends DialogFragment {
             }
         });
         return view;
+    }
+
+    private void checkIfSubmitButtonShouldBeEnabled() {
+        if (isQuestionOneAnswered && isQuestionTwoAnswered && isQuestionThreeAnswered) {
+            btnSubmit.setEnabled(true);
+            btnSubmit.setAlpha(1f);
+        }
     }
 
     private void showData(DataSnapshot dataSnapshot) {

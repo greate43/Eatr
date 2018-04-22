@@ -1,7 +1,7 @@
 package sk.greate43.eatr.utils;
 
-/**
- * Created by great on 3/4/2018.
+/*
+  Created by great on 3/4/2018.
  */
 
 
@@ -26,7 +26,6 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
@@ -124,21 +123,14 @@ public class DrawerUtil implements UpdateProfile {
         });
 
 
-// Create the AccountHeader
+/// Create the AccountHeader
         headerResult = new AccountHeaderBuilder()
+
                 .withActivity(activity)
+                .withAccountHeader(R.layout.material_drawer_compact_persistent_header)
                 .withHeaderBackground(R.drawable.side_nav_bar)
                 .withSelectionListEnabledForSingleProfile(false)
-
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                        return false;
-                    }
-                })
                 .build();
-
 
         //create the drawer and remember the `Drawer` result object
         result = new DrawerBuilder()

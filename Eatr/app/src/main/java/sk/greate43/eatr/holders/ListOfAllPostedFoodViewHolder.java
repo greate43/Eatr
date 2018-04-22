@@ -209,9 +209,18 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
     private void collectReview(Map<String, Object> value) {
         Review review = new Review();
-        review.setReviewId((String) value.get(Constants.RECEIVER_ID));
+        review.setReviewId((String) value.get(Constants.REVIEW_ID));
         review.setOrderId((String) value.get(Constants.ORDER_ID));
-        review.setOverAllFoodQuality(Double.parseDouble(String.valueOf(value.get(Constants.OVER_ALL_FOOD_QUALITY))));
+
+        if (value.get(Constants.QUESTION_ONE_ANSWER) != null)
+            review.setQuestionOneAnswer(Double.parseDouble(String.valueOf(value.get(Constants.QUESTION_ONE_ANSWER))));
+
+        if (value.get(Constants.QUESTION_TWO_ANSWER) != null)
+            review.setQuestionTwoAnswer(Double.parseDouble(String.valueOf(value.get(Constants.QUESTION_TWO_ANSWER))));
+
+        if (value.get(Constants.QUESTION_THREE_ANSWER) != null)
+            review.setQuestionThreeAnswer(Double.parseDouble(String.valueOf(value.get(Constants.QUESTION_THREE_ANSWER))));
+
         review.setReviewGivenBy((String) value.get(Constants.REVIEW_GIVEN_BY));
         review.setUserId((String) value.get(Constants.USER_ID));
         review.setReviewType((String) value.get(Constants.REVIEW_TYPE));
@@ -219,8 +228,8 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
         if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)) {
             // reviews.add(review);
-            Log.d(TAG, "collectReview: rating " + review.getOverAllFoodQuality());
-            ratingAvg += (float) (review.getOverAllFoodQuality());
+            Log.d(TAG, "collectReview: rating " + review.getQuestionOneAnswer());
+            ratingAvg += (float) (review.getQuestionOneAnswer());
             Log.d(TAG, "collectReview: total " + ratingAvg);
             itemCount++;
         }
