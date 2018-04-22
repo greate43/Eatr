@@ -199,9 +199,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
 
     private void showData(@NotNull DataSnapshot dataSnapshot) {
-        if (dataSnapshot.getValue() == null) {
-            return;
-        }
+
 
         if (adaptor != null) {
             adaptor.clear();

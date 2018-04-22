@@ -197,7 +197,7 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             collectReview((Map<String, Object>) ds.getValue());
         }
-
+        itemCount *= 3;
         ratingAvg = ratingAvg / itemCount;
         Log.d(TAG, "showReviewData: itemcount " + itemCount);
         Log.d(TAG, "showReviewData: avg " + ratingAvg);
@@ -229,7 +229,7 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)) {
             // reviews.add(review);
             Log.d(TAG, "collectReview: rating " + review.getQuestionOneAnswer());
-            ratingAvg += (float) (review.getQuestionOneAnswer());
+            ratingAvg += (float) (review.getQuestionOneAnswer() + review.getQuestionTwoAnswer() + review.getQuestionThreeAnswer());
             Log.d(TAG, "collectReview: total " + ratingAvg);
             itemCount++;
         }

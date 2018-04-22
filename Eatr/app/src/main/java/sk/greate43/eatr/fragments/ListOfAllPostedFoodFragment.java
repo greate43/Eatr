@@ -191,9 +191,6 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
 
     private void showData(@NotNull DataSnapshot dataSnapshot) {
-        if (dataSnapshot.getValue() == null) {
-            return;
-        }
 
         if (adaptor != null) {
             adaptor.clear();

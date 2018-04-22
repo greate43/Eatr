@@ -8,4 +8,5 @@ import sk.greate43.eatr.entities.Profile;
 
 public interface UpdateProfile {
     void onNavDrawerDataUpdated(Profile profile);
+    void myOverAllRating(float myRating);
 }
