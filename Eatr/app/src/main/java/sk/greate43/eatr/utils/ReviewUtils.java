@@ -30,6 +30,8 @@ public class ReviewUtils {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private String userType = "";
+    private ValueEventListener buyerReviewListener;
+    private ValueEventListener sellerReviewListener;
 
     private ReviewUtils() {
         mAuth = FirebaseAuth.getInstance();
@@ -48,7 +50,7 @@ public class ReviewUtils {
         userType = typeOfUser;
 
         if (activity instanceof SellerActivity) {
-            mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(sellerReviewListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);
@@ -60,7 +62,7 @@ public class ReviewUtils {
                 }
             });
         } else if (activity instanceof BuyerActivity) {
-            mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(buyerReviewListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);
@@ -144,6 +146,15 @@ public class ReviewUtils {
             ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
 
 
+        }
+    }
+
+    public void removeListener() {
+        if (buyerReviewListener != null) {
+            mDatabaseReference.removeEventListener(buyerReviewListener);
+        }
+        if (sellerReviewListener != null) {
+            mDatabaseReference.removeEventListener(sellerReviewListener);
         }
     }
 }

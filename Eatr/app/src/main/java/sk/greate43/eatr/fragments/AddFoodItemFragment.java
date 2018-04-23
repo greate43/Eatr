@@ -452,7 +452,7 @@ public class AddFoodItemFragment extends Fragment implements
         }
 
         public void showToast (String message){
-            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
         }
 
         public void onStart () {

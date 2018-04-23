@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -41,13 +43,14 @@ public class NotificationJobService extends JobService {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private ValueEventListener valueListenner;
 
 
     @Override
     public boolean onStartJob(JobParameters job) {
 
         Log.d(TAG, "onStartJob: ");
-        mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener(valueListenner = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);
@@ -66,6 +69,13 @@ public class NotificationJobService extends JobService {
     public boolean onStopJob(JobParameters job) {
         Log.d(TAG, "onStopJob: ");
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (valueListenner != null)
+            mDatabaseReference.removeEventListener(valueListenner);
     }
 
     @Override
@@ -130,6 +140,7 @@ public class NotificationJobService extends JobService {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* request code */, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         String CHANNEL_ID = "my_channel_01";
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -149,6 +160,7 @@ public class NotificationJobService extends JobService {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_round)
+                .setSound(uri)
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
