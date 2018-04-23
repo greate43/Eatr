@@ -1,19 +1,24 @@
 package sk.greate43.eatr.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -71,6 +76,7 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
     private StorageReference storageReference;
     ArrayList<Food> foods;
     private ReplaceFragment replaceFragment;
+    private ValueEventListener foodValueListener;
 
 
     public ListOfAllFoodsMapFragment() {
@@ -93,7 +99,7 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_list_of_all_foods_map, container, false);
@@ -103,6 +109,9 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
+        if (!checkIfGpsIsEnabled()) {
+            askUserToStartGpsDialog();
+        }
 
         if (mGoogleApiClient == null) {
             if (getActivity() != null)
@@ -113,7 +122,7 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
                         .build();
         }
 
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(foodValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -135,6 +144,50 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
 
 
         return view;
+    }
+
+    private void askUserToStartGpsDialog() {
+        if (getActivity() != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Would You Like To Turn On The Gps?");
+            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    startGpsFromSettings();
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    showToast("App Might Not be Fully Functional if Gps Is Off  ");
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
+    public void showToast(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void startGpsFromSettings() {
+
+        if (!checkIfGpsIsEnabled()) {
+            Intent gpsOptionsIntent = new Intent(
+                    android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(gpsOptionsIntent);
+        }
+    }
+
+    private boolean checkIfGpsIsEnabled() {
+        LocationManager manager = null;
+        if (getActivity() != null) {
+
+            manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        }
+        return manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
     }
 
     private void showData(@NotNull DataSnapshot dataSnapshot) {
@@ -452,7 +505,12 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
     public void onDetach() {
         super.onDetach();
         replaceFragment = null;
-
+        if (foodValueListener != null) {
+            mDatabaseReference.removeEventListener(foodValueListener);
+        }
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient = null;
+        }
     }
 
 

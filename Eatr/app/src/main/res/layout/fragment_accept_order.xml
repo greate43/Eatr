@@ -62,7 +62,7 @@
         app:layout_constraintEnd_toEndOf="@+id/fragment_accept_order_image_view_food_pic"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_no_of_servings"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_no_of_servings_lbl"
         tools:text="Do You want to accept order?" />
 
     <TextView
@@ -81,7 +81,7 @@
         tools:text="Alooo" />
 
     <TextView
-        android:id="@+id/fragment_accept_order_text_view_no_of_servings"
+        android:id="@+id/fragment_accept_order_text_view_no_of_servings_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -92,14 +92,15 @@
         app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_dish_name" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/fragment_accept_order_text_view_no_of_servings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/fragment_accept_order_text_view_dish_name"
-        app:layout_constraintStart_toEndOf="@+id/fragment_accept_order_text_view_no_of_servings"
+        app:layout_constraintStart_toEndOf="@+id/fragment_accept_order_text_view_no_of_servings_lbl"
         app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_dish_name"
-        tools:text="4" />
+        tools:text="4"
+        android:layout_marginLeft="8dp" />
 </android.support.constraint.ConstraintLayout>

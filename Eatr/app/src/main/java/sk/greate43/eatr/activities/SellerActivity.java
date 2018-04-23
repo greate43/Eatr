@@ -42,10 +42,13 @@ public class SellerActivity extends AppCompatActivity {
     FirebaseStorage mStorage;
     StorageReference storageRef;
     UpdateProfile updateProfile;
-//
+    private ValueEventListener profileValueListener;
+    private ValueEventListener reviewValueListener;
+    //
 //    TextView tvFullName;
 //    TextView tvUserType;
 //    ImageView imgProfile;
+    ReviewUtils reviewUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +59,9 @@ public class SellerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Util.ScheduleNotification(this);
-
-        ReviewUtils.getInstance().reviewTheUser(this, Constants.TYPE_SELLER);
+        //   Util.ScheduleExpireOrder(this);
+        reviewUtils = ReviewUtils.getInstance();
+        reviewUtils.reviewTheUser(this, Constants.TYPE_SELLER);
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -71,7 +75,7 @@ public class SellerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(profileValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -146,7 +150,7 @@ public class SellerActivity extends AppCompatActivity {
             DatabaseReference reviewRef = mDatabaseReference.child(Constants.REVIEW);
             Query query = reviewRef.orderByChild(Constants.USER_ID).equalTo(userId);
 
-            query.addValueEventListener(new ValueEventListener() {
+            query.addValueEventListener(reviewValueListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -163,6 +167,20 @@ public class SellerActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (profileValueListener != null) {
+            mDatabaseReference.removeEventListener(profileValueListener);
+        }
+        if (reviewValueListener != null) {
+            mDatabaseReference.removeEventListener(reviewValueListener);
+        }
+        reviewUtils.removeListener();
+        updateProfile = null;
+        reviewUtils = null;
+    }
+
     private void showReviewData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
             return;
@@ -174,7 +192,7 @@ public class SellerActivity extends AppCompatActivity {
         }
         itemCount *= 3;
         ratingAvg = ratingAvg / itemCount;
-        Log.d(TAG, "showReviewData: "+ratingAvg);
+        Log.d(TAG, "showReviewData: " + ratingAvg);
         if (updateProfile != null) {
             updateProfile.myOverAllRating(ratingAvg);
         }

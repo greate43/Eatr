@@ -211,7 +211,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
             });
         }
 
-        if (orderId != null) {
+        if (postedBy != null) {
             mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.ORDER_ID).equalTo(orderId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

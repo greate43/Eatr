@@ -43,6 +43,9 @@ public class BuyerActivity extends AppCompatActivity {
     private StorageReference storageRef;
     private UpdateProfile updateProfile;
     private Search search;
+    private ValueEventListener profileValueListener;
+    private ValueEventListener reviewValueListener;
+    ReviewUtils reviewUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +55,6 @@ public class BuyerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Util.ScheduleNotification(this);
-
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -66,7 +68,7 @@ public class BuyerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(profileValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -81,7 +83,8 @@ public class BuyerActivity extends AppCompatActivity {
             }
         });
 
-        ReviewUtils.getInstance().reviewTheUser(this, Constants.TYPE_BUYER);
+        reviewUtils = ReviewUtils.getInstance();
+        reviewUtils.reviewTheUser(this, Constants.TYPE_BUYER);
 
         getMyOverallReview(user.getUid());
 
@@ -92,6 +95,20 @@ public class BuyerActivity extends AppCompatActivity {
         this.search = search;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (profileValueListener != null) {
+            mDatabaseReference.removeEventListener(profileValueListener);
+        }
+        if (reviewValueListener != null) {
+            mDatabaseReference.removeEventListener(reviewValueListener);
+        }
+        reviewUtils.removeListener();
+        updateProfile = null;
+        search =  null;
+        reviewUtils = null;
+    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         if (user != null) {
@@ -161,7 +178,7 @@ public class BuyerActivity extends AppCompatActivity {
             DatabaseReference reviewRef = mDatabaseReference.child(Constants.REVIEW);
             Query query = reviewRef.orderByChild(Constants.USER_ID).equalTo(userId);
 
-            query.addValueEventListener(new ValueEventListener() {
+            query.addValueEventListener(reviewValueListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 

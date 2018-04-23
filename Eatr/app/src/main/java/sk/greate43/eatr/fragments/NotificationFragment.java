@@ -45,6 +45,7 @@ public class NotificationFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<Notification> notifications;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ValueEventListener notificationValueListener;
 
 
     public NotificationFragment() {
@@ -73,6 +74,7 @@ public class NotificationFragment extends Fragment {
     private ProgressBar progressBar;
     private static final int TOTAL_ITEMS_TO_LOAD = 15;
     private int mCurrentPage = 1;
+    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -120,7 +122,7 @@ public class NotificationFragment extends Fragment {
                 loadFirebaseData();
             }
         });
-        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
@@ -136,7 +138,7 @@ public class NotificationFragment extends Fragment {
     }
 
     private void loadFirebaseData() {
-        mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(notificationValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);
@@ -196,5 +198,16 @@ public class NotificationFragment extends Fragment {
         super.onPrepareOptionsMenu(menu);
 
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (endlessRecyclerViewScrollListener != null) {
+            endlessRecyclerViewScrollListener = null;
+        }
+        if (notificationValueListener != null) {
+            mDatabaseReference.removeEventListener(notificationValueListener);
+        }
     }
 }

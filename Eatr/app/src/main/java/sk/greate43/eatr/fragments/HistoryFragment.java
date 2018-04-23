@@ -49,6 +49,7 @@ public class HistoryFragment extends Fragment {
 
     private static final int TOTAL_ITEMS_TO_LOAD = 15;
     private int mCurrentPage = 1;
+    private ValueEventListener foodValueListener;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -102,7 +103,6 @@ public class HistoryFragment extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
 
-
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -131,14 +131,12 @@ public class HistoryFragment extends Fragment {
         });
 
 
-
-
         return view;
     }
 
 
     private void loadFirebaseData() {
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(foodValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -271,6 +269,13 @@ public class HistoryFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (foodValueListener != null) {
+            mDatabaseReference.removeEventListener(foodValueListener);
+        }
+    }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {

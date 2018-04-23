@@ -87,4 +87,11 @@ public class BuyerFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mOnNavigationItemSelectedListener != null) {
+            mOnNavigationItemSelectedListener = null;
+        }
+    }
 }

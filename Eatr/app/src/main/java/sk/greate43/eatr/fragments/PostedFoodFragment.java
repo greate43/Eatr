@@ -62,6 +62,8 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
     private static final int TOTAL_ITEMS_TO_LOAD = 15;
     private int mCurrentPage = 1;
+    private ValueEventListener foodValueListener;
+    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
@@ -167,7 +169,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
             }
         });
 
-        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
@@ -181,7 +183,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     }
 
     private void loadFirebaseData() {
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(foodValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -360,6 +362,16 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (foodValueListener != null) {
+            mDatabaseReference.removeEventListener(foodValueListener);
+        }
+        if (endlessRecyclerViewScrollListener != null) {
+            endlessRecyclerViewScrollListener = null;
+        }
+    }
 
     @Override
     public void onEdit(Food food, int position) {

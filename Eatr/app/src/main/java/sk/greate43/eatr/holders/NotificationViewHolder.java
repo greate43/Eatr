@@ -41,6 +41,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
     public Button no;
     private Notification notification;
     private View view;
+
     private DatabaseReference mDatabaseReference;
     private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
         @Override

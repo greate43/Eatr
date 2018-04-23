@@ -27,6 +27,7 @@ public class ExpiryJobService extends JobService {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private ValueEventListener valueListenner;
 
 
     @Override
@@ -44,7 +45,7 @@ public class ExpiryJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters job) {
 
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(valueListenner = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -59,6 +60,13 @@ public class ExpiryJobService extends JobService {
 
 
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (valueListenner != null)
+            mDatabaseReference.removeEventListener(valueListenner);
     }
 
     private void showData(@NotNull DataSnapshot dataSnapshot) {
@@ -156,8 +164,9 @@ public class ExpiryJobService extends JobService {
             return false;
         } else {
             long difference90 = (long) (0.9 * (when - added));
-            return now > (added + difference90);
+            return (now > (added + difference90)) ? true : false;
         }
+
 
     }
 
