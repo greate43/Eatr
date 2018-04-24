@@ -75,7 +75,7 @@ public class NotificationJobService extends JobService {
     public void onDestroy() {
         super.onDestroy();
         if (valueListenner != null)
-            mDatabaseReference.removeEventListener(valueListenner);
+            mDatabaseReference.child(Constants.NOTIFICATION).removeEventListener(valueListenner);
     }
 
     @Override
@@ -160,6 +160,7 @@ public class NotificationJobService extends JobService {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_round)
+                .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
                 .setSound(uri)
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
