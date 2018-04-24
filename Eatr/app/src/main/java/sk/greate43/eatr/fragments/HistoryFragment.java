@@ -50,6 +50,7 @@ public class HistoryFragment extends Fragment {
     private static final int TOTAL_ITEMS_TO_LOAD = 15;
     private int mCurrentPage = 1;
     private ValueEventListener foodValueListener;
+    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -113,13 +114,8 @@ public class HistoryFragment extends Fragment {
 
         loadFirebaseData();
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadFirebaseData();
-            }
-        });
-        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+        swipeRefreshLayout.setOnRefreshListener(() -> loadFirebaseData());
+        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
@@ -136,7 +132,7 @@ public class HistoryFragment extends Fragment {
 
 
     private void loadFirebaseData() {
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(foodValueListener = new ValueEventListener() {
+        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -273,8 +269,9 @@ public class HistoryFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         if (foodValueListener != null) {
-            mDatabaseReference.removeEventListener(foodValueListener);
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
         }
+        endlessRecyclerViewScrollListener =  null;
     }
 
     @Override

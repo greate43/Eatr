@@ -183,7 +183,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     }
 
     private void loadFirebaseData() {
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(foodValueListener = new ValueEventListener() {
+        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -366,7 +366,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     public void onDetach() {
         super.onDetach();
         if (foodValueListener != null) {
-            mDatabaseReference.removeEventListener(foodValueListener);
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
         }
         if (endlessRecyclerViewScrollListener != null) {
             endlessRecyclerViewScrollListener = null;

@@ -15,7 +15,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -28,6 +27,7 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.entities.Review;
 import sk.greate43.eatr.interfaces.UpdateProfile;
+import sk.greate43.eatr.utils.AcceptOderUtils;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
 import sk.greate43.eatr.utils.ReviewUtils;
@@ -44,11 +44,12 @@ public class SellerActivity extends AppCompatActivity {
     UpdateProfile updateProfile;
     private ValueEventListener profileValueListener;
     private ValueEventListener reviewValueListener;
+    ReviewUtils reviewUtils;
+    private AcceptOderUtils acceptOderUtils;
     //
 //    TextView tvFullName;
 //    TextView tvUserType;
 //    ImageView imgProfile;
-    ReviewUtils reviewUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +61,11 @@ public class SellerActivity extends AppCompatActivity {
 
         Util.ScheduleNotification(this);
         //   Util.ScheduleExpireOrder(this);
-        reviewUtils = ReviewUtils.getInstance();
+        reviewUtils = new ReviewUtils();
         reviewUtils.reviewTheUser(this, Constants.TYPE_SELLER);
+        acceptOderUtils = new AcceptOderUtils();
+
+        acceptOderUtils.checkIfOrderIsBookedAndShowOrderAcceptDialog(this);
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -75,7 +79,7 @@ public class SellerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(profileValueListener = new ValueEventListener() {
+        profileValueListener = mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -144,13 +148,12 @@ public class SellerActivity extends AppCompatActivity {
         return true;
     }
 
+    private String userId;
+
     private void getMyOverallReview(String userId) {
-
+        this.userId = userId;
         if (userId != null) {
-            DatabaseReference reviewRef = mDatabaseReference.child(Constants.REVIEW);
-            Query query = reviewRef.orderByChild(Constants.USER_ID).equalTo(userId);
-
-            query.addValueEventListener(reviewValueListener = new ValueEventListener() {
+            reviewValueListener = mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -171,14 +174,19 @@ public class SellerActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         if (profileValueListener != null) {
-            mDatabaseReference.removeEventListener(profileValueListener);
+            mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(profileValueListener);
         }
         if (reviewValueListener != null) {
-            mDatabaseReference.removeEventListener(reviewValueListener);
+            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
         }
+
+
         reviewUtils.removeListener();
+        acceptOderUtils.removeListener();
+        acceptOderUtils = null;
         updateProfile = null;
         reviewUtils = null;
+
     }
 
     private void showReviewData(DataSnapshot dataSnapshot) {

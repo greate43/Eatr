@@ -16,7 +16,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -45,7 +44,7 @@ public class BuyerActivity extends AppCompatActivity {
     private Search search;
     private ValueEventListener profileValueListener;
     private ValueEventListener reviewValueListener;
-    ReviewUtils reviewUtils;
+    private ReviewUtils reviewUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +67,7 @@ public class BuyerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(profileValueListener = new ValueEventListener() {
+        profileValueListener = mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -83,9 +82,8 @@ public class BuyerActivity extends AppCompatActivity {
             }
         });
 
-        reviewUtils = ReviewUtils.getInstance();
+        reviewUtils = new ReviewUtils();
         reviewUtils.reviewTheUser(this, Constants.TYPE_BUYER);
-
         getMyOverallReview(user.getUid());
 
     }
@@ -99,14 +97,14 @@ public class BuyerActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         if (profileValueListener != null) {
-            mDatabaseReference.removeEventListener(profileValueListener);
+            mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(profileValueListener);
         }
         if (reviewValueListener != null) {
-            mDatabaseReference.removeEventListener(reviewValueListener);
+            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
         }
         reviewUtils.removeListener();
         updateProfile = null;
-        search =  null;
+        search = null;
         reviewUtils = null;
     }
 
@@ -172,13 +170,12 @@ public class BuyerActivity extends AppCompatActivity {
         }
     }
 
+    String userId = "";
+
     private void getMyOverallReview(String userId) {
-
+        this.userId = userId;
         if (userId != null) {
-            DatabaseReference reviewRef = mDatabaseReference.child(Constants.REVIEW);
-            Query query = reviewRef.orderByChild(Constants.USER_ID).equalTo(userId);
-
-            query.addValueEventListener(reviewValueListener = new ValueEventListener() {
+            reviewValueListener = mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 

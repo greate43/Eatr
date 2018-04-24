@@ -55,6 +55,7 @@ public class AuthenticationFragment extends Fragment {
     private ProgressDialog mProgressDialog;
     private SignInButton btnAuthGoogle;
     private GoogleSignInClient mGoogleSignInClient;
+    private ValueEventListener authenticationValueListener;
 
     public AuthenticationFragment() {
         // Required empty public constructor
@@ -92,7 +93,7 @@ public class AuthenticationFragment extends Fragment {
         showProgressDialog();
         hideAllUiWidgets();
         if (user != null) {
-            databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            authenticationValueListener = databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -113,24 +114,15 @@ public class AuthenticationFragment extends Fragment {
         }
 
 
-        btnAuthPhoneNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnAuthPhoneNo.setOnClickListener(v -> {
 
-                if (mListener != null) {
-                    mListener.onFragmentReplaced(PhoneNoValidationFragment.newInstance());
-                }
-
+            if (mListener != null) {
+                mListener.onFragmentReplaced(PhoneNoValidationFragment.newInstance());
             }
+
         });
 
-        btnAuthGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                signIn();
-            }
-        });
+        btnAuthGoogle.setOnClickListener(v -> signIn());
 
         return view;
     }
@@ -291,6 +283,13 @@ public class AuthenticationFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mGoogleSignInClient = null;
+        if (authenticationValueListener != null) {
+            databaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(authenticationValueListener);
+
+        }
+        btnAuthPhoneNo.setOnClickListener(null);
+        btnAuthGoogle.setOnClickListener(null);
     }
 
     private void hideAllUiWidgets() {

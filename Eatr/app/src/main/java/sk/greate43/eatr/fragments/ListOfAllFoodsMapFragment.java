@@ -50,8 +50,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -122,7 +120,7 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
                         .build();
         }
 
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(foodValueListener = new ValueEventListener() {
+        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -273,19 +271,13 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
     Marker marker;
 
     private void downLoadImage(final String url, final Food food) {
-        Observable<Bitmap> bitmapObservable = Observable.create(new ObservableOnSubscribe<Bitmap>() {
-            @Override
-            public void subscribe(ObservableEmitter<Bitmap> emitter) throws Exception {
-                emitter.onNext(convertUrlToBitMap(url));
-                emitter.onComplete();
-            }
+        Observable<Bitmap> bitmapObservable = Observable.create(emitter -> {
+            emitter.onNext(convertUrlToBitMap(url));
+            emitter.onComplete();
         });
-        Observable<Food> foodObservable = Observable.create(new ObservableOnSubscribe<Food>() {
-            @Override
-            public void subscribe(ObservableEmitter<Food> emitter) throws Exception {
-                emitter.onNext(food);
-                emitter.onComplete();
-            }
+        Observable<Food> foodObservable = Observable.create(emitter -> {
+            emitter.onNext(food);
+            emitter.onComplete();
         });
 
 
@@ -337,7 +329,6 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
                 // Be notified on the main thread
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
-        ;
 
 
     }
@@ -506,7 +497,7 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
         super.onDetach();
         replaceFragment = null;
         if (foodValueListener != null) {
-            mDatabaseReference.removeEventListener(foodValueListener);
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
         }
         if (mGoogleApiClient != null) {
             mGoogleApiClient = null;
