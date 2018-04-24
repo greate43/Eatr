@@ -113,6 +113,7 @@ public interface Constants {
     /**
      * {@link sk.greate43.eatr.entities.Review}
      */
+    String ARGS_AVG_RATING = "ARGS_AVG_RATING";
     String REVIEW = "Review";
 
     String QUESTION_ONE = "questionOne";

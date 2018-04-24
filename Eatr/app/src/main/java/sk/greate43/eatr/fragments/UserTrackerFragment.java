@@ -106,7 +106,7 @@ public class UserTrackerFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         switch (userType) {
             case Constants.TYPE_SELLER:
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(foodValueListener =new ValueEventListener() {
+                foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -120,7 +120,7 @@ public class UserTrackerFragment extends Fragment {
                 });
                 break;
             case Constants.TYPE_BUYER:
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(foodValueListener =new ValueEventListener() {
+                foodValueListener =  mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -242,7 +242,7 @@ public class UserTrackerFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         if (foodValueListener != null){
-            mDatabaseReference.removeEventListener(foodValueListener);
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(foodValueListener);
         }
     }
 

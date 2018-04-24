@@ -1,0 +1,172 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dialog"
+    tools:context="sk.greate43.eatr.fragmentDialogs.AcceptOrderDialogFragment">
+
+
+    <TextView
+        android:id="@+id/fragment_accept_order_text_view_buyer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/fragment_accept_order_image_view_user_pic"
+        app:layout_constraintTop_toTopOf="@+id/guideline7"
+        tools:text="Buyer Name" />
+
+    <Button
+        android:id="@+id/fragment_accept_order_button_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/background_dark"
+        android:text="NO"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_question" />
+
+    <Button
+        android:id="@+id/fragment_accept_order_button_yes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@android:color/background_dark"
+        android:text="Yes"
+        android:textColor="@android:color/background_light"
+        app:layout_constraintBaseline_toBaselineOf="@+id/fragment_accept_order_button_no"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/fragment_accept_order_image_view_food_pic"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimaryDark"
+        android:src="@android:drawable/ic_menu_gallery"
+        app:layout_constraintBottom_toTopOf="@+id/guideline7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/fragment_accept_order_image_view_user_pic"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_gallery"
+        app:civ_border_color="#FF000000"
+        app:civ_border_width="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline7" />
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <TextView
+        android:id="@+id/fragment_accept_order_text_view_question"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
+        android:text="Do You want to accept order?"
+        android:textColor="@android:color/background_light"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_accept_order_image_view_food_pic"
+        app:layout_constraintStart_toStartOf="@+id/fragment_accept_order_text_view_no_of_servings_lbl"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_no_of_servings_lbl" />
+
+    <TextView
+        android:id="@+id/fragment_accept_order_text_view_dish_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="100dp"
+        android:layout_marginStart="100dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@+id/fragment_accept_order_text_view_dish_name_lbl"
+        app:layout_constraintStart_toEndOf="@+id/fragment_accept_order_text_view_dish_name_lbl"
+        tools:text="Alooo" />
+
+    <TextView
+        android:id="@+id/fragment_accept_order_text_view_dish_name_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="Dish Name"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_accept_order_image_view_user_pic"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_ratingBar" />
+
+    <TextView
+        android:id="@+id/fragment_accept_order_text_view_no_of_servings_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="No Of Servings :"
+        android:textColor="@android:color/background_light"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_accept_order_text_view_dish_name_lbl"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_dish_name_lbl" />
+
+    <TextView
+        android:id="@+id/fragment_accept_order_text_view_no_of_servings"
+        android:layout_width="81dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="64dp"
+        android:layout_marginStart="64dp"
+        android:textColor="@android:color/background_light"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBaseline_toBaselineOf="@+id/fragment_accept_order_text_view_no_of_servings_lbl"
+        app:layout_constraintStart_toEndOf="@+id/fragment_accept_order_text_view_no_of_servings_lbl"
+        tools:text="4" />
+
+    <RatingBar
+        android:id="@+id/fragment_accept_order_ratingBar"
+        style="@android:style/Widget.Holo.Light.RatingBar.Indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="0.1"
+        android:isIndicator="true"
+        app:layout_constraintStart_toStartOf="@+id/fragment_accept_order_text_view_buyer_name"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_buyer_name" />
+</android.support.constraint.ConstraintLayout>

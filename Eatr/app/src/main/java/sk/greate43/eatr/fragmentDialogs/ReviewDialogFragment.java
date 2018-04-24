@@ -57,6 +57,7 @@ public class ReviewDialogFragment extends DialogFragment {
     private float ratingValueForAnswerOne;
     private float ratingValueForAnswerTwo;
     private float ratingValueForAnswerThree;
+    private ValueEventListener profileValueListener;
 
     public ReviewDialogFragment() {
         // Required empty public constructor
@@ -150,7 +151,7 @@ public class ReviewDialogFragment extends DialogFragment {
 
         if (askForReview != null && userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
 
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(askForReview.getPostedBy()).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(askForReview.getPostedBy()).addValueEventListener(profileValueListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -171,7 +172,7 @@ public class ReviewDialogFragment extends DialogFragment {
 
         } else if (askForReview != null && userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
             Log.d(TAG, "onCreateView: " + askForReview.getPurchasedBy());
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(askForReview.getPurchasedBy()).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(askForReview.getPurchasedBy()).addValueEventListener(profileValueListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -235,7 +236,6 @@ public class ReviewDialogFragment extends DialogFragment {
                     review.setReviewType(Constants.REVIEW_FROM_BUYER);
 
 
-
                     mDatabaseReference.child(Constants.BUYER_REVIEW).child(askForReview.getOrderId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER).setValue(false);
                 }
 
@@ -267,6 +267,14 @@ public class ReviewDialogFragment extends DialogFragment {
         }
 
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (profileValueListener != null){
+            mDatabaseReference.removeEventListener(profileValueListener);
+        }
     }
 
     private void collectProfile(Map<String, Object> value) {

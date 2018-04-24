@@ -138,7 +138,7 @@ public class NotificationFragment extends Fragment {
     }
 
     private void loadFirebaseData() {
-        mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(notificationValueListener = new ValueEventListener() {
+        notificationValueListener =  mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);
@@ -207,7 +207,7 @@ public class NotificationFragment extends Fragment {
             endlessRecyclerViewScrollListener = null;
         }
         if (notificationValueListener != null) {
-            mDatabaseReference.removeEventListener(notificationValueListener);
+            mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(notificationValueListener);
         }
     }
 }

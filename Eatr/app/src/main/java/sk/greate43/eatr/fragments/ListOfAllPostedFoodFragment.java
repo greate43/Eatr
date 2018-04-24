@@ -57,6 +57,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     SwipeRefreshLayout swipeRefreshLayout;
     private ValueEventListener foodValueListener;
     EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
+    private ValueEventListener foodValueListenerSearch;
 
     public ListOfAllPostedFoodFragment() {
         // Required empty public constructor
@@ -152,12 +153,13 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         user = mAuth.getCurrentUser();
     }
 
-
+    private String searchKeyword;
     private void retrieveFirebaseData(String searchKeyword) {
+        this.searchKeyword = searchKeyword;
         if (mDatabaseReference != null) {
 
             if (!searchKeyword.isEmpty()) {
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener(foodValueListener = new ValueEventListener() {
+                foodValueListenerSearch = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -172,7 +174,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
             } else {
                 DatabaseReference foodListRef = mDatabaseReference.child(Constants.FOOD);
                 Query query = foodListRef.limitToFirst(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
-                query.orderByChild(Constants.EXPIRY_TIME).addValueEventListener(foodValueListener = new ValueEventListener() {
+                foodValueListener = query.orderByChild(Constants.EXPIRY_TIME).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -308,8 +310,12 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     public void onDetach() {
         super.onDetach();
         if (foodValueListener != null) {
-            mDatabaseReference.removeEventListener(foodValueListener);
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
         }
+        if (foodValueListenerSearch != null){
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).removeEventListener(foodValueListenerSearch);
+        }
+
         if (endlessRecyclerViewScrollListener != null) {
             endlessRecyclerViewScrollListener = null;
         }

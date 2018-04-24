@@ -61,6 +61,7 @@ public class PhoneNoVerificationFragment extends Fragment {
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private ProgressDialog mProgressDialog;
     private FirebaseDatabase database;
+    private Button btnVerify;
 
     public PhoneNoVerificationFragment() {
         // Required empty public constructor
@@ -90,29 +91,25 @@ public class PhoneNoVerificationFragment extends Fragment {
     View v;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_phone_no_verification, container, false);
 
-        v = view;
 
         tvTimer = view.findViewById(R.id.fragment_phone_no_verification_text_view_time_left_to_resend);
         etVerification = view.findViewById(R.id.fragment_phone_no_verfification_et_verification_code);
-        Button btnVerify = view.findViewById(R.id.fragment_phone_no_verfification_button_verify);
+        btnVerify = view.findViewById(R.id.fragment_phone_no_verfification_button_verify);
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
         databaseReference = database.getReference();
 
 
-        btnVerify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!TextUtils.isEmpty(etVerification.getText())) {
-                    String code = etVerification.getText().toString();
-                    verifyCodeManually(code);
-                }
+        btnVerify.setOnClickListener(v -> {
+            if (!TextUtils.isEmpty(etVerification.getText())) {
+                String code = etVerification.getText().toString();
+                verifyCodeManually(code);
             }
         });
 
@@ -181,6 +178,9 @@ public class PhoneNoVerificationFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mCallbacks = null;
+        btnVerify.setOnClickListener(null);
+
     }
 
     public void showProgressDialog() {
@@ -227,15 +227,13 @@ public class PhoneNoVerificationFragment extends Fragment {
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     // Invalid request
                     // ...
-                    if (v != null) {
-                        Log.d(TAG, "onVerificationFailed: "+v);
-                        Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_LONG).show();
-                    }
+                    Log.d(TAG, "onVerificationFailed: " + v);
+                    Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_LONG).show();
+
                 } else if (e instanceof FirebaseTooManyRequestsException) {
                     // The SMS quota for the project has been exceeded
                     // ...
-                    if (v != null)
-                        Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(v, e.getMessage(), Snackbar.LENGTH_LONG).show();
 
                 }
 
@@ -352,7 +350,7 @@ public class PhoneNoVerificationFragment extends Fragment {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The verification code entered was invalid
                                 if (getActivity() != null) {
-                                    Toast.makeText(getActivity().getApplicationContext(), "The verification code entered was invalid", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity().getApplicationContext(), "The verification code entered was invalid", Toast.LENGTH_LONG).show();
                                 }
                             }
                         }
