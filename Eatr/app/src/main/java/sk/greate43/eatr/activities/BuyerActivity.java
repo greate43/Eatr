@@ -27,6 +27,7 @@ import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.entities.Review;
 import sk.greate43.eatr.interfaces.Search;
 import sk.greate43.eatr.interfaces.UpdateProfile;
+import sk.greate43.eatr.utils.AcceptAndCompleteOrderUtils;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
 import sk.greate43.eatr.utils.ReviewUtils;
@@ -45,6 +46,7 @@ public class BuyerActivity extends AppCompatActivity {
     private ValueEventListener profileValueListener;
     private ValueEventListener reviewValueListener;
     private ReviewUtils reviewUtils;
+    AcceptAndCompleteOrderUtils acceptAndCompleteOrderUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +57,9 @@ public class BuyerActivity extends AppCompatActivity {
 
         Util.ScheduleNotification(this);
 
+        acceptAndCompleteOrderUtils = new AcceptAndCompleteOrderUtils();
         updateProfile = DrawerUtil.getInstance().getCallback();
+        acceptAndCompleteOrderUtils.checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
 
         DrawerUtil.getInstance().getDrawer(this, toolbar);
 
@@ -103,6 +107,7 @@ public class BuyerActivity extends AppCompatActivity {
             mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
         }
         reviewUtils.removeListener();
+        acceptAndCompleteOrderUtils.removeListener();
         updateProfile = null;
         search = null;
         reviewUtils = null;

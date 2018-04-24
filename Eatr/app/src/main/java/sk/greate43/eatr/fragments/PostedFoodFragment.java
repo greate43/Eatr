@@ -60,7 +60,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     private String orderState;
     private ProgressBar progressBar;
 
-    private static final int TOTAL_ITEMS_TO_LOAD = 15;
+    private static final int TOTAL_ITEMS_TO_LOAD = 20;
     private int mCurrentPage = 1;
     private ValueEventListener foodValueListener;
     EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;

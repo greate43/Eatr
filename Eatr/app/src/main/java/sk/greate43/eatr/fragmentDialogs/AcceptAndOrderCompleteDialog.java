@@ -32,7 +32,7 @@ import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.utils.Constants;
 
 
-public class AcceptOrderDialogFragment extends DialogFragment {
+public class AcceptAndOrderCompleteDialog extends DialogFragment {
 
     public final String TAG_FRAGMENT = "AcceptOrderDialogFragment";
     Button yes;
@@ -52,18 +52,20 @@ public class AcceptOrderDialogFragment extends DialogFragment {
     private TextView tvBuyerName;
     private RatingBar ratingBar;
     private CircleImageView imgUserPhoto;
+    private String userType;
 
-    public AcceptOrderDialogFragment() {
+    public AcceptAndOrderCompleteDialog() {
         // Required empty public constructor
     }
 
-    public static AcceptOrderDialogFragment newInstance(Food food, Notification notification, Profile profile, float ratingAvg) {
-        AcceptOrderDialogFragment fragment = new AcceptOrderDialogFragment();
+    public static AcceptAndOrderCompleteDialog newInstance(Food food, Notification notification, Profile profile, float ratingAvg, String userType) {
+        AcceptAndOrderCompleteDialog fragment = new AcceptAndOrderCompleteDialog();
         Bundle args = new Bundle();
         args.putSerializable(Constants.ARGS_FOOD, food);
         args.putSerializable(Constants.ARGS_PROFILE, profile);
         args.putSerializable(Constants.ARGS_NOTIFICATION, notification);
         args.putFloat(Constants.ARGS_AVG_RATING, ratingAvg);
+        args.putString(Constants.USER_TYPE, userType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,26 +80,30 @@ public class AcceptOrderDialogFragment extends DialogFragment {
             notification = (Notification) getArguments().getSerializable(Constants.ARGS_NOTIFICATION);
             profile = (Profile) getArguments().getSerializable(Constants.ARGS_PROFILE);
             avgRating = getArguments().getFloat(Constants.ARGS_AVG_RATING);
+            userType = getArguments().getString(Constants.USER_TYPE);
         }
     }
 
     Notification notificationReply = null;
     private static final String TAG = "AcceptOrderDialogFragme";
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_dialog_accept_order, container, false);
-        tvBuyerName = view.findViewById(R.id.fragment_accept_order_text_view_buyer_name);
+        View view = inflater.inflate(R.layout.fragment_dialog_for_accept_and_complete_order, container, false);
+        tvBuyerName = view.findViewById(R.id.fragment_accept_order_text_view_user_name);
         ratingBar = view.findViewById(R.id.fragment_accept_order_ratingBar);
 
         tvDishName = view.findViewById(R.id.fragment_accept_order_text_view_dish_name);
         tvQuestion = view.findViewById(R.id.fragment_accept_order_text_view_question);
         tvNoOfServings = view.findViewById(R.id.fragment_accept_order_text_view_no_of_servings);
+        tvQuestion = view.findViewById(R.id.fragment_accept_order_text_view_question);
         yes = view.findViewById(R.id.fragment_accept_order_button_yes);
         no = view.findViewById(R.id.fragment_accept_order_button_no);
         imgDishPhoto = view.findViewById(R.id.fragment_accept_order_image_view_food_pic);
         imgUserPhoto = view.findViewById(R.id.fragment_accept_order_image_view_user_pic);
+
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -110,6 +116,11 @@ public class AcceptOrderDialogFragment extends DialogFragment {
             tvNoOfServings.setText(String.valueOf(food.getNumberOfServingsPurchased()));
 
             ratingBar.setRating(avgRating);
+            if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)){
+                tvQuestion.setText("Seller Has Requested You To Mark Complete this Order ?");
+            } else  if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)){
+                tvQuestion.setText("Buyer Has Requested You To Accept This Order ?");
+            }
 
             if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
                 Picasso.with(getActivity())
@@ -148,71 +159,126 @@ public class AcceptOrderDialogFragment extends DialogFragment {
                         });
             }
 
-            
-            final String notificationId = mDatabaseReference.push().getKey();
 
-            yes.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            yes.setOnClickListener(v -> {
 
-                    mDatabaseReference.child(Constants.NOTIFICATION)
-                            .child(notification.getNotificationId())
-                            .updateChildren(updateNotificationAlert(true, true));
-                    notificationReply = new Notification();
-                    notificationReply.setTitle(food.getDishName());
-                    notificationReply.setMessage("Your Order Has Been Accepted and You you can get the Order from your Pick Up Place");
-                    notificationReply.setSenderId(user.getUid());
-                    notificationReply.setReceiverId(food.getPurchasedBy());
-                    notificationReply.setOrderId(food.getPushId());
-                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
-                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
-                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
-                    notificationReply.setNotificationId(notificationId);
-                    notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
-                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+                mDatabaseReference.child(Constants.NOTIFICATION)
+                        .child(notification.getNotificationId())
+                        .updateChildren(updateNotificationAlert(true, true));
 
-                    mDatabaseReference.child(Constants.FOOD)
-                            .child(food.getPushId())
-                            .updateChildren(updateUpdateProgress(true, false, false, false, false, false));
-                    mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
 
-                    dismiss();
+                sendNotification(true);
+                dismiss();
 
-                }
             });
 
-            no.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mDatabaseReference.child(Constants.NOTIFICATION)
-                            .child(notification.getNotificationId())
-                            .updateChildren(updateNotificationAlert(true, false));
-                    notificationReply = new Notification();
-                    notificationReply.setTitle(food.getDishName());
-                    notificationReply.setMessage("Your Order Has Been Rejected");
-                    notificationReply.setSenderId(user.getUid());
-                    notificationReply.setReceiverId(food.getPurchasedBy());
-                    notificationReply.setOrderId(food.getPushId());
-                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
-                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
-                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
-                    notificationReply.setNotificationId(notificationId);
-                    notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
-                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+            no.setOnClickListener(v -> {
+                mDatabaseReference.child(Constants.NOTIFICATION)
+                        .child(notification.getNotificationId())
+                        .updateChildren(updateNotificationAlert(true, false));
 
-                    mDatabaseReference.child(Constants.FOOD)
-                            .child(food.getPushId())
-                            .updateChildren(updateUpdateProgress(false, false, false, false, false, false));
 
-                    mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
-                    dismiss();
+                sendNotification(false);
+                dismiss();
 
-                }
             });
         }
 
 
         return view;
+    }
+
+    private void sendNotification(Boolean isOrderAccepted) {
+        String notificationId = mDatabaseReference.push().getKey();
+        Notification notificationReply = null;
+        if (notification.getNotificationType().equals(Constants.TYPE_NOTIFICATION_ORDER_REQUEST)) {
+            if (isOrderAccepted) {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Your Order Has Been Accepted and You you can get the Order from your Pick Up Place");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(true, false, false, false, false, false));
+
+                }
+            } else {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Your Order Has Been Rejected");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, false, false, false, false));
+
+                }
+            }
+        } else if (notification.getNotificationType().equals(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED)) {
+            if (isOrderAccepted) {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Buyer has also marked the order Complete ");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, false, true, true, true));
+                }
+            } else {
+                if (notification != null) {
+                    notificationReply = new Notification();
+                    notificationReply.setTitle(notification.getTitle());
+                    notificationReply.setMessage("Buyer has marked the Incomplete");
+                    notificationReply.setSenderId(user.getUid());
+                    notificationReply.setReceiverId(notification.getSenderId());
+                    notificationReply.setOrderId(notification.getOrderId());
+                    notificationReply.setCheckIfButtonShouldBeEnabled(false);
+                    notificationReply.setCheckIfNotificationAlertShouldBeShown(true);
+                    notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
+                    notificationReply.setNotificationId(notificationId);
+                    notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+                    notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+
+                    mDatabaseReference.child(Constants.FOOD)
+                            .child(notification.getOrderId())
+                            .updateChildren(updateUpdateProgress(false, false, false, false, true, true));
+
+                }
+            }
+        }
+
+
+        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
     }
 
     private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
@@ -229,6 +295,7 @@ public class AcceptOrderDialogFragment extends DialogFragment {
         return result;
     }
 
+
     private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive, boolean isPurchase, boolean isCompeted, boolean isAccepted) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
@@ -244,13 +311,33 @@ public class AcceptOrderDialogFragment extends DialogFragment {
         if (isPurchase) {
             result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, isPurchase);
         }
-//        if (isPurchase && isCompeted) {
-//          //  showReviewDialog();
-//
-//
-//        }
+        if (isPurchase && isCompeted) {
+            showReviewDialog();
 
 
+        }
+
+
+        return result;
+    }
+
+    private void showReviewDialog() {
+        mDatabaseReference.child(Constants.SELLER_REVIEW).child(notification.getOrderId()).updateChildren(reviewUpdate(true));
+        mDatabaseReference.child(Constants.BUYER_REVIEW).child(notification.getOrderId()).updateChildren(reviewUpdate(false));
+
+    }
+
+    private Map<String, Object> reviewUpdate(boolean isSeller) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.ORDER_ID, notification.getOrderId());
+        result.put(Constants.POSTED_BY,notification.getSenderId());
+        result.put(Constants.PURCHASED_BY,notification.getReceiverId());
+        if (isSeller) {
+
+            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER, true);
+        } else {
+            result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER, true);
+        }
         return result;
     }
 }

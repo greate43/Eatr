@@ -27,7 +27,7 @@ import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.entities.Review;
 import sk.greate43.eatr.interfaces.UpdateProfile;
-import sk.greate43.eatr.utils.AcceptOderUtils;
+import sk.greate43.eatr.utils.AcceptAndCompleteOrderUtils;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
 import sk.greate43.eatr.utils.ReviewUtils;
@@ -45,7 +45,7 @@ public class SellerActivity extends AppCompatActivity {
     private ValueEventListener profileValueListener;
     private ValueEventListener reviewValueListener;
     ReviewUtils reviewUtils;
-    private AcceptOderUtils acceptOderUtils;
+    private AcceptAndCompleteOrderUtils acceptAndCompleteOrderUtils;
     //
 //    TextView tvFullName;
 //    TextView tvUserType;
@@ -63,9 +63,9 @@ public class SellerActivity extends AppCompatActivity {
         //   Util.ScheduleExpireOrder(this);
         reviewUtils = new ReviewUtils();
         reviewUtils.reviewTheUser(this, Constants.TYPE_SELLER);
-        acceptOderUtils = new AcceptOderUtils();
+        acceptAndCompleteOrderUtils = new AcceptAndCompleteOrderUtils();
 
-        acceptOderUtils.checkIfOrderIsBookedAndShowOrderAcceptDialog(this);
+        acceptAndCompleteOrderUtils.checkIfOrderIsBookedAndShowOrderAcceptDialog(this,Constants.TYPE_SELLER);
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -182,8 +182,8 @@ public class SellerActivity extends AppCompatActivity {
 
 
         reviewUtils.removeListener();
-        acceptOderUtils.removeListener();
-        acceptOderUtils = null;
+        acceptAndCompleteOrderUtils.removeListener();
+        acceptAndCompleteOrderUtils = null;
         updateProfile = null;
         reviewUtils = null;
 

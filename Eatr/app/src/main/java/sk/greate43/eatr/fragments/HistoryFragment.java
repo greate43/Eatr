@@ -47,7 +47,7 @@ public class HistoryFragment extends Fragment {
     private FirebaseUser user;
     private ProgressBar progressBar;
 
-    private static final int TOTAL_ITEMS_TO_LOAD = 15;
+    private static final int TOTAL_ITEMS_TO_LOAD = 20;
     private int mCurrentPage = 1;
     private ValueEventListener foodValueListener;
     EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;

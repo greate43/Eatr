@@ -72,7 +72,7 @@ public class HistoryViewHolder extends RecyclerView.ViewHolder {
 
     private void getBuyerOrSellerDetails(String postedBy, String purchasedBy) {
         if (postedBy != null) {
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -87,7 +87,7 @@ public class HistoryViewHolder extends RecyclerView.ViewHolder {
         }
 
         if (purchasedBy != null) {
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(purchasedBy).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(purchasedBy).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showProfileData(dataSnapshot, Constants.TYPE_BUYER);

@@ -20,43 +20,62 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.entities.Notification;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.entities.Review;
-import sk.greate43.eatr.fragmentDialogs.AcceptOrderDialogFragment;
+import sk.greate43.eatr.fragmentDialogs.AcceptAndOrderCompleteDialog;
 
-public class AcceptOderUtils {
+public class AcceptAndCompleteOrderUtils {
+    private static final String TAG = "AcceptAndCompleteOrderU";
+    String userType;
+    String userId = "";
+    Observable<Notification> notificationObservable;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private ValueEventListener foodValueListener;
-    private ValueEventListener notificationValueListener;
-    private ValueEventListener reviewValueListener;
-
+   // private ValueEventListener notificationValueListener;
     private Notification notification;
     private Food food;
     private Profile profile;
-    private ValueEventListener profileValueListener;
     private Observable<Food> foodObservable;
     private Observable<Profile> profileObservable;
+    private long itemCount = 0;
+    private float ratingAvg = 0;
 
-
-    public AcceptOderUtils() {
+    public AcceptAndCompleteOrderUtils() {
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
     }
 
-
-    public void checkIfOrderIsBookedAndShowOrderAcceptDialog(final Activity activity) {
+    public void checkIfOrderIsBookedAndShowOrderAcceptDialog(final Activity activity, String userType) {
+        this.userType = userType;
         foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                showData(dataSnapshot, activity);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+    }
+
+    public void checkIfOrderIsCompletedAndShowOrderCompleteDialog(final Activity activity, String userType) {
+        this.userType = userType;
+        Log.d(TAG, "checkIfOrderIsCompletedAndShowOrderCompleteDialog: " + this.userType);
+        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot, activity);
             }
 
@@ -126,60 +145,114 @@ public class AcceptOderUtils {
             food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
         }
 
-        if (!food.getCheckIfOrderIsActive()
-                && !food.getCheckIfOrderIsPurchased()
-                && !food.getCheckIfFoodIsInDraftMode()
-                && food.getCheckIfOrderIsBooked()
-                && !food.getCheckIfOrderIsInProgress()
-                && !food.getCheckIfOrderIsCompleted()
+        if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
 
-                ) {
+            if (!food.getCheckIfOrderIsActive()
+                    && !food.getCheckIfOrderIsPurchased()
+                    && !food.getCheckIfFoodIsInDraftMode()
+                    && food.getCheckIfOrderIsBooked()
+                    && !food.getCheckIfOrderIsInProgress()
+                    && !food.getCheckIfOrderIsCompleted()
 
-            foodObservable = Observable.create(emitter -> {
-                emitter.onNext(food);
-                emitter.onComplete();
-            });
+                    ) {
 
-            profileValueListener = mDatabaseReference.child(Constants.PROFILE).child(food.getPurchasedBy()).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                foodObservable = Observable.create(emitter -> {
+                    emitter.onNext(food);
+                    emitter.onComplete();
+                });
 
-                    Log.d(TAG, "onDataChange: " + dataSnapshot);
-                    showProfileData(dataSnapshot);
+                mDatabaseReference.child(Constants.PROFILE).child(food.getPurchasedBy()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                }
+                        Log.d(TAG, "onDataChange: " + dataSnapshot);
+                        showProfileData(dataSnapshot);
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    System.out.println("The read failed: " + databaseError.getCode());
-                }
-            });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
 
 
-            notificationValueListener = mDatabaseReference.child(Constants.NOTIFICATION)
-                    .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                if (ds.getValue() != null) {
-                                    collectNotification((Map<String, Object>) ds.getValue());
+                mDatabaseReference.child(Constants.NOTIFICATION)
+                        .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    if (ds.getValue() != null) {
+                                        collectNotification((Map<String, Object>) ds.getValue());
 
+                                    }
                                 }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
 
-            getBuyerOverallReview(food.getPurchasedBy(), activity);
+                getBuyerOverallReview(food.getPurchasedBy(), activity);
+
+            }
 
 
+        } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+            if (!food.getCheckIfOrderIsActive()
+                    && !food.getCheckIfOrderIsPurchased()
+                    && !food.getCheckIfFoodIsInDraftMode()
+                    && !food.getCheckIfOrderIsBooked()
+                    && !food.getCheckIfOrderIsInProgress()
+                    && food.getCheckIfOrderIsCompleted()
+                    ) {
+
+                Log.d(TAG, "collectFood: Complete "+food.getCheckIfOrderIsPurchased());
+                foodObservable = Observable.create(emitter -> {
+                    emitter.onNext(food);
+                    emitter.onComplete();
+                });
+
+                mDatabaseReference.child(Constants.PROFILE).child(food.getPostedBy()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        Log.d(TAG, "onDataChange: " + dataSnapshot);
+                        showProfileData(dataSnapshot);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
+                });
+
+
+                mDatabaseReference.child(Constants.NOTIFICATION)
+                        .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    if (ds.getValue() != null) {
+                                        collectNotification((Map<String, Object>) ds.getValue());
+
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+                getBuyerOverallReview(food.getPostedBy(), activity);
+
+            }
         }
-
-
     }
 
     private void showProfileData(DataSnapshot dataSnapshot) {
@@ -207,14 +280,12 @@ public class AcceptOderUtils {
         });
     }
 
-    String userId = "";
-
     private void getBuyerOverallReview(String userId, Activity activity) {
         this.userId = userId;
         if (userId != null) {
 
 
-            reviewValueListener = mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -244,7 +315,7 @@ public class AcceptOderUtils {
         ratingAvg = ratingAvg / itemCount;
 
 
-        if (foodObservable != null & profileValueListener != null & notificationObservable != null) {
+        if (foodObservable != null & profileObservable != null & notificationObservable != null) {
             Observable.zip(foodObservable, profileObservable, notificationObservable, (v1, v2, v3) -> {
                 Object[] objects = new Object[3];
                 objects[0] = v1;
@@ -260,7 +331,7 @@ public class AcceptOderUtils {
                     .subscribe(observer(activity, ratingAvg));
         }
 
-        
+
         ratingAvg = 0;
         itemCount = 0;
 
@@ -286,20 +357,34 @@ public class AcceptOderUtils {
                     notification = (Notification) objects[2];
                 }
 
+                if (userType.equalsIgnoreCase(Constants.TYPE_SELLER) && activity instanceof SellerActivity) {
+                    AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg, userType);
 
-                AcceptOrderDialogFragment acceptOrderDialogFragment = AcceptOrderDialogFragment.newInstance(food, notification, profile, ratingAvg);
+                    FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
 
-                FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
+                    Fragment prev = ((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(acceptOrderDialogFragment.TAG_FRAGMENT);
+                    if (prev != null) {
+                        ft.remove(prev);
+                    }
+                    ft.addToBackStack(null);
 
-                Fragment prev = ((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(acceptOrderDialogFragment.TAG_FRAGMENT);
-                if (prev != null) {
-                    ft.remove(prev);
+
+                    ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
+                } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER) && activity instanceof BuyerActivity) {
+
+                    AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg,userType);
+
+                    FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
+
+                    Fragment prev = ((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(acceptOrderDialogFragment.TAG_FRAGMENT);
+                    if (prev != null) {
+                        ft.remove(prev);
+                    }
+                    ft.addToBackStack(null);
+
+
+                    ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
                 }
-                ft.addToBackStack(null);
-
-
-                ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
-
             }
 
             @Override
@@ -314,10 +399,6 @@ public class AcceptOderUtils {
         };
 
     }
-
-    private long itemCount = 0;
-    private float ratingAvg = 0;
-    private static final String TAG = "AcceptOderUtils";
 
     private void collectReview(Map<String, Object> value) {
         Review review = new Review();
@@ -337,19 +418,25 @@ public class AcceptOderUtils {
         review.setUserId((String) value.get(Constants.USER_ID));
         review.setReviewType((String) value.get(Constants.REVIEW_TYPE));
 
-
-        if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_SELLER)) {
-            // reviews.add(review);
-            Log.d(TAG, "collectReview: rating " + review.getQuestionOneAnswer());
-            ratingAvg += (float) (review.getQuestionOneAnswer() + review.getQuestionTwoAnswer() + review.getQuestionThreeAnswer());
-            Log.d(TAG, "collectReview: total " + ratingAvg);
-            itemCount++;
+        if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
+            if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_SELLER)) {
+                // reviews.add(review);
+                Log.d(TAG, "collectReview: rating " + review.getQuestionOneAnswer());
+                ratingAvg += (float) (review.getQuestionOneAnswer() + review.getQuestionTwoAnswer() + review.getQuestionThreeAnswer());
+                Log.d(TAG, "collectReview: total " + ratingAvg);
+                itemCount++;
+            }
+        } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+            if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)) {
+                // reviews.add(review);
+                Log.d(TAG, "collectReview: rating " + review.getQuestionOneAnswer());
+                ratingAvg += (float) (review.getQuestionOneAnswer() + review.getQuestionTwoAnswer() + review.getQuestionThreeAnswer());
+                Log.d(TAG, "collectReview: total " + ratingAvg);
+                itemCount++;
+            }
         }
 
-
     }
-
-    Observable<Notification> notificationObservable;
 
     private void collectNotification(Map<String, Object> value) {
         final Notification notification = new Notification();
@@ -366,6 +453,7 @@ public class AcceptOderUtils {
         notification.setSenderId(String.valueOf(value.get(Constants.SENDER_ID)));
         notification.setReceiverId(String.valueOf(value.get(Constants.RECEIVER_ID)));
         notification.setNotificationType(String.valueOf(value.get(Constants.NOTIFICATION_TYPE)));
+
         if (notification.getReceiverId().equals(user.getUid()) && notification.getCheckIfNotificationAlertShouldBeShown()) {
             notificationObservable = Observable.create(emitter -> {
                 emitter.onNext(notification);
@@ -380,17 +468,17 @@ public class AcceptOderUtils {
             mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(foodValueListener);
         }
 
-        if (notificationValueListener != null) {
-            mDatabaseReference.child(Constants.NOTIFICATION)
-                    .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).removeEventListener(notificationValueListener);
-        }
+//        if (notificationValueListener != null) {
+//            mDatabaseReference.child(Constants.NOTIFICATION)
+//                    .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).removeEventListener(notificationValueListener);
+//        }
 
-        if (reviewValueListener != null) {
-            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
-        }
-
-        if (profileValueListener != null) {
-            mDatabaseReference.child(Constants.PROFILE).child(food.getPurchasedBy()).removeEventListener(profileValueListener);
-        }
+//        if (reviewValueListener != null) {
+//            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
+//        }
+//
+//        if (profileValueListener != null) {
+//            mDatabaseReference.child(Constants.PROFILE).child(food.getPurchasedBy()).removeEventListener(profileValueListener);
+//        }
     }
 }

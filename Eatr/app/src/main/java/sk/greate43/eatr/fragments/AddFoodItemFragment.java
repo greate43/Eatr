@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -44,8 +43,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -175,14 +172,7 @@ public class AddFoodItemFragment extends Fragment implements
         btnShareFood.setOnClickListener(this);
 
         imgChooseImage = view.findViewById(R.id.fragment_add_food_item_image_view_choose_image);
-        imgChooseImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                selectPictureFromGalleryOrCameraDialog();
-
-            }
-        });
+        imgChooseImage.setOnClickListener(v -> selectPictureFromGalleryOrCameraDialog());
 
 
 // Create an instance of GoogleAPIClient.
@@ -256,17 +246,14 @@ public class AddFoodItemFragment extends Fragment implements
                     "Select photo from gallery",
                     "Capture photo from camera"};
             pictureDialog.setItems(pictureDialogItems,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
-                                    choosePhotoFromGallery();
-                                    break;
-                                case 1:
-                                    takePhotoFromCamera();
-                                    break;
-                            }
+                    (dialog, which) -> {
+                        switch (which) {
+                            case 0:
+                                choosePhotoFromGallery();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                break;
                         }
                     });
             pictureDialog.show();
@@ -277,17 +264,13 @@ public class AddFoodItemFragment extends Fragment implements
         if (getActivity() != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Would You Like To Turn On The Gps?");
-            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    startGpsFromSettings();
-                    dialog.dismiss();
-                }
+            builder.setPositiveButton(android.R.string.yes, (dialog, id) -> {
+                startGpsFromSettings();
+                dialog.dismiss();
             });
-            builder.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    showToast("App Might Not be Fully Functional if Gps Is Off  ");
-                    dialog.dismiss();
-                }
+            builder.setNegativeButton(R.string.No, (dialog, id) -> {
+                showToast("App Might Not be Fully Functional if Gps Is Off  ");
+                dialog.dismiss();
             });
             AlertDialog dialog = builder.create();
             dialog.show();
@@ -585,94 +568,86 @@ public class AddFoodItemFragment extends Fragment implements
 
 
             //  storageRef.putFile(imgUri)
-            uploadTask.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
+            uploadTask.addOnFailureListener(exception -> {
+                // Handle unsuccessful uploads
 
-                    food = new Food();
-                    food.setPushId(pushId);
-                    food.setDishName(dishName);
-                    food.setCuisine(cuisine);
-                    food.setIngredientsTags(ingredientsTags);
-                    food.setPickUpLocation(pickUpLocation);
-                    food.setImageUri("");
-                    food.setImage(imgUri);
-                    food.setLongitude(longitude);
-                    food.setLatitude(latitude);
-                    food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
-                    food.setTimeStamp(ServerValue.TIMESTAMP);
-                    food.setCheckIfOrderIsActive(checkIfOrderIsActive);
-                    food.setPrice(price);
-                    food.setNumberOfServings(numberOfServings);
-                    food.setExpiryTime(expiryTime);
-                    food.setCheckIfOrderIsPurchased(false);
-                    food.setPostedBy(user.getUid());
-                    food.setPurchasedBy("");
-                    food.setCheckIfOrderIsInProgress(false);
-                    food.setCheckIfOrderIsAccepted(false);
-                    food.setCheckIfOrderIsBooked(false);
-                    food.setCheckIfOrderIsCompleted(false);
-                    food.setCheckIfMapShouldBeClosed(false);
+                food = new Food();
+                food.setPushId(pushId);
+                food.setDishName(dishName);
+                food.setCuisine(cuisine);
+                food.setIngredientsTags(ingredientsTags);
+                food.setPickUpLocation(pickUpLocation);
+                food.setImageUri("");
+                food.setImage(imgUri);
+                food.setLongitude(longitude);
+                food.setLatitude(latitude);
+                food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
+                food.setTimeStamp(ServerValue.TIMESTAMP);
+                food.setCheckIfOrderIsActive(checkIfOrderIsActive);
+                food.setPrice(price);
+                food.setNumberOfServings(numberOfServings);
+                food.setExpiryTime(expiryTime);
+                food.setCheckIfOrderIsPurchased(false);
+                food.setPostedBy(user.getUid());
+                food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
+                food.setCheckIfOrderIsAccepted(false);
+                food.setCheckIfOrderIsBooked(false);
+                food.setCheckIfOrderIsCompleted(false);
+                food.setCheckIfMapShouldBeClosed(false);
 
-                    mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
-                    Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
-                    if (dialogUploadingImage.isShowing()) {
-                        dialogUploadingImage.dismiss();
-                    }
-                    if (replaceFragment != null) {
-
-
-                        replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
-                    }
-
-                    //  getActivity().finish();
+                mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
+                Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
+                if (dialogUploadingImage.isShowing()) {
+                    dialogUploadingImage.dismiss();
                 }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                    // Get a URL to the uploaded content
-
-                    food = new Food();
-                    food.setPushId(pushId);
-                    food.setDishName(dishName);
-                    food.setCuisine(cuisine);
-                    food.setIngredientsTags(ingredientsTags);
-                    food.setPickUpLocation(pickUpLocation);
-                    food.setImageUri(String.valueOf(downloadUrl));
-                    food.setImage(imgUri);
-                    food.setLongitude(longitude);
-                    food.setLatitude(latitude);
-                    food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
-                    food.setTimeStamp(ServerValue.TIMESTAMP);
-                    food.setCheckIfOrderIsActive(checkIfOrderIsActive);
-                    food.setPrice(price);
-                    food.setNumberOfServings(numberOfServings);
-                    food.setExpiryTime(expiryTime);
-                    food.setCheckIfOrderIsPurchased(false);
-                    food.setPostedBy(user.getUid());
-                    food.setPurchasedBy("");
-                    food.setCheckIfOrderIsInProgress(false);
-                    food.setCheckIfOrderIsAccepted(false);
-                    food.setCheckIfOrderIsBooked(false);
-                    food.setCheckIfOrderIsCompleted(false);
-                    food.setCheckIfMapShouldBeClosed(false);
+                if (replaceFragment != null) {
 
 
-                    mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
-                    if (dialogUploadingImage.isShowing()) {
-                        dialogUploadingImage.dismiss();
-                    }
+                    replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                }
 
-                    if (replaceFragment != null) {
+                //  getActivity().finish();
+            }).addOnSuccessListener(taskSnapshot -> {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                // Get a URL to the uploaded content
+
+                food = new Food();
+                food.setPushId(pushId);
+                food.setDishName(dishName);
+                food.setCuisine(cuisine);
+                food.setIngredientsTags(ingredientsTags);
+                food.setPickUpLocation(pickUpLocation);
+                food.setImageUri(String.valueOf(downloadUrl));
+                food.setImage(imgUri);
+                food.setLongitude(longitude);
+                food.setLatitude(latitude);
+                food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
+                food.setTimeStamp(ServerValue.TIMESTAMP);
+                food.setCheckIfOrderIsActive(checkIfOrderIsActive);
+                food.setPrice(price);
+                food.setNumberOfServings(numberOfServings);
+                food.setExpiryTime(expiryTime);
+                food.setCheckIfOrderIsPurchased(false);
+                food.setPostedBy(user.getUid());
+                food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
+                food.setCheckIfOrderIsAccepted(false);
+                food.setCheckIfOrderIsBooked(false);
+                food.setCheckIfOrderIsCompleted(false);
+                food.setCheckIfMapShouldBeClosed(false);
 
 
-                        replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
-                    }
+                mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
+                if (dialogUploadingImage.isShowing()) {
+                    dialogUploadingImage.dismiss();
+                }
+
+                if (replaceFragment != null) {
 
 
+                    replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
                 }
 
 
