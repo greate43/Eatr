@@ -197,7 +197,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
 
     private void getSellerDetailsAndReview(String postedBy, String orderId) {
         if (postedBy != null) {
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addListenerForSingleValueEvent(new ValueEventListener() {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -212,7 +212,7 @@ public class PostedFoodViewHolder extends RecyclerView.ViewHolder implements Vie
         }
 
         if (postedBy != null) {
-            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.ORDER_ID).equalTo(orderId).addListenerForSingleValueEvent(new ValueEventListener() {
+            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.ORDER_ID).equalTo(orderId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
