@@ -72,7 +72,7 @@ public class NotificationFragment extends Fragment {
     }
 
     private ProgressBar progressBar;
-    private static final int TOTAL_ITEMS_TO_LOAD = 15;
+    private static final int TOTAL_ITEMS_TO_LOAD = 20;
     private int mCurrentPage = 1;
     EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
@@ -116,12 +116,7 @@ public class NotificationFragment extends Fragment {
 
         loadFirebaseData();
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadFirebaseData();
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> loadFirebaseData());
         recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {

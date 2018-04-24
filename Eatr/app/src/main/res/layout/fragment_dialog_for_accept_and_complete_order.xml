@@ -8,7 +8,7 @@
 
 
     <TextView
-        android:id="@+id/fragment_accept_order_text_view_buyer_name"
+        android:id="@+id/fragment_accept_order_text_view_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
@@ -167,6 +167,6 @@
         android:rating="0"
         android:stepSize="0.1"
         android:isIndicator="true"
-        app:layout_constraintStart_toStartOf="@+id/fragment_accept_order_text_view_buyer_name"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_buyer_name" />
+        app:layout_constraintStart_toStartOf="@+id/fragment_accept_order_text_view_user_name"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_accept_order_text_view_user_name" />
 </android.support.constraint.ConstraintLayout>

@@ -50,7 +50,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
-    private static final int TOTAL_ITEMS_TO_LOAD = 15;
+    private static final int TOTAL_ITEMS_TO_LOAD = 20;
     private int mCurrentPage = 1;
     private ProgressBar progressBar;
     LinearLayoutManager layoutManager;

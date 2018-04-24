@@ -153,7 +153,7 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
 
     private void getSellerDetailsAndReview(String postedBy) {
         if (postedBy != null) {
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(postedBy).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 

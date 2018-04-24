@@ -84,31 +84,25 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         img = itemView.findViewById(R.id.notification_list_circleImageView);
         yes = itemView.findViewById(R.id.notification_list_button_yes);
         no = itemView.findViewById(R.id.notification_list_button_no);
-        yes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (notification != null) {
-                    mDatabaseReference.child(Constants.NOTIFICATION)
-                            .child(notification.getNotificationId())
-                            .updateChildren(updateNotificationAlert(true, true));
+        yes.setOnClickListener(v -> {
+            if (notification != null) {
+                mDatabaseReference.child(Constants.NOTIFICATION)
+                        .child(notification.getNotificationId())
+                        .updateChildren(updateNotificationAlert(true, true));
 
 
-                    sendNotification(true);
-                }
+                sendNotification(true);
             }
         });
-        no.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (notification != null) {
-                    mDatabaseReference.child(Constants.NOTIFICATION)
-                            .child(notification.getNotificationId())
-                            .updateChildren(updateNotificationAlert(true, false));
+        no.setOnClickListener(v -> {
+            if (notification != null) {
+                mDatabaseReference.child(Constants.NOTIFICATION)
+                        .child(notification.getNotificationId())
+                        .updateChildren(updateNotificationAlert(true, false));
 
-                    sendNotification(false);
+                sendNotification(false);
 
 
-                }
             }
         });
     }
