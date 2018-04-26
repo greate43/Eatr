@@ -1,6 +1,7 @@
 package sk.greate43.eatr.utils;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -12,6 +13,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.Contract;
 
 import java.util.Map;
 
@@ -37,8 +40,8 @@ public class AcceptAndCompleteOrderUtils {
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private ValueEventListener foodValueListener;
-   // private ValueEventListener notificationValueListener;
+    private ValueEventListener mFoodValueListener;
+    // private ValueEventListener notificationValueListener;
     private Notification notification;
     private Food food;
     private Profile profile;
@@ -46,8 +49,14 @@ public class AcceptAndCompleteOrderUtils {
     private Observable<Profile> profileObservable;
     private long itemCount = 0;
     private float ratingAvg = 0;
+    public static final AcceptAndCompleteOrderUtils ourInstance = new AcceptAndCompleteOrderUtils();
 
-    public AcceptAndCompleteOrderUtils() {
+    @Contract(pure = true)
+    public static AcceptAndCompleteOrderUtils getOurInstance() {
+        return ourInstance;
+    }
+
+    private AcceptAndCompleteOrderUtils() {
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
@@ -56,7 +65,7 @@ public class AcceptAndCompleteOrderUtils {
 
     public void checkIfOrderIsBookedAndShowOrderAcceptDialog(final Activity activity, String userType) {
         this.userType = userType;
-        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+        mFoodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -73,7 +82,7 @@ public class AcceptAndCompleteOrderUtils {
     public void checkIfOrderIsCompletedAndShowOrderCompleteDialog(final Activity activity, String userType) {
         this.userType = userType;
         Log.d(TAG, "checkIfOrderIsCompletedAndShowOrderCompleteDialog: " + this.userType);
-        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+        mFoodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot, activity);
@@ -179,21 +188,21 @@ public class AcceptAndCompleteOrderUtils {
 
                 mDatabaseReference.child(Constants.NOTIFICATION)
                         .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                    if (ds.getValue() != null) {
-                                        collectNotification((Map<String, Object>) ds.getValue());
-
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            if (ds.getValue() != null) {
+                                collectNotification((Map<String, Object>) ds.getValue());
 
                             }
-                        });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 getBuyerOverallReview(food.getPurchasedBy(), activity);
 
@@ -209,7 +218,7 @@ public class AcceptAndCompleteOrderUtils {
                     && food.getCheckIfOrderIsCompleted()
                     ) {
 
-                Log.d(TAG, "collectFood: Complete "+food.getCheckIfOrderIsPurchased());
+                Log.d(TAG, "collectFood: Complete " + food.getCheckIfOrderIsPurchased());
                 foodObservable = Observable.create(emitter -> {
                     emitter.onNext(food);
                     emitter.onComplete();
@@ -233,21 +242,21 @@ public class AcceptAndCompleteOrderUtils {
 
                 mDatabaseReference.child(Constants.NOTIFICATION)
                         .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                    if (ds.getValue() != null) {
-                                        collectNotification((Map<String, Object>) ds.getValue());
-
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            if (ds.getValue() != null) {
+                                collectNotification((Map<String, Object>) ds.getValue());
 
                             }
-                        });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
                 getBuyerOverallReview(food.getPostedBy(), activity);
 
@@ -337,6 +346,8 @@ public class AcceptAndCompleteOrderUtils {
 
     }
 
+    @NonNull
+    @Contract(pure = true)
     private Observer<Object[]> observer(Activity activity, float ratingAvg) {
         return new Observer<Object[]>() {
             @Override
@@ -372,7 +383,7 @@ public class AcceptAndCompleteOrderUtils {
                     ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
                 } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER) && activity instanceof BuyerActivity) {
 
-                    AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg,userType);
+                    AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg, userType);
 
                     FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
 
@@ -464,8 +475,8 @@ public class AcceptAndCompleteOrderUtils {
     }
 
     public void removeListener() {
-        if (foodValueListener != null) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(foodValueListener);
+        if (mFoodValueListener != null) {
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(mFoodValueListener);
         }
 
 //        if (notificationValueListener != null) {

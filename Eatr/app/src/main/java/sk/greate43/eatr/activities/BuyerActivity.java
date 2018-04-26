@@ -45,8 +45,6 @@ public class BuyerActivity extends AppCompatActivity {
     private Search search;
     private ValueEventListener profileValueListener;
     private ValueEventListener reviewValueListener;
-    private ReviewUtils reviewUtils;
-    AcceptAndCompleteOrderUtils acceptAndCompleteOrderUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +55,8 @@ public class BuyerActivity extends AppCompatActivity {
 
         Util.ScheduleNotification(this);
 
-        acceptAndCompleteOrderUtils = new AcceptAndCompleteOrderUtils();
         updateProfile = DrawerUtil.getInstance().getCallback();
-        acceptAndCompleteOrderUtils.checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
+        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
 
         DrawerUtil.getInstance().getDrawer(this, toolbar);
 
@@ -86,8 +83,7 @@ public class BuyerActivity extends AppCompatActivity {
             }
         });
 
-        reviewUtils = new ReviewUtils();
-        reviewUtils.reviewTheUser(this, Constants.TYPE_BUYER);
+        ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_BUYER);
         getMyOverallReview(user.getUid());
 
     }
@@ -106,11 +102,10 @@ public class BuyerActivity extends AppCompatActivity {
         if (reviewValueListener != null) {
             mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
         }
-        reviewUtils.removeListener();
-        acceptAndCompleteOrderUtils.removeListener();
+        ReviewUtils.getOurInstance().removeListener();
+        AcceptAndCompleteOrderUtils.getOurInstance().removeListener();
         updateProfile = null;
         search = null;
-        reviewUtils = null;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
