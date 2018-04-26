@@ -44,8 +44,6 @@ public class SellerActivity extends AppCompatActivity {
     UpdateProfile updateProfile;
     private ValueEventListener profileValueListener;
     private ValueEventListener reviewValueListener;
-    ReviewUtils reviewUtils;
-    private AcceptAndCompleteOrderUtils acceptAndCompleteOrderUtils;
     //
 //    TextView tvFullName;
 //    TextView tvUserType;
@@ -61,11 +59,10 @@ public class SellerActivity extends AppCompatActivity {
 
         Util.ScheduleNotification(this);
         //   Util.ScheduleExpireOrder(this);
-        reviewUtils = new ReviewUtils();
-        reviewUtils.reviewTheUser(this, Constants.TYPE_SELLER);
-        acceptAndCompleteOrderUtils = new AcceptAndCompleteOrderUtils();
+        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsBookedAndShowOrderAcceptDialog(this, Constants.TYPE_SELLER);
 
-        acceptAndCompleteOrderUtils.checkIfOrderIsBookedAndShowOrderAcceptDialog(this,Constants.TYPE_SELLER);
+        ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_SELLER);
+
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -181,11 +178,9 @@ public class SellerActivity extends AppCompatActivity {
         }
 
 
-        reviewUtils.removeListener();
-        acceptAndCompleteOrderUtils.removeListener();
-        acceptAndCompleteOrderUtils = null;
+        ReviewUtils.getOurInstance().removeListener();
+        AcceptAndCompleteOrderUtils.getOurInstance().removeListener();
         updateProfile = null;
-        reviewUtils = null;
 
     }
 

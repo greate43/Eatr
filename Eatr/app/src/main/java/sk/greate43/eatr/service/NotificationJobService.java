@@ -50,7 +50,7 @@ public class NotificationJobService extends JobService {
     public boolean onStartJob(JobParameters job) {
 
         Log.d(TAG, "onStartJob: ");
-        mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener(valueListenner = new ValueEventListener() {
+        valueListenner =  mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);
@@ -74,8 +74,8 @@ public class NotificationJobService extends JobService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (valueListenner != null)
-            mDatabaseReference.child(Constants.NOTIFICATION).removeEventListener(valueListenner);
+//        if (valueListenner != null)
+//            mDatabaseReference.child(Constants.NOTIFICATION).removeEventListener(valueListenner);
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -30,8 +31,14 @@ public class ReviewUtils {
     private String userType = "";
     private ValueEventListener buyerReviewListener;
     private ValueEventListener sellerReviewListener;
+    public static final ReviewUtils ourInstance = new ReviewUtils();
 
-    public ReviewUtils() {
+    @Contract(pure = true)
+    public static ReviewUtils getOurInstance() {
+        return ourInstance;
+    }
+
+    private ReviewUtils() {
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
@@ -39,13 +46,12 @@ public class ReviewUtils {
     }
 
 
-
     public void reviewTheUser(final Activity activity, String typeOfUser) {
         //activityReview = activity;
         userType = typeOfUser;
 
         if (activity instanceof SellerActivity) {
-            sellerReviewListener =  mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener( new ValueEventListener() {
+            sellerReviewListener = mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);
@@ -57,7 +63,7 @@ public class ReviewUtils {
                 }
             });
         } else if (activity instanceof BuyerActivity) {
-            buyerReviewListener = mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener( new ValueEventListener() {
+            buyerReviewListener = mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);
