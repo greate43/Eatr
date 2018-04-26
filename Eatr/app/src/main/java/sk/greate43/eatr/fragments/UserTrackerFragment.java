@@ -49,6 +49,7 @@ public class UserTrackerFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
+    private ValueEventListener foodValueListener;
 
     public UserTrackerFragment() {
         // Required empty public constructor
@@ -105,7 +106,7 @@ public class UserTrackerFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         switch (userType) {
             case Constants.TYPE_SELLER:
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -119,7 +120,7 @@ public class UserTrackerFragment extends Fragment {
                 });
                 break;
             case Constants.TYPE_BUYER:
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                foodValueListener =  mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -201,7 +202,7 @@ public class UserTrackerFragment extends Fragment {
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime(value.get(Constants.TIME_STAMP).toString());
+            food.setTime(Long.parseLong(String.valueOf(value.get(Constants.TIME_STAMP))));
         }
         if (value.get(Constants.PURCHASED_BY) != null) {
             food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
@@ -235,6 +236,14 @@ public class UserTrackerFragment extends Fragment {
 //
 //        }
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (foodValueListener != null){
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(foodValueListener);
+        }
     }
 
     @Override

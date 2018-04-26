@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 
@@ -33,6 +36,7 @@ import sk.greate43.eatr.activities.DetailFoodActivity;
 import sk.greate43.eatr.adaptors.ListOfAllPostedFoodRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.interfaces.Search;
+import sk.greate43.eatr.recyclerCustomItem.EndlessRecyclerViewScrollListener;
 import sk.greate43.eatr.recyclerCustomItem.RecyclerItemClickListener;
 import sk.greate43.eatr.utils.Constants;
 
@@ -46,6 +50,14 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
+    private static final int TOTAL_ITEMS_TO_LOAD = 30;
+    private int mCurrentPage = 1;
+    private ProgressBar progressBar;
+    LinearLayoutManager layoutManager;
+    SwipeRefreshLayout swipeRefreshLayout;
+    private ValueEventListener foodValueListener;
+    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
+    private ValueEventListener foodValueListenerSearch;
 
     public ListOfAllPostedFoodFragment() {
         // Required empty public constructor
@@ -75,26 +87,64 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         View view = inflater.inflate(R.layout.fragment_list_of_all_posted_food, container, false);
 
         initialize();
-
         recyclerView = view.findViewById(R.id.fragment_list_of_all_posted_food_recycler_view);
+        progressBar = view.findViewById(R.id.loading_more_progress);
+        swipeRefreshLayout = view.findViewById(R.id.fragment_list_of_all_posted_food_swipe_refresh_layout);
+
         if (getActivity() != null)
             adaptor = new ListOfAllPostedFoodRecyclerViewAdaptor((BuyerActivity) getActivity());
 
         foods = adaptor.getFoods();
+        recyclerView.setHasFixedSize(true);
+        progressBar.setVisibility(View.GONE);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), recyclerView, this));
 
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+
         retrieveFirebaseData("");
+
+
+//        swipeRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+//                mCurrentPage++;
+//                Log.d(TAG, "onRefresh: " + mCurrentPage);
+//                retrieveFirebaseData("");
+//            }
+//        });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                retrieveFirebaseData("");
+
+            }
+        });
+
+        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
+                mCurrentPage = page;
+                progressBar.setVisibility(View.VISIBLE);
+                retrieveFirebaseData("");
+
+            }
+        });
+
+
+        //  implementScrollListener();
+
         return view;
     }
+
 
     private void initialize() {
         mAuth = FirebaseAuth.getInstance();
@@ -103,11 +153,13 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         user = mAuth.getCurrentUser();
     }
 
-
+    private String searchKeyword;
     private void retrieveFirebaseData(String searchKeyword) {
+        this.searchKeyword = searchKeyword;
         if (mDatabaseReference != null) {
+
             if (!searchKeyword.isEmpty()) {
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener(new ValueEventListener() {
+                foodValueListenerSearch = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -120,7 +172,9 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
                     }
                 });
             } else {
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(new ValueEventListener() {
+                DatabaseReference foodListRef = mDatabaseReference.child(Constants.FOOD);
+                Query query = foodListRef.limitToFirst(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
+                foodValueListener = query.orderByChild(Constants.EXPIRY_TIME).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -133,6 +187,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
                     }
                 });
             }
+
         } else {
             initialize();
         }
@@ -140,9 +195,6 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
 
     private void showData(@NotNull DataSnapshot dataSnapshot) {
-        if (dataSnapshot.getValue() == null) {
-            return;
-        }
 
         if (adaptor != null) {
             adaptor.clear();
@@ -156,6 +208,9 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
             }
         }
         adaptor.notifyDataSetChanged();
+        progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
+
     }
 
     private void collectFood(Map<String, Object> value) {
@@ -189,8 +244,9 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime(value.get(Constants.TIME_STAMP).toString());
+            food.setTime((long) value.get(Constants.TIME_STAMP));
         }
+
         if (value.get(Constants.PURCHASED_BY) != null) {
             food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
         }
@@ -251,6 +307,21 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        if (foodValueListener != null) {
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
+        }
+        if (foodValueListenerSearch != null){
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).removeEventListener(foodValueListenerSearch);
+        }
+
+        if (endlessRecyclerViewScrollListener != null) {
+            endlessRecyclerViewScrollListener = null;
+        }
+    }
+
+    @Override
     public void onSearchCompleted(String searchKeyword) {
         if (searchKeyword != null && !searchKeyword.isEmpty()) {
             retrieveFirebaseData(searchKeyword.toLowerCase());
@@ -258,4 +329,6 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
             retrieveFirebaseData("");
         }
     }
+
+
 }

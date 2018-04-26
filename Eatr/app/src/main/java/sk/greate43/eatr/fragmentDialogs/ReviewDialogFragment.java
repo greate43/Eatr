@@ -26,7 +26,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import sk.greate43.eatr.R;
-import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.entities.AskForReview;
 import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.entities.Review;
 import sk.greate43.eatr.utils.Constants;
@@ -35,27 +35,39 @@ import sk.greate43.eatr.utils.Constants;
 public class ReviewDialogFragment extends DialogFragment {
 
     private static final String TAG = "ReviewDialogFragment";
-    TextView tv;
-    RatingBar rbReview;
+    public String TAG_FRAGMENT = "ReviewDialogFragment";
+    private TextView tvQuestionOne;
+    private TextView tvQuestionTwo;
+    private TextView tvQuestionThree;
+
     CircleImageView imgUserPic;
-    Food food;
+    AskForReview askForReview;
     String userType;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private Button btnSubmit;
-    public String TAG_FRAGMENT ="ReviewDialogFragment";
+    private boolean isQuestionOneAnswered = false;
+    private boolean isQuestionTwoAnswered = false;
+    private boolean isQuestionThreeAnswered = false;
+    private RatingBar rbReviewAnswerOne;
+    private RatingBar rbReviewAnswerThree;
+    private RatingBar rbReviewAnswerTwo;
+    private float ratingValueForAnswerOne;
+    private float ratingValueForAnswerTwo;
+    private float ratingValueForAnswerThree;
+    private ValueEventListener profileValueListener;
 
     public ReviewDialogFragment() {
         // Required empty public constructor
     }
 
-    public static ReviewDialogFragment newInstance(String userType, Food food) {
+    public static ReviewDialogFragment newInstance(String userType, AskForReview askForReview) {
         ReviewDialogFragment fragment = new ReviewDialogFragment();
         Bundle args = new Bundle();
         args.putString(Constants.USER_TYPE, userType);
-        args.putSerializable(Constants.ARGS_FOOD, food);
+        args.putSerializable(Constants.ARGS_ASK_FOR_REVIEW, askForReview);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,47 +78,80 @@ public class ReviewDialogFragment extends DialogFragment {
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogThemeCustom);
 
         if (getArguments() != null) {
-            food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
+            askForReview = (AskForReview) getArguments().getSerializable(Constants.ARGS_ASK_FOR_REVIEW);
             userType = getArguments().getString(Constants.USER_TYPE);
 
         }
     }
-
-    float ratingValue;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dialog_review, container, false);
-        tv = view.findViewById(R.id.fragment_dialog_review_text_view);
+        tvQuestionOne = view.findViewById(R.id.fragment_dialog_review_text_view_question_one);
+        tvQuestionTwo = view.findViewById(R.id.fragment_dialog_review_text_view_question_two);
+        tvQuestionThree = view.findViewById(R.id.fragment_dialog_review_text_view_question_three);
+
         imgUserPic = view.findViewById(R.id.fragment_dialog_review_circleImageView_user_image);
-        rbReview = view.findViewById(R.id.fragment_dialog_review_ratingBar);
+
+        rbReviewAnswerOne = view.findViewById(R.id.fragment_dialog_review_ratingBar_question_one_answer);
+        rbReviewAnswerTwo = view.findViewById(R.id.fragment_dialog_review_ratingBar_question_two_answer);
+        rbReviewAnswerThree = view.findViewById(R.id.fragment_dialog_review_ratingBar_question_three_answer);
+
         btnSubmit = view.findViewById(R.id.fragment_dialog_button_submit_review);
 
         btnSubmit.setEnabled(false);
         btnSubmit.setAlpha(0.3f);
 
 
-        rbReview.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+        rbReviewAnswerOne.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                btnSubmit.setEnabled(true);
-                btnSubmit.setAlpha(1f);
-                ratingValue = rating;
+                if (rating < 1) {
+                    rbReviewAnswerOne.setRating(1);
+                }
 
+
+                ratingValueForAnswerOne = rating;
+                isQuestionOneAnswered = true;
+
+                checkIfSubmitButtonShouldBeEnabled();
             }
         });
 
+        rbReviewAnswerTwo.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (rating < 1) {
+                    rbReviewAnswerTwo.setRating(1);
+                }
+                ratingValueForAnswerTwo = rating;
+                isQuestionTwoAnswered = true;
 
+                checkIfSubmitButtonShouldBeEnabled();
+            }
+        });
+        rbReviewAnswerThree.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (rating < 1) {
+                    rbReviewAnswerThree.setRating(1);
+                }
+                ratingValueForAnswerThree = rating;
+                isQuestionThreeAnswered = true;
+
+                checkIfSubmitButtonShouldBeEnabled();
+            }
+        });
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
 
-        if (food != null && userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
+        if (askForReview != null && userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
 
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(food.getPostedBy()).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(askForReview.getPostedBy()).addValueEventListener(profileValueListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -121,10 +166,13 @@ public class ReviewDialogFragment extends DialogFragment {
                 }
             });
 
-            tv.setText("How Much Would You Rate Order Overall Food Quality?");
+            tvQuestionOne.setText(Constants.BUYER_QUESTION_ONE);
+            tvQuestionTwo.setText(Constants.BUYER_QUESTION_TWO);
+            tvQuestionThree.setText(Constants.BUYER_QUESTION_THREE);
 
-        } else if (food != null && userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
-            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(food.getPurchasedBy()).addValueEventListener(new ValueEventListener() {
+        } else if (askForReview != null && userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
+            Log.d(TAG, "onCreateView: " + askForReview.getPurchasedBy());
+            mDatabaseReference.child(Constants.PROFILE).orderByChild(Constants.USER_ID).equalTo(askForReview.getPurchasedBy()).addValueEventListener(profileValueListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -140,7 +188,10 @@ public class ReviewDialogFragment extends DialogFragment {
             });
 
 
-            tv.setText("How Much Would You Rate Buyer ?");
+            tvQuestionOne.setText(Constants.SELLER_QUESTION_ONE);
+            tvQuestionTwo.setText(Constants.SELLER_QUESTION_TWO);
+            tvQuestionThree.setText(Constants.SELLER_QUESTION_THREE);
+
 
         }
 
@@ -152,25 +203,43 @@ public class ReviewDialogFragment extends DialogFragment {
                 Review review = new Review();
                 if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)) {
                     review.setReviewId(reviewId);
-                    review.setOrderId(food.getPushId());
-                    review.setOverAllFoodQuality(ratingValue);
-                    review.setReviewGivenBy(food.getPostedBy());
-                    review.setUserId(food.getPurchasedBy());
-                    mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER).setValue(false);
+                    review.setOrderId(askForReview.getOrderId());
 
+                    review.setQuestionOne(Constants.SELLER_QUESTION_ONE);
+                    review.setQuestionTwo(Constants.SELLER_QUESTION_TWO);
+                    review.setQuestionThree(Constants.SELLER_QUESTION_THREE);
 
+                    review.setQuestionOneAnswer(ratingValueForAnswerOne);
+                    review.setQuestionTwoAnswer(ratingValueForAnswerTwo);
+                    review.setQuestionThreeAnswer(ratingValueForAnswerThree);
 
-
+                    review.setReviewGivenBy(askForReview.getPostedBy());
+                    review.setUserId(askForReview.getPurchasedBy());
+                    review.setReviewType(Constants.REVIEW_FROM_SELLER);
+                    mDatabaseReference.child(Constants.SELLER_REVIEW).child(askForReview.getOrderId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER).setValue(false);
 
 
                 } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)) {
                     review.setReviewId(reviewId);
-                    review.setOrderId(food.getPushId());
-                    review.setOverAllFoodQuality(ratingValue);
-                    review.setReviewGivenBy(food.getPurchasedBy());
-                    review.setUserId(food.getPostedBy());
-                    mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER).setValue(false);
+                    review.setOrderId(askForReview.getOrderId());
+
+                    review.setQuestionOne(Constants.BUYER_QUESTION_ONE);
+                    review.setQuestionTwo(Constants.BUYER_QUESTION_TWO);
+                    review.setQuestionThree(Constants.BUYER_QUESTION_THREE);
+
+                    review.setQuestionOneAnswer(ratingValueForAnswerOne);
+                    review.setQuestionTwoAnswer(ratingValueForAnswerTwo);
+                    review.setQuestionThreeAnswer(ratingValueForAnswerThree);
+
+                    review.setReviewGivenBy(askForReview.getPurchasedBy());
+                    review.setUserId(askForReview.getPostedBy());
+                    review.setReviewType(Constants.REVIEW_FROM_BUYER);
+
+
+                    mDatabaseReference.child(Constants.BUYER_REVIEW).child(askForReview.getOrderId()).child(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER).setValue(false);
                 }
+
+
                 mDatabaseReference.child(Constants.REVIEW).child(reviewId).setValue(review);
 
 
@@ -178,6 +247,13 @@ public class ReviewDialogFragment extends DialogFragment {
             }
         });
         return view;
+    }
+
+    private void checkIfSubmitButtonShouldBeEnabled() {
+        if (isQuestionOneAnswered && isQuestionTwoAnswered && isQuestionThreeAnswered) {
+            btnSubmit.setEnabled(true);
+            btnSubmit.setAlpha(1f);
+        }
     }
 
     private void showData(DataSnapshot dataSnapshot) {
@@ -193,6 +269,14 @@ public class ReviewDialogFragment extends DialogFragment {
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (profileValueListener != null){
+            mDatabaseReference.removeEventListener(profileValueListener);
+        }
+    }
+
     private void collectProfile(Map<String, Object> value) {
         Log.d(TAG, "collectProfile: " + value);
         Profile profile = new Profile();
@@ -206,7 +290,7 @@ public class ReviewDialogFragment extends DialogFragment {
         profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));
 
 
-        if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
+        if (profile.getProfilePhotoUri() != null && !profile.getProfilePhotoUri().isEmpty()) {
             Picasso.with(getActivity())
                     .load(profile.getProfilePhotoUri())
                     .fit()

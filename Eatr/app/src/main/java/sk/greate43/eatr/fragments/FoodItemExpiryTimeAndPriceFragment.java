@@ -166,6 +166,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         result.put(Constants.NO_OF_SERVINGS, numberOfServings);
         result.put(Constants.EXPIRY_TIME, expiryTime);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, true);
+        result.put(Constants.TIME_STAMP,ServerValue.TIMESTAMP);
         result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
         return result;
     }

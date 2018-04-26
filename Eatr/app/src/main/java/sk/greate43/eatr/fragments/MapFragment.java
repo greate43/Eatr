@@ -121,6 +121,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     private int REQUEST_CHECK_SETTINGS = 2;
     private String userType;
     private String price;
+    private ValueEventListener foodValueListener;
+    private ValueEventListener liveLocationUpdateValueListener;
 
     public MapFragment() {
         // Required empty public constructor
@@ -182,7 +184,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
 
                 createLocationRequest();
-                mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                foodValueListener =   mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -198,7 +200,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
                 break;
             case Constants.TYPE_SELLER:
-                mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+                liveLocationUpdateValueListener = mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -772,6 +774,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
         }
 
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (liveLocationUpdateValueListener != null) {
+            mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).removeEventListener(liveLocationUpdateValueListener);
+        }
+        if (foodValueListener != null) {
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(foodValueListener);
+        }
+
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient = null;
+        }
     }
 
     private void setUpMap() {

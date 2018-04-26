@@ -19,19 +19,22 @@ import java.util.Map;
 
 import sk.greate43.eatr.activities.BuyerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
-import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.entities.AskForReview;
 import sk.greate43.eatr.fragmentDialogs.ReviewDialogFragment;
 
 public class ReviewUtils {
     private static final String TAG = "ReviewUtils";
-    private static final ReviewUtils ourInstance = new ReviewUtils();
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private String userType = "";
+    private ValueEventListener buyerReviewListener;
+    private ValueEventListener sellerReviewListener;
+    public static final ReviewUtils ourInstance = new ReviewUtils();
 
     @Contract(pure = true)
-    public static ReviewUtils getInstance() {
+    public static ReviewUtils getOurInstance() {
         return ourInstance;
     }
 
@@ -42,14 +45,13 @@ public class ReviewUtils {
         user = mAuth.getCurrentUser();
     }
 
-    private String userType = "";
 
     public void reviewTheUser(final Activity activity, String typeOfUser) {
         //activityReview = activity;
         userType = typeOfUser;
 
         if (activity instanceof SellerActivity) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+            sellerReviewListener = mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);
@@ -61,7 +63,7 @@ public class ReviewUtils {
                 }
             });
         } else if (activity instanceof BuyerActivity) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+            buyerReviewListener = mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);
@@ -91,97 +93,70 @@ public class ReviewUtils {
     }
 
     private void checkIfReviewIsRequired(@NotNull Map<String, Object> value, Activity activity) {
-        Food food = new Food();
-        food.setPushId((String) value.get(Constants.PUSH_ID));
-        food.setDishName((String) value.get(Constants.DISH_NAME));
-        food.setCuisine((String) value.get(Constants.CUISINE));
-        if (value.get(Constants.EXPIRY_TIME) != null) {
-            food.setExpiryTime((long) value.get(Constants.EXPIRY_TIME));
-        }
-        food.setIngredientsTags(String.valueOf(value.get(Constants.INGREDIENTS_TAGS)));
-        food.setImageUri((String) value.get(Constants.IMAGE_URI));
-        food.setPrice(Long.parseLong(String.valueOf(value.get(Constants.PRICE))));
-        food.setNumberOfServings((long) value.get(Constants.NO_OF_SERVINGS));
-        food.setLatitude((double) value.get(Constants.LATITUDE));
-        food.setLongitude((double) value.get(Constants.LONGITUDE));
-        food.setPickUpLocation((String) value.get(Constants.PICK_UP_LOCATION));
-        food.setCheckIfOrderIsActive((boolean) value.get(Constants.CHECK_IF_ORDER_IS_ACTIVE));
-        food.setCheckIfFoodIsInDraftMode((boolean) value.get(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE));
-        food.setCheckIfOrderIsPurchased((boolean) value.get(Constants.CHECK_IF_ORDER_IS_PURCHASED));
-
-        if (value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED) != null)
-            food.setCheckIfOrderIsBooked((boolean) value.get(Constants.CHECK_IF_ORDERED_IS_BOOKED));
-
-        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null)
-            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+        AskForReview askForReview = new AskForReview();
 
 
-        if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime(value.get(Constants.TIME_STAMP).toString());
-        }
-        if (value.get(Constants.PURCHASED_BY) != null) {
-            food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
-        }
-
-
-        if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null) {
-            food.setCheckIfOrderIsInProgress((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+        if (value.get(Constants.ORDER_ID) != null) {
+            askForReview.setOrderId((String) value.get(Constants.ORDER_ID));
         }
 
 
         if (value.get(Constants.POSTED_BY) != null) {
-            food.setPostedBy((String) value.get(Constants.POSTED_BY));
+            askForReview.setPostedBy((String) value.get(Constants.POSTED_BY));
+        }
+        if (value.get(Constants.PURCHASED_BY) != null) {
+            askForReview.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
         }
 
-        if (value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED) != null) {
-            food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
-        }
+
         if (value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER) != null) {
-            food.setCheckIfReviewDialogShouldBeShownForBuyer((boolean) value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER));
+            askForReview.setCheckIfReviewDialogShouldBeShownForBuyer((boolean) value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER));
         }
 
         if (value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER) != null) {
-            food.setCheckIfReviewDialogShouldBeShownForSeller((boolean) value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER));
+            askForReview.setCheckIfReviewDialogShouldBeShownForSeller((boolean) value.get(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER));
         }
 
-        if (!food.getCheckIfOrderIsActive()
-                && food.getCheckIfOrderIsPurchased()
-                && !food.getCheckIfFoodIsInDraftMode()
-                && !food.getCheckIfOrderIsBooked()
-                && !food.getCheckIfOrderIsInProgress()
-                && food.getCheckIfOrderIsCompleted()
-                ) {
 
-            if (activity != null && activity instanceof SellerActivity && food.getCheckIfReviewDialogShouldBeShownForSeller()) {
-                ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, food);
+        if (activity != null && activity instanceof SellerActivity && askForReview.getCheckIfReviewDialogShouldBeShownForSeller()) {
+            ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, askForReview);
 
-                FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
+            FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
 
-                Fragment prev =((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
-                if (prev != null) {
-                    ft.remove(prev);
-                }
-                ft.addToBackStack(null);
-
-
-                ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
-
-            } else if (activity != null && activity instanceof BuyerActivity && food.getCheckIfReviewDialogShouldBeShownForBuyer()) {
-                ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, food);
-
-                FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
-
-                Fragment prev =((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
-                if (prev != null) {
-                    ft.remove(prev);
-                }
-                ft.addToBackStack(null);
-
-
-                ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
-
-
+            Fragment prev = ((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
+            if (prev != null) {
+                ft.remove(prev);
             }
+            ft.addToBackStack(null);
+
+
+            ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
+
+        } else if (activity != null && activity instanceof BuyerActivity && askForReview.getCheckIfReviewDialogShouldBeShownForBuyer()) {
+            ReviewDialogFragment reviewDialogFragment = ReviewDialogFragment.newInstance(userType, askForReview);
+
+            FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
+
+            Fragment prev = ((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(reviewDialogFragment.TAG_FRAGMENT);
+            if (prev != null) {
+                ft.remove(prev);
+            }
+            ft.addToBackStack(null);
+
+
+            ft.add(reviewDialogFragment, reviewDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
+
+
+        }
+    }
+
+    public void removeListener() {
+        if (buyerReviewListener != null) {
+            mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(buyerReviewListener);
+        }
+        if (sellerReviewListener != null) {
+            mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(sellerReviewListener);
         }
     }
 }
+

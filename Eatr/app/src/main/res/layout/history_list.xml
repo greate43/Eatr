@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Buyer Id : "
+            android:text="Buyer Name : "
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/history_list_order_id_lbl"
             app:layout_constraintTop_toBottomOf="@+id/history_list_order_id_lbl" />
@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="16dp"
-            android:text="Seller Id : "
+            android:text="Seller Name : "
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/history_list_buyer_name_lbl"

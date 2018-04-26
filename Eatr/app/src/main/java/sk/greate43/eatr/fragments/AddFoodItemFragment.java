@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -16,6 +15,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -43,8 +43,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -174,14 +172,7 @@ public class AddFoodItemFragment extends Fragment implements
         btnShareFood.setOnClickListener(this);
 
         imgChooseImage = view.findViewById(R.id.fragment_add_food_item_image_view_choose_image);
-        imgChooseImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                selectPictureFromGalleryOrCameraDialog();
-
-            }
-        });
+        imgChooseImage.setOnClickListener(v -> selectPictureFromGalleryOrCameraDialog());
 
 
 // Create an instance of GoogleAPIClient.
@@ -255,17 +246,14 @@ public class AddFoodItemFragment extends Fragment implements
                     "Select photo from gallery",
                     "Capture photo from camera"};
             pictureDialog.setItems(pictureDialogItems,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
-                                    choosePhotoFromGallery();
-                                    break;
-                                case 1:
-                                    takePhotoFromCamera();
-                                    break;
-                            }
+                    (dialog, which) -> {
+                        switch (which) {
+                            case 0:
+                                choosePhotoFromGallery();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                break;
                         }
                     });
             pictureDialog.show();
@@ -276,17 +264,13 @@ public class AddFoodItemFragment extends Fragment implements
         if (getActivity() != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Would You Like To Turn On The Gps?");
-            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    startGpsFromSettings();
-                    dialog.dismiss();
-                }
+            builder.setPositiveButton(android.R.string.yes, (dialog, id) -> {
+                startGpsFromSettings();
+                dialog.dismiss();
             });
-            builder.setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    showToast("App Might Not be Fully Functional if Gps Is Off  ");
-                    dialog.dismiss();
-                }
+            builder.setNegativeButton(R.string.No, (dialog, id) -> {
+                showToast("App Might Not be Fully Functional if Gps Is Off  ");
+                dialog.dismiss();
             });
             AlertDialog dialog = builder.create();
             dialog.show();
@@ -321,70 +305,77 @@ public class AddFoodItemFragment extends Fragment implements
                 requestPermissions(new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_AND_WRITE_PERMISSION);
                 return;
             }
+            try {
+
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "Food Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+
+                if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                    imgUri = getActivity().getContentResolver().insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                } else {
+                    imgUri = getActivity().getContentResolver().insert(
+                            MediaStore.Images.Media.INTERNAL_CONTENT_URI, values);
+                    Log.d(TAG, "takePhotoFromCamera: unMounted");
+
+                }
+
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
 
 
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.Images.Media.TITLE, "Food Picture");
-            values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-            imgUri = getActivity().getContentResolver().insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        ClipData clip =
+                                ClipData.newUri(getActivity().getContentResolver(), "", imgUri);
 
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-                intent.setClipData(ClipData.newRawUri("", imgUri));
-                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
+                        intent.setClipData(clip);
+                        getActivity().grantUriPermission(getActivity().getPackageName(), imgUri,
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } else {
+                        List<ResolveInfo> resInfoList =
+                                getActivity().getPackageManager()
+                                        .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+                        for (ResolveInfo resolveInfo : resInfoList) {
+                            String packageName = resolveInfo.activityInfo.packageName;
+                            getActivity().grantUriPermission(packageName, imgUri,
+                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+                    }
 
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                ClipData clip =
-                        ClipData.newUri(getActivity().getContentResolver(), "", imgUri);
-
-                intent.setClipData(clip);
-                getActivity().grantUriPermission(getActivity().getPackageName(), imgUri,
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            } else {
-                List<ResolveInfo> resInfoList =
-                       getActivity().getPackageManager()
-                                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-
-                for (ResolveInfo resolveInfo : resInfoList) {
-                    String packageName = resolveInfo.activityInfo.packageName;
-                    getActivity().grantUriPermission(packageName, imgUri,
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivityForResult(intent, CAMERA_RESULT);
+                } catch(Exception ex){
+                    Snackbar.make(view, ex.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
                 }
             }
-
-
-            startActivityForResult(intent, CAMERA_RESULT);
         }
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        @Override
+        public void onActivityResult ( int requestCode, int resultCode, Intent data){
 
-        super.onActivityResult(requestCode, resultCode, data);
+            super.onActivityResult(requestCode, resultCode, data);
 
 
-        if (resultCode == RESULT_CANCELED) {
-            return;
-        }
-        if (requestCode == GALLERY_RESULT) {
-            if (resultCode == RESULT_OK && data != null) {
-                imgUri = data.getData();
-
-                setImage(imgUri);
-
-                Log.d(TAG, "onActivityResult: 1 " + imgUri.getLastPathSegment());
+            if (resultCode == RESULT_CANCELED) {
+                return;
             }
+            if (requestCode == GALLERY_RESULT) {
+                if (resultCode == RESULT_OK ) {
+                    imgUri = data.getData();
 
-        } else if (requestCode == CAMERA_RESULT) {
-            //  String pathOfBmp = null;
-            if (resultCode == RESULT_OK && data != null) {
+                    setImage(imgUri);
+
+                    Log.d(TAG, "onActivityResult: 1 " + imgUri.getLastPathSegment());
+                }
+
+            } else if (requestCode == CAMERA_RESULT) {
+                //  String pathOfBmp = null;
+                if (resultCode == RESULT_OK ) {
 //                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
 //                if (getActivity() != null) {
 //                    pathOfBmp = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "title", null);
@@ -392,40 +383,31 @@ public class AddFoodItemFragment extends Fragment implements
 //                imgUri = Uri.parse(pathOfBmp);
 
 
-                try {
+                    // Bitmap thumbnail = MediaStore.Images.Media.getBitmap(
+                    //  getActivity().getContentResolver(), imgUri);
+                    //  String imageUrl = getRealPathFromURI(imgUri);
+                    Log.d(TAG, "onActivityResult: " + imgUri);
+                    setImage(imgUri);
+
+                }
+
+            } else if (requestCode == PLACE_PICKER_REQUEST) {
+                if (resultCode == RESULT_OK ) {
                     if (getActivity() != null) {
-
-
-                        // Bitmap thumbnail = MediaStore.Images.Media.getBitmap(
-                        //  getActivity().getContentResolver(), imgUri);
-                        //  String imageUrl = getRealPathFromURI(imgUri);
-                        Log.d(TAG, "onActivityResult: " + imgUri);
-                        setImage(imgUri);
-
+                        Place place = PlacePicker.getPlace(getActivity(), data);
+                        longitude = place.getLatLng().longitude;
+                        latitude = place.getLatLng().latitude;
+                        etPickLocation.setText(place.getAddress());
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    //  String toastMsg = String.format("Place: %s", place.getAddress());
+                    //showToast(toastMsg);
                 }
-                Log.d(TAG, "onActivityResult:  2 " + imgUri);
             }
 
-        } else if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK && data != null) {
-                if (getActivity() != null) {
-                    Place place = PlacePicker.getPlace(getActivity(), data);
-                    longitude = place.getLatLng().longitude;
-                    latitude = place.getLatLng().latitude;
-                    etPickLocation.setText(place.getAddress());
-                }
-                //  String toastMsg = String.format("Place: %s", place.getAddress());
-                //showToast(toastMsg);
-            }
+
         }
 
-
-    }
-
-    //    public String getRealPathFromURI(Uri contentUri) {
+        //    public String getRealPathFromURI(Uri contentUri) {
 //        String[] proj = { MediaStore.Images.Media.DATA };
 //        Cursor cursor = getActivity().managedQuery(contentUri, proj, null, null, null);
 //        int column_index = cursor
@@ -433,88 +415,88 @@ public class AddFoodItemFragment extends Fragment implements
 //        cursor.moveToFirst();
 //        return cursor.getString(column_index);
 //    }
-    public void setImage(Uri uri) {
-        if (uri != null)
-            Picasso.with(getActivity())
-                    .load(uri)
-                    .fit()
-                    .centerCrop()
-                    .into(imgChooseImage, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                        }
+        public void setImage (Uri uri){
+            if (uri != null)
+                Picasso.with(getActivity())
+                        .load(uri)
+                        .fit()
+                        .centerCrop()
+                        .into(imgChooseImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "onSuccess: ");
+                            }
 
-                        @Override
-                        public void onError() {
+                            @Override
+                            public void onError() {
 
-                        }
-                    });
-    }
+                            }
+                        });
+        }
 
-    public void showToast(String message) {
-        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
-    }
+        public void showToast (String message){
+            Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+        }
 
-    public void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
+        public void onStart () {
+            mGoogleApiClient.connect();
+            super.onStart();
+        }
 
-    public void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
+        public void onStop () {
+            mGoogleApiClient.disconnect();
+            super.onStop();
+        }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
+        @Override
+        public void onConnected (@Nullable Bundle bundle){
 
-        getLocation();
-    }
+            getLocation();
+        }
 
-    public void getLocation() {
-        if (getActivity() != null) {
-            int HasFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), ACCESS_FINE_LOCATION);
+        public void getLocation () {
+            if (getActivity() != null) {
+                int HasFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), ACCESS_FINE_LOCATION);
 
-            if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
-                return;
+                if (HasFineLocationPermission != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATION_PERMISSION);
+                    return;
+                }
+            }
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+            if (mLastLocation != null) {
+
+                Geocoder geocoder;
+                List<Address> addresses = null;
+                geocoder = new Geocoder(getActivity(), Locale.getDefault());
+
+                try {
+                    longitude = mLastLocation.getLongitude();
+                    latitude = mLastLocation.getLatitude();
+                    addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (addresses != null) {
+                    String address = addresses.get(0).getAddressLine(0);
+                    // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                    String city = addresses.get(0).getLocality();
+                    String state = addresses.get(0).getAdminArea();
+                    String country = addresses.get(0).getCountryName();
+                    //  String postalCode = addresses.get(0).getPostalCode();
+                    String knownName = addresses.get(0).getFeatureName(); // O
+
+
+                    etPickLocation.setText(String.format("%s %s %s %s", knownName, city, state, country));
+                }
             }
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
 
-            Geocoder geocoder;
-            List<Address> addresses = null;
-            geocoder = new Geocoder(getActivity(), Locale.getDefault());
+        @Override
+        public void onConnectionSuspended ( int i){
 
-            try {
-                longitude = mLastLocation.getLongitude();
-                latitude = mLastLocation.getLatitude();
-                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (addresses != null) {
-                String address = addresses.get(0).getAddressLine(0);
-                // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-                String city = addresses.get(0).getLocality();
-                String state = addresses.get(0).getAdminArea();
-                String country = addresses.get(0).getCountryName();
-                //  String postalCode = addresses.get(0).getPostalCode();
-                String knownName = addresses.get(0).getFeatureName(); // O
-
-
-                etPickLocation.setText(String.format("%s %s %s %s", knownName, city, state, country));
-            }
         }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
 
 //    private boolean isNetworkAvailable() {
 //        ConnectivityManager connectivityManager
@@ -524,10 +506,10 @@ public class AddFoodItemFragment extends Fragment implements
 //        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 //    }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        @Override
+        public void onConnectionFailed (@NonNull ConnectionResult connectionResult){
 
-    }
+        }
 
 
 //    private File createImageFile() throws IOException {
@@ -564,27 +546,29 @@ public class AddFoodItemFragment extends Fragment implements
 //        return image;
 //    }
 
-    private void writeSellerData(final String pushId, final String dishName, final String cuisine, final String ingredientsTags, final String pickUpLocation, final Uri imgUri, final double longitude, final double latitude, final long price, final long numberOfServings, final long expiryTime, final boolean checkIfFoodIsInDraftMode, final boolean checkIfOrderIsActive) {
+        private void writeSellerData ( final String pushId, final String dishName,
+        final String cuisine, final String ingredientsTags, final String pickUpLocation,
+        final Uri imgUri, final double longitude, final double latitude, final long price,
+        final long numberOfServings, final long expiryTime, final boolean checkIfFoodIsInDraftMode,
+        final boolean checkIfOrderIsActive){
 
-        dialogUploadingImage.setMessage("Uploading Image........");
-        dialogUploadingImage.show();
-        // Get the data from an ImageView as bytes
-        imgChooseImage.setDrawingCacheEnabled(true);
-        imgChooseImage.buildDrawingCache();
-        Bitmap bitmap = imgChooseImage.getDrawingCache();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
+            dialogUploadingImage.setMessage("Uploading Image........");
+            dialogUploadingImage.show();
+            // Get the data from an ImageView as bytes
+            imgChooseImage.setDrawingCacheEnabled(true);
+            imgChooseImage.buildDrawingCache();
+            Bitmap bitmap = imgChooseImage.getDrawingCache();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
 
-        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(pushId).putBytes(data);
+            UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(pushId).putBytes(data);
 
-        //     storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
+            //     storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
 
 
-        //  storageRef.putFile(imgUri)
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
+            //  storageRef.putFile(imgUri)
+            uploadTask.addOnFailureListener(exception -> {
                 // Handle unsuccessful uploads
 
                 food = new Food();
@@ -624,10 +608,7 @@ public class AddFoodItemFragment extends Fragment implements
                 }
 
                 //  getActivity().finish();
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+            }).addOnSuccessListener(taskSnapshot -> {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 // Get a URL to the uploaded content
@@ -670,164 +651,162 @@ public class AddFoodItemFragment extends Fragment implements
                 }
 
 
-            }
-
-
-        });
-
-
-    }
-
-    private void pickPlace() {
-
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        if (!checkIfGpsIsEnabled()) {
-            askUserToStartGpsDialog();
-        } else {
-            try {
-                if (getActivity() != null) {
-                    startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
-                }
-            } catch (GooglePlayServicesRepairableException e) {
-                e.printStackTrace();
-            } catch (GooglePlayServicesNotAvailableException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void startGpsFromSettings() {
-
-        if (!checkIfGpsIsEnabled()) {
-            Intent gpsOptionsIntent = new Intent(
-                    android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(gpsOptionsIntent);
-        }
-    }
-
-    private boolean checkIfGpsIsEnabled() {
-        LocationManager manager = null;
-        if (getActivity() != null) {
-
-            manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        }
-        return manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-    }
-
-    @Override
-    public void onClick(View v) {
-        view = v;
-        switch (v.getId()) {
-            case R.id.fragment_add_food_item_button_get_location:
-                pickPlace();
-                break;
-            case R.id.fragment_add_food_item_button_share_food:
-
-
-                if (food != null && food.getImageUri() != null && !food.getImageUri().isEmpty()) {
-                    imgUri = Uri.parse(food.getImageUri());
-                }
-
-
-                if (
-                        !TextUtils.isEmpty(etDishName.getText().toString())
-                                && !TextUtils.isEmpty(etCuisine.getText().toString())
-                                && !etIncidentsTags.getTagList().isEmpty()
-                                && !TextUtils.isEmpty(etPickLocation.getText().toString())
-                                && imgUri != null
-                        ) {
-
-
-                    writeSellerData(
-                            pushId
-                            , etDishName.getText().toString().toLowerCase()
-                            , etCuisine.getText().toString()
-                            , etIncidentsTags.getTagList().toString()
-                            , etPickLocation.getText().toString()
-                            , imgUri
-                            , longitude
-                            , latitude
-                            , price
-                            , numberOfServings
-                            , expiryTime
-                            , checkIfFoodIsInDraftMode
-                            , checkIfOrderIsActive
-
-                    );
-
-
-                } else if (imgUri == null) {
-                    Snackbar.make(view, "Please Select the image ", Snackbar.LENGTH_SHORT).show();
-
-                } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
-                    etDishName.setError("Dish Name is Empty  ");
-                } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
-                    etCuisine.setError("Cuisine Name is Empty  ");
-                } else if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
-                    etPickLocation.setError("Pick Up Name is Empty  ");
-                } else if (etIncidentsTags.getTagList().isEmpty()) {
-
-                    tilIncidentsTags.setError("There Should be at Lest 1 Tag");
-                }
-
-                break;
+            });
 
 
         }
-    }
 
+        private void pickPlace () {
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        if (context instanceof ReplaceFragment) {
-            replaceFragment = (ReplaceFragment) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement ReplaceFragment");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        replaceFragment = null;
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_READ_EXTERNAL_STORAGE_PERMISSION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "onRequestPermissionsResult: 1");
-                    choosePhotoFromGallery();
-                }
-                break;
-            case REQUEST_CAMERA_AND_WRITE_PERMISSION:
-
-                if (grantResults.length > 0) {
-                    Log.d(TAG, "onRequestPermissionsResult: 0");
-                    boolean cameraPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    boolean readExternalStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    Log.d(TAG, "onRequestPermissionsResult: 2 ");
-                    if (cameraPermission && readExternalStorage) {
-                        takePhotoFromCamera();
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            if (!checkIfGpsIsEnabled()) {
+                askUserToStartGpsDialog();
+            } else {
+                try {
+                    if (getActivity() != null) {
+                        startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
                     }
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
                 }
+            }
+        }
 
-                break;
-            case REQUEST_FINE_LOCATION_PERMISSION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getLocation();
-                }
-                break;
+        private void startGpsFromSettings () {
+
+            if (!checkIfGpsIsEnabled()) {
+                Intent gpsOptionsIntent = new Intent(
+                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(gpsOptionsIntent);
+            }
+        }
+
+        private boolean checkIfGpsIsEnabled () {
+            LocationManager manager = null;
+            if (getActivity() != null) {
+
+                manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            }
+            return manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         }
-    }
 
-}
+        @Override
+        public void onClick (View v){
+            view = v;
+            switch (v.getId()) {
+                case R.id.fragment_add_food_item_button_get_location:
+                    pickPlace();
+                    break;
+                case R.id.fragment_add_food_item_button_share_food:
+
+
+                    if (food != null && food.getImageUri() != null && !food.getImageUri().isEmpty()) {
+                        imgUri = Uri.parse(food.getImageUri());
+                    }
+
+
+                    if (
+                            !TextUtils.isEmpty(etDishName.getText().toString())
+                                    && !TextUtils.isEmpty(etCuisine.getText().toString())
+                                    && !etIncidentsTags.getTagList().isEmpty()
+                                    && !TextUtils.isEmpty(etPickLocation.getText().toString())
+                                    && imgUri != null
+                            ) {
+
+
+                        writeSellerData(
+                                pushId
+                                , etDishName.getText().toString().toLowerCase()
+                                , etCuisine.getText().toString()
+                                , etIncidentsTags.getTagList().toString()
+                                , etPickLocation.getText().toString()
+                                , imgUri
+                                , longitude
+                                , latitude
+                                , price
+                                , numberOfServings
+                                , expiryTime
+                                , checkIfFoodIsInDraftMode
+                                , checkIfOrderIsActive
+
+                        );
+
+
+                    } else if (imgUri == null) {
+                        Snackbar.make(view, "Please Select the image ", Snackbar.LENGTH_SHORT).show();
+
+                    } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
+                        etDishName.setError("Dish Name is Empty  ");
+                    } else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
+                        etCuisine.setError("Cuisine Name is Empty  ");
+                    } else if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
+                        etPickLocation.setError("Pick Up Name is Empty  ");
+                    } else if (etIncidentsTags.getTagList().isEmpty()) {
+
+                        tilIncidentsTags.setError("There Should be at Lest 1 Tag");
+                    }
+
+                    break;
+
+
+            }
+        }
+
+
+        @Override
+        public void onAttach (Context context){
+            super.onAttach(context);
+            // This makes sure that the container activity has implemented
+            // the callback interface. If not, it throws an exception
+            if (context instanceof ReplaceFragment) {
+                replaceFragment = (ReplaceFragment) context;
+            } else {
+                throw new RuntimeException(context.toString()
+                        + " must implement ReplaceFragment");
+            }
+        }
+
+        @Override
+        public void onDetach () {
+            super.onDetach();
+            replaceFragment = null;
+
+        }
+
+        @Override
+        public void onRequestPermissionsResult ( int requestCode, @NonNull String[] permissions,
+        @NonNull int[] grantResults){
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            switch (requestCode) {
+                case REQUEST_READ_EXTERNAL_STORAGE_PERMISSION:
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        Log.d(TAG, "onRequestPermissionsResult: 1");
+                        choosePhotoFromGallery();
+                    }
+                    break;
+                case REQUEST_CAMERA_AND_WRITE_PERMISSION:
+
+                    if (grantResults.length > 0) {
+                        Log.d(TAG, "onRequestPermissionsResult: 0");
+                        boolean cameraPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                        boolean readExternalStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                        Log.d(TAG, "onRequestPermissionsResult: 2 ");
+                        if (cameraPermission && readExternalStorage) {
+                            takePhotoFromCamera();
+                        }
+                    }
+
+                    break;
+                case REQUEST_FINE_LOCATION_PERMISSION:
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        getLocation();
+                    }
+                    break;
+
+            }
+        }
+
+    }

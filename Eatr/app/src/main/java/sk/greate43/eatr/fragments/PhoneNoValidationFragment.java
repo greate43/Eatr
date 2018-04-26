@@ -21,6 +21,7 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
     private ReplaceFragment mListener;
     private TextInputEditText etPhoneNo;
     private CountryCodePicker ccp;
+    private Button btnNext;
 
 
     public PhoneNoValidationFragment() {
@@ -52,19 +53,16 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
         ccp.registerCarrierNumberEditText(etPhoneNo);
         ccp.setNumberAutoFormattingEnabled(true);
 
-        Button btnNext = view.findViewById(R.id.fragment_phone_no_authentation_button_next);
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ccp.isValidFullNumber()) {
-                    if (mListener != null) {
-                        mListener.onFragmentReplaced(PhoneNoVerificationFragment.newInstance(ccp.getFullNumberWithPlus()));
-                    }
-                } else {
-                    etPhoneNo.setError("Phone No is Invalid");
+        btnNext = view.findViewById(R.id.fragment_phone_no_authentation_button_next);
+        btnNext.setOnClickListener(v -> {
+            if (ccp.isValidFullNumber()) {
+                if (mListener != null) {
+                    mListener.onFragmentReplaced(PhoneNoVerificationFragment.newInstance(ccp.getFullNumberWithPlus()));
                 }
-
+            } else {
+                etPhoneNo.setError("Phone No is Invalid");
             }
+
         });
 
 
@@ -87,6 +85,7 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        btnNext.setOnClickListener(null);
     }
 
 

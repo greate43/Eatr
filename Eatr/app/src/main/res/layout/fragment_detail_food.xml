@@ -10,8 +10,8 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/fragment_detail_food_image_view_food_item"
-        app:layout_constraintTop_toTopOf="@+id/fragment_detail_food_image_view_food_item">
+
+        >
 
         <ImageView
             android:id="@+id/fragment_detail_food_image_view_food_item"
@@ -29,6 +29,8 @@
             android:id="@+id/fragment_detail_food_button_order"
             android:layout_width="178dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginStart="88dp"
             android:layout_marginTop="8dp"
             android:text="Order"
