@@ -1,16 +1,17 @@
-package sk.greate43.eatr.holders;
+package sk.greate43.eatr.fragmentDialogs;
 
-import android.content.Context;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,86 +26,166 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import sk.greate43.eatr.R;
+import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.entities.Notification;
+import sk.greate43.eatr.entities.Profile;
 import sk.greate43.eatr.utils.Constants;
 
-/**
- * Created by great on 3/22/2018.
- */
 
-public class NotificationViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {
-    private static final String TAG = "NotificationViewHolder";
-    public TextView tvTitle;
-    public TextView tvMessage;
-    public CircleImageView img;
-    public Button yes;
-    public Button no;
-    private Notification notification;
-    private View view;
+public class AcceptAndOrderCompleteDialog extends DialogFragment {
 
-    private DatabaseReference mDatabaseReference;
-    private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-
-
-            switch (item.getItemId()) {
-                case 1:
-                    if (notification != null) {
-                        mDatabaseReference.child(Constants.NOTIFICATION).child(notification.getNotificationId()).removeValue();
-
-
-                        Snackbar.make(view, "Deleted " + notification.getNotificationId(), Toast.LENGTH_SHORT).show();
-
-
-                        break;
-                    }
-                    break;
-            }
-            return true;
-        }
-    };
+    public final String TAG_FRAGMENT = "AcceptOrderDialogFragment";
+    Button yes;
+    Button no;
+    ImageView imgDishPhoto;
+    Food food;
+    private TextView tvDishName;
+    private TextView tvNoOfServings;
+    private TextView tvQuestion;
     private FirebaseDatabase database;
+    private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private Notification notification;
+    private float avgRating;
+    private Profile profile;
+    private TextView tvBuyerName;
+    private RatingBar ratingBar;
+    private CircleImageView imgUserPhoto;
+    private String userType;
 
-    public NotificationViewHolder(View itemView) {
-        super(itemView);
-        view = itemView;
+    public AcceptAndOrderCompleteDialog() {
+        // Required empty public constructor
+    }
+
+    public static AcceptAndOrderCompleteDialog newInstance(Food food, Notification notification, Profile profile, float ratingAvg, String userType) {
+        AcceptAndOrderCompleteDialog fragment = new AcceptAndOrderCompleteDialog();
+        Bundle args = new Bundle();
+        args.putSerializable(Constants.ARGS_FOOD, food);
+        args.putSerializable(Constants.ARGS_PROFILE, profile);
+        args.putSerializable(Constants.ARGS_NOTIFICATION, notification);
+        args.putFloat(Constants.ARGS_AVG_RATING, ratingAvg);
+        args.putString(Constants.USER_TYPE, userType);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogThemeCustom);
+
+        if (getArguments() != null) {
+            food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
+            notification = (Notification) getArguments().getSerializable(Constants.ARGS_NOTIFICATION);
+            profile = (Profile) getArguments().getSerializable(Constants.ARGS_PROFILE);
+            avgRating = getArguments().getFloat(Constants.ARGS_AVG_RATING);
+            userType = getArguments().getString(Constants.USER_TYPE);
+        }
+    }
+
+    Notification notificationReply = null;
+    private static final String TAG = "AcceptOrderDialogFragme";
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_dialog_for_accept_and_complete_order, container, false);
+        tvBuyerName = view.findViewById(R.id.fragment_accept_order_text_view_user_name);
+        ratingBar = view.findViewById(R.id.fragment_accept_order_ratingBar);
+
+        tvDishName = view.findViewById(R.id.fragment_accept_order_text_view_dish_name);
+        tvQuestion = view.findViewById(R.id.fragment_accept_order_text_view_question);
+        tvNoOfServings = view.findViewById(R.id.fragment_accept_order_text_view_no_of_servings);
+        tvQuestion = view.findViewById(R.id.fragment_accept_order_text_view_question);
+        yes = view.findViewById(R.id.fragment_accept_order_button_yes);
+        no = view.findViewById(R.id.fragment_accept_order_button_no);
+        imgDishPhoto = view.findViewById(R.id.fragment_accept_order_image_view_food_pic);
+        imgUserPhoto = view.findViewById(R.id.fragment_accept_order_image_view_user_pic);
+
+
         mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
 
+        tvBuyerName.setText(profile.getFullname());
+        if (food != null && profile != null && notification != null) {
+            tvDishName.setText(String.valueOf(food.getDishName()));
+            tvNoOfServings.setText(String.valueOf(food.getNumberOfServingsPurchased()));
 
-        database = FirebaseDatabase.getInstance();
+            ratingBar.setRating(avgRating);
+            if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)){
+                tvQuestion.setText("Seller Has Requested You To Mark Complete this Order ?");
+            } else  if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)){
+                tvQuestion.setText("Buyer Has Requested You To Accept This Order ?");
+            }
 
-        mDatabaseReference = database.getReference();
+            if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
+                Picasso.with(getActivity())
+                        .load(food.getImageUri())
+                        .fit()
+                        .centerCrop()
+                        .into(imgDishPhoto, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "onSuccess: ");
+                            }
 
-        tvTitle = itemView.findViewById(R.id.notification_list_title);
-        tvMessage = itemView.findViewById(R.id.notification_list_message);
-        img = itemView.findViewById(R.id.notification_list_circleImageView);
-        yes = itemView.findViewById(R.id.notification_list_button_yes);
-        no = itemView.findViewById(R.id.notification_list_button_no);
-        yes.setOnClickListener(v -> {
-            if (notification != null) {
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+            }
+
+
+            if (profile.getProfilePhotoUri() != null && !profile.getProfilePhotoUri().isEmpty()) {
+                Picasso.with(getActivity())
+                        .load(profile.getProfilePhotoUri())
+                        .fit()
+                        .centerCrop()
+                        .into(imgUserPhoto, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "onSuccess: ");
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+            }
+
+
+            yes.setOnClickListener(v -> {
+
                 mDatabaseReference.child(Constants.NOTIFICATION)
                         .child(notification.getNotificationId())
                         .updateChildren(updateNotificationAlert(true, true));
 
 
                 sendNotification(true);
-            }
-        });
-        no.setOnClickListener(v -> {
-            if (notification != null) {
+                dismiss();
+
+            });
+
+            no.setOnClickListener(v -> {
                 mDatabaseReference.child(Constants.NOTIFICATION)
                         .child(notification.getNotificationId())
                         .updateChildren(updateNotificationAlert(true, false));
 
+
                 sendNotification(false);
+                dismiss();
+
+            });
+        }
 
 
-            }
-        });
+        return view;
     }
 
     private void sendNotification(Boolean isOrderAccepted) {
@@ -200,6 +281,21 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
     }
 
+    private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
+        if (isAccepted) {
+            result.put(Constants.MESSAGE, "You Have accepted this order");
+        } else {
+            result.put(Constants.MESSAGE, "You Have rejected this order");
+
+        }
+        result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
+
+        return result;
+    }
+
+
     private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive, boolean isPurchase, boolean isCompeted, boolean isAccepted) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
@@ -243,84 +339,5 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
             result.put(Constants.CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER, true);
         }
         return result;
-    }
-
-    private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
-        if (isAccepted) {
-            result.put(Constants.MESSAGE, "You Have accepted this order");
-        } else {
-            result.put(Constants.MESSAGE, "You Have rejected this order");
-
-        }
-        result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
-
-        return result;
-    }
-
-    public void populate(Notification notification, Context context) {
-        this.notification = notification;
-        if (notification.getNotificationImage() != null && !notification.getNotificationImage().isEmpty()) {
-            Picasso.with(context)
-                    .load(notification.getNotificationImage())
-                    .fit()
-                    .centerCrop()
-                    .into(img, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
-        } else {
-            Log.d(TAG, "populate: ");
-            Picasso.with(context)
-                    .load(R.drawable.ic_launcher_round)
-                    .fit()
-                    .centerCrop()
-                    .into(img, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
-        }
-        tvMessage.setText(notification.getMessage());
-        tvTitle.setText(notification.getTitle());
-
-        if (notification.getCheckIfButtonShouldBeEnabled()) {
-            yes.setVisibility(View.VISIBLE);
-            no.setVisibility(View.VISIBLE);
-        } else {
-            yes.setVisibility(View.GONE);
-            no.setVisibility(View.GONE);
-            activateContextMenu();
-        }
-    }
-
-
-    @Override
-    public void onClick(View v) {
-
-    }
-
-    private void activateContextMenu() {
-        itemView.setOnCreateContextMenuListener(this);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        MenuItem Delete = menu.add(Menu.NONE, 1, 1, "Delete");
-        Delete.setOnMenuItemClickListener(onEditMenu);
     }
 }

@@ -216,6 +216,7 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
         result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, false);
         result.put(Constants.PURCHASED_BY, "");
         result.put(Constants.POSTED_BY, food.getPostedBy());
+        result.put(Constants.TIME_STAMP,food.getTime());
         result.put(Constants.PURCHASED_DATE, 0);
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, false);
         result.put(Constants.CHECK_IF_ORDER_IS_ACCEPTED, false);

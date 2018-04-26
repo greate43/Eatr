@@ -21,7 +21,6 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,6 +55,7 @@ public class AuthenticationFragment extends Fragment {
     private ProgressDialog mProgressDialog;
     private SignInButton btnAuthGoogle;
     private GoogleSignInClient mGoogleSignInClient;
+    private ValueEventListener authenticationValueListener;
 
     public AuthenticationFragment() {
         // Required empty public constructor
@@ -82,7 +82,6 @@ public class AuthenticationFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_authentation, container, false);
-        FirebaseApp.initializeApp(getActivity());
 
         btnAuthPhoneNo = view.findViewById(R.id.fragment_authentication_button_open_phone_auth);
         btnAuthGoogle = view.findViewById(R.id.fragment_authentation_button_google_auth);
@@ -94,7 +93,7 @@ public class AuthenticationFragment extends Fragment {
         showProgressDialog();
         hideAllUiWidgets();
         if (user != null) {
-            databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            authenticationValueListener = databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -115,24 +114,15 @@ public class AuthenticationFragment extends Fragment {
         }
 
 
-        btnAuthPhoneNo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnAuthPhoneNo.setOnClickListener(v -> {
 
-                if (mListener != null) {
-                    mListener.onFragmentReplaced(PhoneNoValidationFragment.newInstance());
-                }
-
+            if (mListener != null) {
+                mListener.onFragmentReplaced(PhoneNoValidationFragment.newInstance());
             }
+
         });
 
-        btnAuthGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                signIn();
-            }
-        });
+        btnAuthGoogle.setOnClickListener(v -> signIn());
 
         return view;
     }
@@ -272,6 +262,11 @@ public class AuthenticationFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -288,6 +283,13 @@ public class AuthenticationFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mGoogleSignInClient = null;
+        if (authenticationValueListener != null) {
+            databaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(authenticationValueListener);
+
+        }
+        btnAuthPhoneNo.setOnClickListener(null);
+        btnAuthGoogle.setOnClickListener(null);
     }
 
     private void hideAllUiWidgets() {

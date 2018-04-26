@@ -1,7 +1,7 @@
 package sk.greate43.eatr.utils;
 
-/**
- * Created by great on 3/4/2018.
+/*
+  Created by great on 3/4/2018.
  */
 
 
@@ -11,8 +11,10 @@ import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +28,6 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
@@ -59,6 +60,7 @@ public class DrawerUtil implements UpdateProfile {
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private RatingBar ratingBar;
 
     private DrawerUtil() {
         mAuth = FirebaseAuth.getInstance();
@@ -124,21 +126,14 @@ public class DrawerUtil implements UpdateProfile {
         });
 
 
-// Create the AccountHeader
+/// Create the AccountHeader
         headerResult = new AccountHeaderBuilder()
+
                 .withActivity(activity)
+                .withAccountHeader(R.layout.material_drawer_compact_persistent_header)
                 .withHeaderBackground(R.drawable.side_nav_bar)
                 .withSelectionListEnabledForSingleProfile(false)
-
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                        return false;
-                    }
-                })
                 .build();
-
 
         //create the drawer and remember the `Drawer` result object
         result = new DrawerBuilder()
@@ -259,6 +254,11 @@ public class DrawerUtil implements UpdateProfile {
 
         result.setSelection(1, true);
 
+        //define and create the arrow ;)
+        ratingBar = (RatingBar) headerResult.getView().findViewById(R.id.material_drawer_account_header_overall_ratingbar);
+        //for RTL you would have to define the other arrow
+
+
         if (activity instanceof SellerActivity) {
 
             result.addStickyFooterItem(new PrimaryDrawerItem().withName("Buy Food").withIdentifier(8));
@@ -287,5 +287,12 @@ public class DrawerUtil implements UpdateProfile {
             headerResult.addProfiles(new ProfileDrawerItem().withName(data.getFullname()).withEmail(data.getUserType()).withIcon(Uri.parse(data.getProfilePhotoUri())));
         }
 
+    }
+
+    @Override
+    public void myOverAllRating(float myRating) {
+        Log.d(TAG, "showReviewData: "+myRating);
+
+        ratingBar.setRating(myRating);
     }
 }

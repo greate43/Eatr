@@ -19,8 +19,8 @@ import sk.greate43.eatr.holders.HistoryViewHolder;
 
 public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryViewHolder> {
     private static final String TAG = "HistoryRecyclerViewAdap";
-    LayoutInflater layoutInflater;
-    ArrayList<Food> foods;
+    private LayoutInflater layoutInflater;
+    private ArrayList<Food> foods;
 
     public HistoryRecyclerViewAdaptor(Activity activity) {
 

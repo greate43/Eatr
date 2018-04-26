@@ -25,7 +25,9 @@ import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Profile;
+import sk.greate43.eatr.entities.Review;
 import sk.greate43.eatr.interfaces.UpdateProfile;
+import sk.greate43.eatr.utils.AcceptAndCompleteOrderUtils;
 import sk.greate43.eatr.utils.Constants;
 import sk.greate43.eatr.utils.DrawerUtil;
 import sk.greate43.eatr.utils.ReviewUtils;
@@ -40,7 +42,9 @@ public class SellerActivity extends AppCompatActivity {
     FirebaseStorage mStorage;
     StorageReference storageRef;
     UpdateProfile updateProfile;
-//
+    private ValueEventListener profileValueListener;
+    private ValueEventListener reviewValueListener;
+    //
 //    TextView tvFullName;
 //    TextView tvUserType;
 //    ImageView imgProfile;
@@ -54,8 +58,11 @@ public class SellerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Util.ScheduleNotification(this);
+        //   Util.ScheduleExpireOrder(this);
+        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsBookedAndShowOrderAcceptDialog(this, Constants.TYPE_SELLER);
 
-        ReviewUtils.getInstance().reviewTheUser(this, Constants.TYPE_SELLER);
+        ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_SELLER);
+
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -69,7 +76,7 @@ public class SellerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+        profileValueListener = mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -84,6 +91,8 @@ public class SellerActivity extends AppCompatActivity {
             }
         });
 
+
+        getMyOverallReview(user.getUid());
 
     }
 
@@ -119,6 +128,7 @@ public class SellerActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem search = menu.findItem(R.id.menu_item_search);
@@ -134,6 +144,100 @@ public class SellerActivity extends AppCompatActivity {
 
         return true;
     }
+
+    private String userId;
+
+    private void getMyOverallReview(String userId) {
+        this.userId = userId;
+        if (userId != null) {
+            reviewValueListener = mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    showReviewData(dataSnapshot);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
+            });
+        }
+
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (profileValueListener != null) {
+            mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(profileValueListener);
+        }
+        if (reviewValueListener != null) {
+            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
+        }
+
+
+        ReviewUtils.getOurInstance().removeListener();
+        AcceptAndCompleteOrderUtils.getOurInstance().removeListener();
+        updateProfile = null;
+
+    }
+
+    private void showReviewData(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) {
+            return;
+        }
+
+        ;
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            collectReview((Map<String, Object>) ds.getValue());
+        }
+        itemCount *= 3;
+        ratingAvg = ratingAvg / itemCount;
+        Log.d(TAG, "showReviewData: " + ratingAvg);
+        if (updateProfile != null) {
+            updateProfile.myOverAllRating(ratingAvg);
+        }
+
+        ratingAvg = 0;
+        itemCount = 0;
+
+    }
+
+    private long itemCount = 0;
+    private float ratingAvg = 0;
+
+    private void collectReview(Map<String, Object> value) {
+        Review review = new Review();
+        review.setReviewId((String) value.get(Constants.REVIEW_ID));
+        review.setOrderId((String) value.get(Constants.ORDER_ID));
+
+        if (value.get(Constants.QUESTION_ONE_ANSWER) != null)
+            review.setQuestionOneAnswer(Double.parseDouble(String.valueOf(value.get(Constants.QUESTION_ONE_ANSWER))));
+
+        if (value.get(Constants.QUESTION_TWO_ANSWER) != null)
+            review.setQuestionTwoAnswer(Double.parseDouble(String.valueOf(value.get(Constants.QUESTION_TWO_ANSWER))));
+
+        if (value.get(Constants.QUESTION_THREE_ANSWER) != null)
+            review.setQuestionThreeAnswer(Double.parseDouble(String.valueOf(value.get(Constants.QUESTION_THREE_ANSWER))));
+
+        review.setReviewGivenBy((String) value.get(Constants.REVIEW_GIVEN_BY));
+        review.setUserId((String) value.get(Constants.USER_ID));
+        review.setReviewType((String) value.get(Constants.REVIEW_TYPE));
+
+
+        if (review.getReviewType() != null && review.getReviewType().equals(Constants.REVIEW_FROM_BUYER)) {
+            // reviews.add(review);
+            Log.d(TAG, "collectReview: rating " + review.getQuestionOneAnswer());
+            ratingAvg += (float) (review.getQuestionOneAnswer() + review.getQuestionTwoAnswer() + review.getQuestionThreeAnswer());
+            Log.d(TAG, "collectReview: total " + ratingAvg);
+            itemCount++;
+        }
+
+
+    }
+
 
     private void showData(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() == null) {
@@ -151,7 +255,7 @@ public class SellerActivity extends AppCompatActivity {
         profile.setFirstName(String.valueOf(value.get(Constants.FIRST_NAME)));
         profile.setLastName(String.valueOf(value.get(Constants.LAST_NAME)));
         profile.setProfilePhotoUri(String.valueOf(value.get(Constants.PROFILE_PHOTO_URI)));
-        if (String.valueOf(value.get(Constants.EMAIL)) != null) {
+        if (value.get(Constants.EMAIL) != null) {
             profile.setEmail(String.valueOf(value.get(Constants.EMAIL)));
         }
         profile.setUserType(String.valueOf(value.get(Constants.USER_TYPE)));

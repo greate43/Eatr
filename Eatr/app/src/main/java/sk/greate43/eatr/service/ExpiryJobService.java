@@ -27,6 +27,7 @@ public class ExpiryJobService extends JobService {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private ValueEventListener valueListenner;
 
 
     @Override
@@ -44,7 +45,7 @@ public class ExpiryJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters job) {
 
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(valueListenner = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -59,6 +60,13 @@ public class ExpiryJobService extends JobService {
 
 
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (valueListenner != null)
+            mDatabaseReference.removeEventListener(valueListenner);
     }
 
     private void showData(@NotNull DataSnapshot dataSnapshot) {
@@ -110,7 +118,7 @@ public class ExpiryJobService extends JobService {
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime(value.get(Constants.TIME_STAMP).toString());
+            food.setTime(Long.parseLong(String.valueOf(value.get(Constants.TIME_STAMP))));
         }
         if (value.get(Constants.PURCHASED_BY) != null) {
             food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
@@ -141,7 +149,7 @@ public class ExpiryJobService extends JobService {
                 ) {
 
 
-            if (isExpiryNeeded( Long.parseLong(food.getTime()),food.getExpiryTime())) {
+            if (isExpiryNeeded(food.getTime(), food.getExpiryTime())) {
                 Log.d(TAG, "collectFood: ");
                 mDatabaseReference.child(Constants.FOOD).child(food.getPushId()).updateChildren(updateFood());
             }
@@ -156,10 +164,12 @@ public class ExpiryJobService extends JobService {
             return false;
         } else {
             long difference90 = (long) (0.9 * (when - added));
-            return now > (added + difference90);
+            return (now > (added + difference90)) ? true : false;
         }
 
+
     }
+
     private Map<String, Object> updateFood() {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_ORDER_IS_PURCHASED, false);

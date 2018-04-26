@@ -1,79 +1,148 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="sk.greate43.eatr.fragmentDialogs.ReviewDialogFragment"
     android:background="@color/bg_dialog"
+    tools:context="sk.greate43.eatr.fragmentDialogs.ReviewDialogFragment"
 
     >
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        android:id="@+id/fragment_dialog_review_circleImageView_user_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/transparent"
-        android:src="@color/customBlue"
-        app:layout_constraintBottom_toTopOf="@+id/guideline9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <de.hdodenhof.circleimageview.CircleImageView
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4" />
+            android:id="@+id/fragment_dialog_review_circleImageView_user_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
+            android:src="@color/customBlue"
+            app:layout_constraintBottom_toTopOf="@+id/guideline9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <RatingBar
-        android:id="@+id/fragment_dialog_review_ratingBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:numStars="5"
-        android:rating="0"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_text_view"
-        app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_text_view"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_text_view" />
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.4" />
 
-    <TextView
-        android:id="@+id/fragment_dialog_review_text_view"
-        android:layout_width="0dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="24dp"
-        android:text="How Much Would You Rate Order Overall Quality?"
-        android:textAllCaps="false"
-        android:textColor="@android:color/background_light"
-        android:textSize="15sp"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_circleImageView_user_image"
-        app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_circleImageView_user_image"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_circleImageView_user_image" />
+        <RatingBar
+            android:id="@+id/fragment_dialog_review_ratingBar_question_one_answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.1"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_text_view_question_one"
+            app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_text_view_question_one"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_text_view_question_one" />
 
-    <Button
-        android:id="@+id/fragment_dialog_button_submit_review"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@android:color/black"
-        android:text="Submit"
-        android:textColor="@android:color/background_light"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_ratingBar"
-        app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_ratingBar"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_ratingBar" />
+        <TextView
+            android:id="@+id/fragment_dialog_review_text_view_question_one"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="How Much Would You Rate Order Overall Quality?"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@android:color/background_light"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_circleImageView_user_image"
+            app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_circleImageView_user_image"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_circleImageView_user_image" />
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/fragment_dialog_review_text_view_question_two"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:text="Question 2"
+            android:textColor="@android:color/background_light"
+            android:textSize="15sp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_text_view_question_one"
+            app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_text_view_question_one"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_ratingBar_question_one_answer" />
+
+        <RatingBar
+            android:id="@+id/fragment_dialog_review_ratingBar_question_two_answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.1"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_text_view_question_two"
+            app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_text_view_question_two"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_text_view_question_two" />
+
+        <TextView
+            android:id="@+id/fragment_dialog_review_text_view_question_three"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
+            android:text="question 3"
+            android:gravity="center"
+            android:textColor="@android:color/background_light"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_text_view_question_two"
+            app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_text_view_question_two"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_ratingBar_question_two_answer" />
+
+        <RatingBar
+            android:id="@+id/fragment_dialog_review_ratingBar_question_three_answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.1"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_text_view_question_three"
+            app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_text_view_question_three"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_text_view_question_three" />
+
+        <Button
+            android:id="@+id/fragment_dialog_button_submit_review"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/black"
+            android:text="Submit"
+            android:textColor="@android:color/background_light"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_dialog_review_ratingBar_question_three_answer"
+            app:layout_constraintStart_toStartOf="@+id/fragment_dialog_review_ratingBar_question_three_answer"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_dialog_review_ratingBar_question_three_answer" />
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

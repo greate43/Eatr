@@ -38,8 +38,7 @@ public interface Constants {
     String CHECK_IF_MAP_SHOULD_BE_CLOSED = "checkIfMapShouldBeClosed";
     String CHECK_IF_ORDER_IS_COMPLETED = "checkIfOrderIsCompleted";
     String NO_OF_SERVINGS_PURCHASED = "numberOfServingsPurchased";
-    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER = "checkIfReviewDialogShouldBeShownForBuyer";
-    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER = "checkIfReviewDialogShouldBeShownForSeller";
+
 
     //Food Constants
 
@@ -114,11 +113,41 @@ public interface Constants {
     /**
      * {@link sk.greate43.eatr.entities.Review}
      */
-    String REVIEW="Review";
-    String OVER_ALL_FOOD_QUALITY = "overAllFoodQuality";
+    String ARGS_AVG_RATING = "ARGS_AVG_RATING";
+    String REVIEW = "Review";
+
+    String QUESTION_ONE = "questionOne";
+    String QUESTION_TWO = "questionTwo";
+    String QUESTION_THREE = "questionThree";
+
+    String QUESTION_ONE_ANSWER = "questionOneAnswer";
+    String QUESTION_TWO_ANSWER = "questionTwoAnswer";
+    String QUESTION_THREE_ANSWER = "questionThreeAnswer";
+
+
+    String BUYER_QUESTION_ONE = "How Much Would You Rate Order Overall Food Quality ?";
+    String BUYER_QUESTION_TWO = "Would You Recommend This Seller ?";
+    String BUYER_QUESTION_THREE = "Was The Service As Described ?";
+
+    String SELLER_QUESTION_ONE = "How Much Would You Rate Buyer ?";
+    String SELLER_QUESTION_TWO = "Would You Recommend this Buyer ?";
+    String SELLER_QUESTION_THREE = "Was The Service As Described ?";
+
     String REVIEW_GIVEN_BY = "reviewGivenBy";
     String REVIEW_ID = "reviewId";
+    String REVIEW_FROM_BUYER = "REVIEW_FROM_BUYER";
+    String REVIEW_FROM_SELLER = "REVIEW_FROM_SELLER";
+    String REVIEW_TYPE = "reviewType";
+
     // review end
+// Ask for review
+    String ARGS_ASK_FOR_REVIEW = "ARGS_ASK_FOR_REVIEW";
+    String BUYER_REVIEW = "AskBuyerForReview";
+    String SELLER_REVIEW = "AskSellerForReview";
+
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_BUYER = "checkIfReviewDialogShouldBeShownForBuyer";
+    String CHECK_IF_REVIEW_DIALOG_SHOULD_BE_SHOWN_FOR_SELLER = "checkIfReviewDialogShouldBeShownForSeller";
+// end ask for review
 
     // Permission and Requests Constants
     int CAMERA_RESULT = 111;

@@ -18,7 +18,7 @@ public class Food implements Serializable {
     private String pickUpLocation;
     private String imageUri;
     private Map<String, String> timeStamp;
-    private String time;
+    private long time;
     private boolean checkIfOrderIsActive;
     private long expiryTime;
     private long price;
@@ -38,29 +38,13 @@ public class Food implements Serializable {
     private boolean checkIfOrderIsBooked;
     private boolean checkIfMapShouldBeClosed;
     private boolean checkIfOrderIsCompleted;
-    private boolean checkIfReviewDialogShouldBeShownForBuyer;
-    private boolean checkIfReviewDialogShouldBeShownForSeller;
+
 
     public Food() {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
     }
 
 
-    public boolean getCheckIfReviewDialogShouldBeShownForBuyer() {
-        return checkIfReviewDialogShouldBeShownForBuyer;
-    }
-
-    public void setCheckIfReviewDialogShouldBeShownForBuyer(boolean checkIfReviewDialogShouldBeShownForBuyer) {
-        this.checkIfReviewDialogShouldBeShownForBuyer = checkIfReviewDialogShouldBeShownForBuyer;
-    }
-
-    public boolean getCheckIfReviewDialogShouldBeShownForSeller() {
-        return checkIfReviewDialogShouldBeShownForSeller;
-    }
-
-    public void setCheckIfReviewDialogShouldBeShownForSeller(boolean checkIfReviewDialogShouldBeShownForSeller) {
-        this.checkIfReviewDialogShouldBeShownForSeller = checkIfReviewDialogShouldBeShownForSeller;
-    }
 
     public long getNumberOfServingsPurchased() {
         return numberOfServingsPurchased;
@@ -268,12 +252,12 @@ public class Food implements Serializable {
 
 
     @Exclude
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
     @Exclude
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 

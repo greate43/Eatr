@@ -3,6 +3,7 @@ package sk.greate43.eatr.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,11 +24,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.adaptors.HistoryRecyclerViewAdaptor;
 import sk.greate43.eatr.entities.Food;
+import sk.greate43.eatr.recyclerCustomItem.EndlessRecyclerViewScrollListener;
 import sk.greate43.eatr.utils.Constants;
 
 public class HistoryFragment extends Fragment {
@@ -35,11 +39,18 @@ public class HistoryFragment extends Fragment {
     RecyclerView recyclerView;
     ArrayList<Food> foods;
     HistoryRecyclerViewAdaptor adaptor;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private ProgressBar progressBar;
+
+    private static final int TOTAL_ITEMS_TO_LOAD = 20;
+    private int mCurrentPage = 1;
+    private ValueEventListener foodValueListener;
+    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -74,18 +85,23 @@ public class HistoryFragment extends Fragment {
         setHasOptionsMenu(true);
 
         recyclerView = view.findViewById(R.id.fragment_history_recycler_view);
+        progressBar = view.findViewById(R.id.loading_more_progress);
+        swipeRefreshLayout = view.findViewById(R.id.fragment_history_swipe_refresh_layout);
+
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         mDatabaseReference = database.getReference();
         user = mAuth.getCurrentUser();
+
+        progressBar.setVisibility(View.GONE);
+
+        recyclerView.setHasFixedSize(true);
         if (getActivity() != null)
             adaptor = new HistoryRecyclerViewAdaptor(getActivity());
         foods = adaptor.getFoods();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
 
 
         recyclerView.setLayoutManager(layoutManager);
@@ -95,11 +111,33 @@ public class HistoryFragment extends Fragment {
         recyclerView.setAdapter(adaptor);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).addValueEventListener(new ValueEventListener() {
+
+        loadFirebaseData();
+
+        swipeRefreshLayout.setOnRefreshListener(() -> loadFirebaseData());
+        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
+
+                mCurrentPage = page;
+                progressBar.setVisibility(View.VISIBLE);
+                loadFirebaseData();
+            }
+        });
+
+
+        return view;
+    }
+
+
+    private void loadFirebaseData() {
+        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 showData(dataSnapshot);
+
             }
 
             @Override
@@ -108,7 +146,7 @@ public class HistoryFragment extends Fragment {
             }
         });
 
-        return view;
+
     }
 
     private void showData(DataSnapshot dataSnapshot) {
@@ -129,7 +167,9 @@ public class HistoryFragment extends Fragment {
             }
         }
         adaptor.notifyDataSetChanged();
-
+        Collections.reverse(foods);
+        progressBar.setVisibility(View.GONE);
+        swipeRefreshLayout.setRefreshing(false);
 
     }
 
@@ -162,7 +202,7 @@ public class HistoryFragment extends Fragment {
 
 
         if (value.get(Constants.TIME_STAMP) != null) {
-            food.setTime(value.get(Constants.TIME_STAMP).toString());
+            food.setTime(Long.parseLong(String.valueOf(value.get(Constants.TIME_STAMP))));
         }
         if (value.get(Constants.PURCHASED_BY) != null) {
             food.setPurchasedBy((String) value.get(Constants.PURCHASED_BY));
@@ -170,7 +210,7 @@ public class HistoryFragment extends Fragment {
 
 
         if (value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS) != null) {
-            food.setCheckIfOrderIsInProgress((Boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
+            food.setCheckIfOrderIsInProgress((boolean) value.get(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS));
         }
 
 
@@ -201,6 +241,7 @@ public class HistoryFragment extends Fragment {
                         ) {
 
                     foods.add(food);
+
                 }
 
                 break;
@@ -216,11 +257,21 @@ public class HistoryFragment extends Fragment {
                         ) {
 
                     foods.add(food);
+
                 }
 
                 break;
         }
 
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (foodValueListener != null) {
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
+        }
+        endlessRecyclerViewScrollListener =  null;
     }
 
     @Override
