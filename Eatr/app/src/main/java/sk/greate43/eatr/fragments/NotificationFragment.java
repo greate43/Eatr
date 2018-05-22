@@ -116,7 +116,10 @@ public class NotificationFragment extends Fragment {
 
         loadFirebaseData();
 
-        swipeRefreshLayout.setOnRefreshListener(() -> loadFirebaseData());
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mCurrentPage ++;
+            loadFirebaseData();
+        });
         recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {

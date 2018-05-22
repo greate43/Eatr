@@ -8,7 +8,6 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,33 +24,30 @@ public class SellerFragment extends Fragment {
     FirebaseAuth mAuth;
     FirebaseUser user;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+            = item -> {
+                FragmentManager fragmentManager = getChildFragmentManager();
 
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            FragmentManager fragmentManager = getChildFragmentManager();
+                switch (item.getItemId()) {
+                    case R.id.navigation_seller_home:
 
-            switch (item.getItemId()) {
-                case R.id.navigation_seller_home:
-
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.fragment_seller_container, PostedFoodPagerFragment.newInstance())
-                            .addToBackStack(null)
-                            .commit();
-                    return true;
-                case R.id.navigation_seller_history:
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.fragment_seller_container, PostedFoodPagerFragment.newInstance())
+                                .addToBackStack(null)
+                                .commit();
+                        return true;
+                    case R.id.navigation_seller_history:
 
 
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.fragment_seller_container, HistoryFragment.newInstance(Constants.TYPE_SELLER))
-                            .addToBackStack(null)
-                            .commit();
-                    return true;
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.fragment_seller_container, HistoryFragment.newInstance(Constants.TYPE_SELLER))
+                                .addToBackStack(null)
+                                .commit();
+                        return true;
 
-            }
-            return false;
-        }
-    };
+                }
+                return false;
+            };
+    private BottomNavigationView mNavigation;
 
     public SellerFragment() {
         // Required empty public constructor
@@ -79,13 +75,13 @@ public class SellerFragment extends Fragment {
         user = mAuth.getCurrentUser();
 
 
-        BottomNavigationView navigation = view.findViewById(R.id.activity_seller_navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mNavigation = view.findViewById(R.id.activity_seller_navigation);
+        mNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         FragmentManager fragmentManager = getChildFragmentManager();
 
         fragmentManager.beginTransaction()
-                .replace(R.id.fragment_seller_container, PostedFoodPagerFragment.newInstance())
+                .add(R.id.fragment_seller_container, PostedFoodPagerFragment.newInstance())
                 .commit();
 
         return view;
@@ -93,9 +89,9 @@ public class SellerFragment extends Fragment {
 
     @Override
     public void onDetach() {
+        mNavigation.setOnNavigationItemSelectedListener(null);
+
         super.onDetach();
-        if (mOnNavigationItemSelectedListener != null) {
-            mOnNavigationItemSelectedListener = null;
-        }
+
     }
 }

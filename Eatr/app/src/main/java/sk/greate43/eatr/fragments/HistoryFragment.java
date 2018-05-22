@@ -50,7 +50,6 @@ public class HistoryFragment extends Fragment {
     private static final int TOTAL_ITEMS_TO_LOAD = 20;
     private int mCurrentPage = 1;
     private ValueEventListener foodValueListener;
-    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -114,8 +113,12 @@ public class HistoryFragment extends Fragment {
 
         loadFirebaseData();
 
-        swipeRefreshLayout.setOnRefreshListener(() -> loadFirebaseData());
-        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mCurrentPage++;
+
+            loadFirebaseData();
+        });
+        recyclerView.addOnScrollListener( new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
@@ -267,11 +270,13 @@ public class HistoryFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        super.onDetach();
         if (foodValueListener != null) {
             mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
         }
-        endlessRecyclerViewScrollListener =  null;
+        recyclerView.addOnScrollListener(null);
+
+        super.onDetach();
+
     }
 
     @Override
