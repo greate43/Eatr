@@ -63,7 +63,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     private static final int TOTAL_ITEMS_TO_LOAD = 20;
     private int mCurrentPage = 1;
     private ValueEventListener foodValueListener;
-    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
 
     public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
@@ -136,13 +135,11 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
         recyclerView.setHasFixedSize(true);
 
         FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_posted_food_add_food_item_btn);
-        addFoodItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
-                startActivity(intent);
-            }
+        addFoodItem.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
+            startActivity(intent);
         });
+
         if (getActivity() != null)
             adaptor = new PostedFoodRecyclerViewAdaptor((SellerActivity) getActivity(), this);
         adaptor.setStates(states);
@@ -162,14 +159,13 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 //        itemTouchHelper.attachToRecyclerView(recyclerView);
 
         loadFirebaseData();
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadFirebaseData();
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mCurrentPage ++;
+
+            loadFirebaseData();
         });
 
-        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+        recyclerView.addOnScrollListener( new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
@@ -364,13 +360,13 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
     @Override
     public void onDetach() {
-        super.onDetach();
         if (foodValueListener != null) {
             mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
         }
-        if (endlessRecyclerViewScrollListener != null) {
-            endlessRecyclerViewScrollListener = null;
-        }
+       recyclerView.addOnItemTouchListener(null);
+        recyclerView.addOnScrollListener(null);
+        super.onDetach();
+
     }
 
     @Override
@@ -391,18 +387,12 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
             if (food.getImageUri() != null && food.getImageUri().isEmpty()) {
                 storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(food.getImageUri());
 
-                storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // File deleted successfully
-                        Log.d(TAG, "onSuccess: deleted file");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Uh-oh, an error occurred!
-                        Log.d(TAG, "onFailure: did not delete file");
-                    }
+                storageReference.delete().addOnSuccessListener(aVoid -> {
+                    // File deleted successfully
+                    Log.d(TAG, "onSuccess: deleted file");
+                }).addOnFailureListener(exception -> {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "onFailure: did not delete file");
                 });
             }
             Toast.makeText(getActivity(), "Deleted " + food.getPushId(), Toast.LENGTH_SHORT).show();
