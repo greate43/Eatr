@@ -153,57 +153,62 @@ public class DrawerUtil implements UpdateProfile {
                         //   drawerItemMap
 
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
 
 
-                        if (drawerItem.getIdentifier() == 1 && (activity instanceof SellerActivity)) {
-                            // load tournament screen
+                    if (drawerItem.getIdentifier() == 1 && (activity instanceof SellerActivity)) {
+                        // load tournament screen
 //                            Intent intent = new Intent(activity, MainActivity.class);
 //                            view.getContext().startActivity(intent);
 
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, SellerFragment.newInstance()).commit();
-                        } else if (drawerItem.getIdentifier() == 1 && (activity instanceof BuyerActivity)) {
-                            // load tournament screen
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null)
+                                .replace(R.id.content_seller_container, SellerFragment.newInstance())
+                                .commit();
+
+                    } else if (drawerItem.getIdentifier() == 1 && (activity instanceof BuyerActivity)) {
+                        // load tournament screen
 //                            Intent intent = new Intent(activity, MainActivity.class);
 //                            view.getContext().startActivity(intent);
 
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, BuyerFragment.newInstance()).commit();
-                        } else if (drawerItem.getIdentifier() == 2 && (activity instanceof SellerActivity)) {
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null)
+                                .replace(R.id.content_buyer_container, BuyerFragment.newInstance())
+                                .commit();
 
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, SettingFragment.newInstance()).commit();
+                    } else if (drawerItem.getIdentifier() == 2 && (activity instanceof SellerActivity)) {
 
-                        } else if (drawerItem.getIdentifier() == 2 && (activity instanceof BuyerActivity)) {
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, SettingFragment.newInstance()).commit();
 
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, SettingFragment.newInstance()).commit();
+                    } else if (drawerItem.getIdentifier() == 2 && (activity instanceof BuyerActivity)) {
 
-                        } else if (drawerItem.getIdentifier() == 3) {
-                            FirebaseAuth mAuth;
-                            FirebaseUser user;
-                            mAuth = FirebaseAuth.getInstance();
-                            user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                mAuth.signOut();
-                                activity.finish();
-                                Intent intent = new Intent(activity, MainActivity.class);
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, SettingFragment.newInstance()).commit();
 
-                                activity.startActivity(intent);
-                            }
+                    } else if (drawerItem.getIdentifier() == 3) {
+                        FirebaseAuth mAuth;
+                        FirebaseUser user;
+                        mAuth = FirebaseAuth.getInstance();
+                        user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            mAuth.signOut();
+                            Intent intent = new Intent(activity, MainActivity.class);
 
-                        } else if (drawerItem.getIdentifier() == 4 && activity instanceof SellerActivity) {
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, ProfileFragment.newInstance(profile)).commit();
-                        } else if (drawerItem.getIdentifier() == 4 && activity instanceof BuyerActivity) {
-                            if (profile != null) {
-                                FragmentManager fragment = activity.getSupportFragmentManager();
-                                fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, ProfileFragment.newInstance(profile)).commit();
-                            }
+                            activity.startActivity(intent);
+                            activity.finish();
+
                         }
+
+                    } else if (drawerItem.getIdentifier() == 4 && activity instanceof SellerActivity) {
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, ProfileFragment.newInstance(profile)).commit();
+                    } else if (drawerItem.getIdentifier() == 4 && activity instanceof BuyerActivity) {
+                        if (profile != null) {
+                            FragmentManager fragment = activity.getSupportFragmentManager();
+                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, ProfileFragment.newInstance(profile)).commit();
+                        }
+                    }
 
 //                        else if (drawerItem.getIdentifier() == 5 && activity instanceof SellerActivity) {
 //                            if (profile != null) {
@@ -212,42 +217,41 @@ public class DrawerUtil implements UpdateProfile {
 //                            }
 //                        }
 
-                        else if (drawerItem.getIdentifier() == 6 && activity instanceof SellerActivity) {
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, NotificationFragment.newInstance()).commit();
+                    else if (drawerItem.getIdentifier() == 6 && activity instanceof SellerActivity) {
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, NotificationFragment.newInstance()).commit();
 
-                        } else if (drawerItem.getIdentifier() == 6 && activity instanceof BuyerActivity) {
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, NotificationFragment.newInstance()).commit();
+                    } else if (drawerItem.getIdentifier() == 6 && activity instanceof BuyerActivity) {
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, NotificationFragment.newInstance()).commit();
 
-                        } else if (drawerItem.getIdentifier() == 7 && activity instanceof SellerActivity) {
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, UserTrackerFragment.newInstance(Constants.TYPE_SELLER)).commit();
+                    } else if (drawerItem.getIdentifier() == 7 && activity instanceof SellerActivity) {
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null).replace(R.id.content_seller_container, UserTrackerFragment.newInstance(Constants.TYPE_SELLER)).commit();
 
-                        } else if (drawerItem.getIdentifier() == 7 && activity instanceof BuyerActivity) {
-                            FragmentManager fragment = activity.getSupportFragmentManager();
-                            fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, UserTrackerFragment.newInstance(Constants.TYPE_BUYER)).commit();
+                    } else if (drawerItem.getIdentifier() == 7 && activity instanceof BuyerActivity) {
+                        FragmentManager fragment = activity.getSupportFragmentManager();
+                        fragment.beginTransaction().addToBackStack(null).replace(R.id.content_buyer_container, UserTrackerFragment.newInstance(Constants.TYPE_BUYER)).commit();
 
-                        } else if (drawerItem.getIdentifier() == 8 && activity instanceof SellerActivity) {
+                    } else if (drawerItem.getIdentifier() == 8 && activity instanceof SellerActivity) {
 
-                            mDatabaseReference.child(Constants.PROFILE).child(profile.getUserId()).child(Constants.USER_TYPE).setValue(Constants.TYPE_BUYER);
-                            Intent intent = new Intent(activity, MainActivity.class);
-                            activity.startActivity(intent);
-                            activity.finish();
+                        mDatabaseReference.child(Constants.PROFILE).child(profile.getUserId()).child(Constants.USER_TYPE).setValue(Constants.TYPE_BUYER);
+                        Intent intent = new Intent(activity, MainActivity.class);
+                        activity.startActivity(intent);
+                        activity.finish();
 
-                        } else if (drawerItem.getIdentifier() == 8 && activity instanceof BuyerActivity) {
-                            mDatabaseReference.child(Constants.PROFILE).child(profile.getUserId()).child(Constants.USER_TYPE).setValue(Constants.TYPE_SELLER);
-                            Intent intent = new Intent(activity, MainActivity.class);
-                            activity.startActivity(intent);
-                            activity.finish();
+                    } else if (drawerItem.getIdentifier() == 8 && activity instanceof BuyerActivity) {
+                        mDatabaseReference.child(Constants.PROFILE).child(profile.getUserId()).child(Constants.USER_TYPE).setValue(Constants.TYPE_SELLER);
+                        Intent intent = new Intent(activity, MainActivity.class);
+                        activity.startActivity(intent);
+                        activity.finish();
 
-                        }
-
-
-                        closeDrawer();
-
-                        return true;
                     }
+
+
+                    closeDrawer();
+
+                    return true;
                 })
                 .build();
 

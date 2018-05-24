@@ -55,8 +55,9 @@ public class BuyerActivity extends AppCompatActivity {
 
         Util.ScheduleNotification(this);
 
+
+
         updateProfile = DrawerUtil.getInstance().getCallback();
-        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
 
         DrawerUtil.getInstance().getDrawer(this, toolbar);
 
@@ -84,6 +85,9 @@ public class BuyerActivity extends AppCompatActivity {
         });
 
         ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_BUYER);
+
+        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
+
         getMyOverallReview(user.getUid());
 
     }
@@ -102,6 +106,8 @@ public class BuyerActivity extends AppCompatActivity {
         if (reviewValueListener != null) {
             mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
         }
+
+
         ReviewUtils.getOurInstance().removeListener();
         AcceptAndCompleteOrderUtils.getOurInstance().removeListener();
         updateProfile = null;
@@ -151,10 +157,11 @@ public class BuyerActivity extends AppCompatActivity {
                     mAuth.signOut();
 
 
-                    finish();
                     Intent intent = new Intent(BuyerActivity.this, MainActivity.class);
 
                     startActivity(intent);
+                    finish();
+
 
                 }
                 return true;
