@@ -21,7 +21,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/fragment_posted_food_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            tools:listitem="@layout/posted_food_list" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <include
@@ -50,6 +51,7 @@
         android:src="@drawable/add_entry_btn"
         app:backgroundTint="@color/primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_posted_food_swipe_refresh_layout" />
 
 </android.support.constraint.ConstraintLayout>

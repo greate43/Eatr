@@ -56,7 +56,6 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     LinearLayoutManager layoutManager;
     SwipeRefreshLayout swipeRefreshLayout;
     private ValueEventListener foodValueListener;
-    EndlessRecyclerViewScrollListener endlessRecyclerViewScrollListener;
     private ValueEventListener foodValueListenerSearch;
 
     public ListOfAllPostedFoodFragment() {
@@ -120,15 +119,14 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 //            }
 //        });
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                retrieveFirebaseData("");
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            mCurrentPage ++;
 
-            }
+            retrieveFirebaseData("");
+
         });
 
-        recyclerView.addOnScrollListener(endlessRecyclerViewScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+        recyclerView.addOnScrollListener( new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 Log.d(TAG, "onLoadMore: page " + page + " totalItemsCounts " + totalItemsCount);
@@ -308,17 +306,16 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
     @Override
     public void onDetach() {
-        super.onDetach();
         if (foodValueListener != null) {
             mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
         }
         if (foodValueListenerSearch != null){
             mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).removeEventListener(foodValueListenerSearch);
         }
+        recyclerView.addOnItemTouchListener(null);
+        recyclerView.addOnScrollListener(null);
+        super.onDetach();
 
-        if (endlessRecyclerViewScrollListener != null) {
-            endlessRecyclerViewScrollListener = null;
-        }
     }
 
     @Override
