@@ -33,9 +33,9 @@ import sk.greate43.eatr.fragmentDialogs.AcceptAndOrderCompleteDialog;
 
 public class AcceptAndCompleteOrderUtils {
     private static final String TAG = "AcceptAndCompleteOrderU";
-    String userType;
-    String userId = "";
-    Observable<Notification> notificationObservable;
+    private String userType;
+    private String userId = "";
+    private Observable<Notification> notificationObservable;
     private FirebaseDatabase database;
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
@@ -67,13 +67,13 @@ public class AcceptAndCompleteOrderUtils {
         this.userType = userType;
         mFoodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 showData(dataSnapshot, activity);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
@@ -84,12 +84,12 @@ public class AcceptAndCompleteOrderUtils {
         Log.d(TAG, "checkIfOrderIsCompletedAndShowOrderCompleteDialog: " + this.userType);
         mFoodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 showData(dataSnapshot, activity);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
@@ -172,7 +172,7 @@ public class AcceptAndCompleteOrderUtils {
 
                 mDatabaseReference.child(Constants.PROFILE).child(food.getPurchasedBy()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                         Log.d(TAG, "onDataChange: " + dataSnapshot);
                         showProfileData(dataSnapshot);
@@ -180,7 +180,7 @@ public class AcceptAndCompleteOrderUtils {
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
                         System.out.println("The read failed: " + databaseError.getCode());
                     }
                 });
@@ -189,7 +189,7 @@ public class AcceptAndCompleteOrderUtils {
                 mDatabaseReference.child(Constants.NOTIFICATION)
                         .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             if (ds.getValue() != null) {
                                 collectNotification((Map<String, Object>) ds.getValue());
@@ -199,7 +199,7 @@ public class AcceptAndCompleteOrderUtils {
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
                 });
@@ -226,7 +226,7 @@ public class AcceptAndCompleteOrderUtils {
 
                 mDatabaseReference.child(Constants.PROFILE).child(food.getPostedBy()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                         Log.d(TAG, "onDataChange: " + dataSnapshot);
                         showProfileData(dataSnapshot);
@@ -234,7 +234,7 @@ public class AcceptAndCompleteOrderUtils {
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
                         System.out.println("The read failed: " + databaseError.getCode());
                     }
                 });
@@ -243,7 +243,7 @@ public class AcceptAndCompleteOrderUtils {
                 mDatabaseReference.child(Constants.NOTIFICATION)
                         .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             if (ds.getValue() != null) {
                                 collectNotification((Map<String, Object>) ds.getValue());
@@ -253,7 +253,7 @@ public class AcceptAndCompleteOrderUtils {
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                     }
                 });
@@ -296,13 +296,13 @@ public class AcceptAndCompleteOrderUtils {
 
             mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                     showReviewData(dataSnapshot, activity);
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
+                public void onCancelled(@NonNull DatabaseError databaseError) {
                     System.out.println("The read failed: " + databaseError.getCode());
                 }
             });
@@ -475,9 +475,9 @@ public class AcceptAndCompleteOrderUtils {
     }
 
     public void removeListener() {
-        if (mFoodValueListener != null) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(mFoodValueListener);
-        }
+//        if (mFoodValueListener != null) {
+//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(mFoodValueListener);
+//        }
 
 //        if (notificationValueListener != null) {
 //            mDatabaseReference.child(Constants.NOTIFICATION)

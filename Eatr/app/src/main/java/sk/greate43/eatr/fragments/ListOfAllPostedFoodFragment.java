@@ -306,14 +306,14 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
 
     @Override
     public void onDetach() {
-        if (foodValueListener != null) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
-        }
-        if (foodValueListenerSearch != null){
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).removeEventListener(foodValueListenerSearch);
-        }
-        recyclerView.addOnItemTouchListener(null);
-        recyclerView.addOnScrollListener(null);
+//        if (foodValueListener != null) {
+//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
+//        }
+//        if (foodValueListenerSearch != null){
+//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).removeEventListener(foodValueListenerSearch);
+//        }
+//        recyclerView.addOnItemTouchListener(null);
+//        recyclerView.addOnScrollListener(null);
         super.onDetach();
 
     }

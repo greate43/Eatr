@@ -496,9 +496,9 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
     public void onDetach() {
         super.onDetach();
         replaceFragment = null;
-        if (foodValueListener != null) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
-        }
+//        if (foodValueListener != null) {
+//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).removeEventListener(foodValueListener);
+//        }
         if (mGoogleApiClient != null) {
             mGoogleApiClient = null;
         }
