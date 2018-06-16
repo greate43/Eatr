@@ -241,9 +241,9 @@ public class UserTrackerFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        if (foodValueListener != null){
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(foodValueListener);
-        }
+//        if (foodValueListener != null){
+//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(foodValueListener);
+//        }
     }
 
     @Override
