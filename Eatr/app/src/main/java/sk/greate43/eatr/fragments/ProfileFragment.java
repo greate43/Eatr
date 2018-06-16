@@ -230,85 +230,76 @@ public class ProfileFragment extends Fragment {
 
         UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(userId).child(userId).putBytes(data);
 
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        uploadTask.addOnSuccessListener(taskSnapshot -> {
+            String downloadUrl = String.valueOf(storageRef.getDownloadUrl());
 
+            profile = new Profile();
+            profile.setUserId(userId);
+            profile.setFirstName(firstName);
+            profile.setLastName(lastName);
+            profile.setProfilePhotoUri(downloadUrl);
+            profile.setUserType(userType);
+            if (!email.isEmpty())
+                profile.setEmail(email);
 
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                String downloadUrl = String.valueOf(taskSnapshot.getDownloadUrl());
-
-                profile = new Profile();
-                profile.setUserId(userId);
-                profile.setFirstName(firstName);
-                profile.setLastName(lastName);
-                profile.setProfilePhotoUri(downloadUrl);
-                profile.setUserType(userType);
-                if (!email.isEmpty())
-                    profile.setEmail(email);
-
-                mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
-                if (allowToCheckUserType) {
-                    if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
-                        if (getActivity() != null) {
-                            Intent intent = new Intent(getActivity(), SellerActivity.class);
-                            getActivity().startActivity(intent);
-                            getActivity().finish();
-                        }
-
-                    } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
-                        if (getActivity() != null) {
-                            Intent intent = new Intent(getActivity(), BuyerActivity.class);
-                            getActivity().startActivity(intent);
-                            getActivity().finish();
-                        }
+            mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
+            if (allowToCheckUserType) {
+                if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
+                    if (getActivity() != null) {
+                        Intent intent = new Intent(getActivity(), SellerActivity.class);
+                        getActivity().startActivity(intent);
+                        getActivity().finish();
                     }
-                } else {
-                    Snackbar.make(view, "Profile was Successfully Updated", Snackbar.LENGTH_LONG).show();
+
+                } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
+                    if (getActivity() != null) {
+                        Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                        getActivity().startActivity(intent);
+                        getActivity().finish();
+                    }
                 }
-
-
-                hideProgressDialog();
-
-
+            } else {
+                Snackbar.make(view, "Profile was Successfully Updated", Snackbar.LENGTH_LONG).show();
             }
 
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
 
-                profile = new Profile();
-                profile.setUserId(userId);
-                profile.setFirstName(firstName);
-                profile.setLastName(lastName);
-                profile.setProfilePhotoUri("");
-                profile.setUserType(userType);
-
-                mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
+            hideProgressDialog();
 
 
-                if (allowToCheckUserType) {
-                    if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
-                        if (getActivity() != null) {
-                            Intent intent = new Intent(getActivity(), SellerActivity.class);
-                            getActivity().startActivity(intent);
-                            getActivity().finish();
-                        }
+        }).addOnFailureListener(e -> {
 
-                    } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
-                        if (getActivity() != null) {
-                            Intent intent = new Intent(getActivity(), BuyerActivity.class);
-                            getActivity().startActivity(intent);
-                            getActivity().finish();
-                        }
+            profile = new Profile();
+            profile.setUserId(userId);
+            profile.setFirstName(firstName);
+            profile.setLastName(lastName);
+            profile.setProfilePhotoUri("");
+            profile.setUserType(userType);
+
+            mDatabaseReference.child(Constants.PROFILE).child(userId).setValue(profile);
+
+
+            if (allowToCheckUserType) {
+                if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_SELLER)) {
+                    if (getActivity() != null) {
+                        Intent intent = new Intent(getActivity(), SellerActivity.class);
+                        getActivity().startActivity(intent);
+                        getActivity().finish();
                     }
-                } else {
-                    Snackbar.make(view, "Profile was Successfully Updated But Image wasn't uploaded", Snackbar.LENGTH_LONG).show();
+
+                } else if (profile.getUserType().equalsIgnoreCase(Constants.TYPE_BUYER)) {
+                    if (getActivity() != null) {
+                        Intent intent = new Intent(getActivity(), BuyerActivity.class);
+                        getActivity().startActivity(intent);
+                        getActivity().finish();
+                    }
                 }
-
-
-                hideProgressDialog();
-
+            } else {
+                Snackbar.make(view, "Profile was Successfully Updated But Image wasn't uploaded", Snackbar.LENGTH_LONG).show();
             }
+
+
+            hideProgressDialog();
+
         });
 
     }
@@ -321,17 +312,14 @@ public class ProfileFragment extends Fragment {
                 "Select photo from gallery",
                 "Capture photo from camera"};
         pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                choosePhotoFromGallery();
-                                break;
-                            case 1:
-                                takePhotoFromCamera();
-                                break;
-                        }
+                (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            choosePhotoFromGallery();
+                            break;
+                        case 1:
+                            takePhotoFromCamera();
+                            break;
                     }
                 });
         pictureDialog.show();

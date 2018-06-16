@@ -270,9 +270,9 @@ public class HistoryFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        if (foodValueListener != null) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
-        }
+//        if (foodValueListener != null) {
+//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_DATE).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
+//        }
         recyclerView.addOnScrollListener(null);
 
         super.onDetach();
