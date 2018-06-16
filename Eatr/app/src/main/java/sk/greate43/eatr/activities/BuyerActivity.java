@@ -56,6 +56,9 @@ public class BuyerActivity extends AppCompatActivity {
         Util.ScheduleNotification(this);
 
 
+        ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_BUYER);
+
+        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -84,9 +87,7 @@ public class BuyerActivity extends AppCompatActivity {
             }
         });
 
-        ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_BUYER);
 
-        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
 
         getMyOverallReview(user.getUid());
 
@@ -100,18 +101,18 @@ public class BuyerActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (profileValueListener != null) {
-            mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(profileValueListener);
-        }
-        if (reviewValueListener != null) {
-            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
-        }
-
-
-        ReviewUtils.getOurInstance().removeListener();
-        AcceptAndCompleteOrderUtils.getOurInstance().removeListener();
-        updateProfile = null;
-        search = null;
+//        if (profileValueListener != null) {
+//            mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(profileValueListener);
+//        }
+//        if (reviewValueListener != null) {
+//            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
+//        }
+//
+//
+//        ReviewUtils.getOurInstance().removeListener();
+//        AcceptAndCompleteOrderUtils.getOurInstance().removeListener();
+//        updateProfile = null;
+//        search = null;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

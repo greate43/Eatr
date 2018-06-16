@@ -360,11 +360,11 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
     @Override
     public void onDetach() {
-        if (foodValueListener != null) {
-            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
-        }
-       recyclerView.addOnItemTouchListener(null);
-        recyclerView.addOnScrollListener(null);
+//        if (foodValueListener != null) {
+//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(foodValueListener);
+//        }
+//       recyclerView.addOnItemTouchListener(null);
+//        recyclerView.addOnScrollListener(null);
         super.onDetach();
 
     }

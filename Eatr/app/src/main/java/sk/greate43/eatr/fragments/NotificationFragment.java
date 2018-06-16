@@ -201,11 +201,11 @@ public class NotificationFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        if (endlessRecyclerViewScrollListener != null) {
-            endlessRecyclerViewScrollListener = null;
-        }
-        if (notificationValueListener != null) {
-            mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(notificationValueListener);
-        }
+//        if (endlessRecyclerViewScrollListener != null) {
+//            endlessRecyclerViewScrollListener = null;
+//        }
+//        if (notificationValueListener != null) {
+//            mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).removeEventListener(notificationValueListener);
+//        }
     }
 }

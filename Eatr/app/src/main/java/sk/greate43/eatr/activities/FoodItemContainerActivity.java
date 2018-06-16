@@ -16,19 +16,20 @@ import sk.greate43.eatr.utils.Constants;
 
 public class FoodItemContainerActivity extends AppCompatActivity implements ReplaceFragment {
     private static final String TAG = "FoodItemContainerActivi";
+    private Food mFood;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_item_containter);
         Intent intent = getIntent();
-        Food food = (Food) intent.getSerializableExtra(Constants.ARGS_FOOD);
+        mFood = (Food) intent.getSerializableExtra(Constants.ARGS_FOOD);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if (food != null) {
-            Log.d(TAG, "onCreate: " + food.getPushId());
+        if (mFood != null) {
+            Log.d(TAG, "onCreate: " + mFood.getPushId());
             fragmentManager.beginTransaction()
-                    .replace(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance(food))
+                    .replace(R.id.activity_food_item_container_fragment, AddFoodItemFragment.newInstance(mFood))
                     .commit();
         } else {
             Log.d(TAG, "onCreate: new data added");

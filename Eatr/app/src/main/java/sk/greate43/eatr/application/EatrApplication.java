@@ -22,14 +22,14 @@ public class EatrApplication extends Application {
 
     }
 
-    private void enableStrictModePolicy() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build();
-
-            StrictMode.setThreadPolicy(policy);
-        }
-    }
+//    private void enableStrictModePolicy() {
+//        if (BuildConfig.DEBUG) {
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+//                    .detectAll()
+//                    .penaltyLog()
+//                    .build();
+//
+//            StrictMode.setThreadPolicy(policy);
+//        }
+//    }
 }

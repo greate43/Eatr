@@ -278,7 +278,9 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
         }
 
 
-        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
+        if (notificationId != null) {
+            mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
+        }
     }
 
     private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
