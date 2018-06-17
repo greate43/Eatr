@@ -43,14 +43,13 @@ public class NotificationJobService extends JobService {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private ValueEventListener valueListenner;
 
 
     @Override
     public boolean onStartJob(JobParameters job) {
 
         Log.d(TAG, "onStartJob: ");
-        valueListenner =  mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener( new ValueEventListener() {
+      mDatabaseReference.child(Constants.NOTIFICATION).addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);

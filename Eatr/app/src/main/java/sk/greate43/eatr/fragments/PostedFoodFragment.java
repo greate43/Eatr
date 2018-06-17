@@ -62,7 +62,6 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
     private static final int TOTAL_ITEMS_TO_LOAD = 20;
     private int mCurrentPage = 1;
-    private ValueEventListener foodValueListener;
 
     public static PostedFoodFragment newInstance(String orderState) {
         PostedFoodFragment fragment = new PostedFoodFragment();
@@ -179,7 +178,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
     }
 
     private void loadFirebaseData() {
-        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener( new ValueEventListener() {
+      mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 

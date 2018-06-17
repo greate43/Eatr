@@ -45,6 +45,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -61,6 +64,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import me.originqiu.library.EditTag;
 import sk.greate43.eatr.R;
@@ -591,95 +595,101 @@ public class AddFoodItemFragment extends Fragment implements
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();
 
-        UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(pushId).putBytes(data);
+        StorageReference ref = storageRef.child(Constants.PHOTOS).child(user.getUid()).child(pushId);
+        UploadTask uploadTask = ref.putBytes(data);
 
         //     storageRef.child(Constants.PHOTOS).child(user.getUid()).child(dishName).child(imgUri.getLastPathSegment());
-
-
-        //  storageRef.putFile(imgUri)
-        uploadTask.addOnFailureListener(exception -> {
-            // Handle unsuccessful uploads
-
-            food = new Food();
-            food.setPushId(pushId);
-            food.setDishName(dishName);
-            food.setCuisine(cuisine);
-            food.setIngredientsTags(ingredientsTags);
-            food.setPickUpLocation(pickUpLocation);
-            food.setImageUri("");
-            food.setImage(imgUri);
-            food.setLongitude(longitude);
-            food.setLatitude(latitude);
-            food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
-            food.setTimeStamp(ServerValue.TIMESTAMP);
-            food.setCheckIfOrderIsActive(checkIfOrderIsActive);
-            food.setPrice(price);
-            food.setNumberOfServings(numberOfServings);
-            food.setExpiryTime(expiryTime);
-            food.setCheckIfOrderIsPurchased(false);
-            food.setPostedBy(user.getUid());
-            food.setPurchasedBy("");
-            food.setCheckIfOrderIsInProgress(false);
-            food.setCheckIfOrderIsAccepted(false);
-            food.setCheckIfOrderIsBooked(false);
-            food.setCheckIfOrderIsCompleted(false);
-            food.setCheckIfMapShouldBeClosed(false);
-
-            mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
-            Log.d(TAG, "onFailure: " + exception.getLocalizedMessage());
-            if (dialogUploadingImage.isShowing()) {
-                dialogUploadingImage.dismiss();
-            }
-            if (replaceFragment != null) {
-
-
-                replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+        Task<Uri> urlTask = uploadTask.continueWithTask(task -> {
+            if (!task.isSuccessful()) {
+                throw Objects.requireNonNull(task.getException());
             }
 
-            //  getActivity().finish();
-        }).addOnSuccessListener(taskSnapshot -> {
-            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-            Uri downloadUri = task.getResult();
-            // Get a URL to the uploaded content
+            // Continue with the task to get the download URL
+            return ref.getDownloadUrl();
+        }).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Get a URL to the uploaded content
+                Uri downloadUri = task.getResult();
 
-            food = new Food();
-            food.setPushId(pushId);
-            food.setDishName(dishName);
-            food.setCuisine(cuisine);
-            food.setIngredientsTags(ingredientsTags);
-            food.setPickUpLocation(pickUpLocation);
-            food.setImageUri(String.valueOf(downloadUrl));
-            food.setImage(imgUri);
-            food.setLongitude(longitude);
-            food.setLatitude(latitude);
-            food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
-            food.setTimeStamp(ServerValue.TIMESTAMP);
-            food.setCheckIfOrderIsActive(checkIfOrderIsActive);
-            food.setPrice(price);
-            food.setNumberOfServings(numberOfServings);
-            food.setExpiryTime(expiryTime);
-            food.setCheckIfOrderIsPurchased(false);
-            food.setPostedBy(user.getUid());
-            food.setPurchasedBy("");
-            food.setCheckIfOrderIsInProgress(false);
-            food.setCheckIfOrderIsAccepted(false);
-            food.setCheckIfOrderIsBooked(false);
-            food.setCheckIfOrderIsCompleted(false);
-            food.setCheckIfMapShouldBeClosed(false);
+                food = new Food();
+                food.setPushId(pushId);
+                food.setDishName(dishName);
+                food.setCuisine(cuisine);
+                food.setIngredientsTags(ingredientsTags);
+                food.setPickUpLocation(pickUpLocation);
+                food.setImageUri(String.valueOf(downloadUri));
+                food.setImage(imgUri);
+                food.setLongitude(longitude);
+                food.setLatitude(latitude);
+                food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
+                food.setTimeStamp(ServerValue.TIMESTAMP);
+                food.setCheckIfOrderIsActive(checkIfOrderIsActive);
+                food.setPrice(price);
+                food.setNumberOfServings(numberOfServings);
+                food.setExpiryTime(expiryTime);
+                food.setCheckIfOrderIsPurchased(false);
+                food.setPostedBy(user.getUid());
+                food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
+                food.setCheckIfOrderIsAccepted(false);
+                food.setCheckIfOrderIsBooked(false);
+                food.setCheckIfOrderIsCompleted(false);
+                food.setCheckIfMapShouldBeClosed(false);
 
 
-            mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
-            if (dialogUploadingImage.isShowing()) {
-                dialogUploadingImage.dismiss();
+                mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
+                if (dialogUploadingImage.isShowing()) {
+                    dialogUploadingImage.dismiss();
+                }
+
+                if (replaceFragment != null) {
+
+
+                    replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                }
+
+            } else {
+                // Handle failures
+                // ...
+                // Handle unsuccessful uploads
+
+                food = new Food();
+                food.setPushId(pushId);
+                food.setDishName(dishName);
+                food.setCuisine(cuisine);
+                food.setIngredientsTags(ingredientsTags);
+                food.setPickUpLocation(pickUpLocation);
+                food.setImageUri("");
+                food.setImage(imgUri);
+                food.setLongitude(longitude);
+                food.setLatitude(latitude);
+                food.setCheckIfFoodIsInDraftMode(checkIfFoodIsInDraftMode);
+                food.setTimeStamp(ServerValue.TIMESTAMP);
+                food.setCheckIfOrderIsActive(checkIfOrderIsActive);
+                food.setPrice(price);
+                food.setNumberOfServings(numberOfServings);
+                food.setExpiryTime(expiryTime);
+                food.setCheckIfOrderIsPurchased(false);
+                food.setPostedBy(user.getUid());
+                food.setPurchasedBy("");
+                food.setCheckIfOrderIsInProgress(false);
+                food.setCheckIfOrderIsAccepted(false);
+                food.setCheckIfOrderIsBooked(false);
+                food.setCheckIfOrderIsCompleted(false);
+                food.setCheckIfMapShouldBeClosed(false);
+
+                mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
+                if (dialogUploadingImage.isShowing()) {
+                    dialogUploadingImage.dismiss();
+                }
+                if (replaceFragment != null) {
+
+
+                    replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
+                }
+
+                //  getActivity().finish();
             }
-
-            if (replaceFragment != null) {
-
-
-                replaceFragment.onFragmentReplaced(FoodItemExpiryTimeAndPriceFragment.newInstance(food));
-            }
-
-
         });
 
 
@@ -739,7 +749,7 @@ public class AddFoodItemFragment extends Fragment implements
 
                 if (
                         !TextUtils.isEmpty(etDishName.getText().toString())
-                               // && !TextUtils.isEmpty(etCuisine.getText().toString())
+                                // && !TextUtils.isEmpty(etCuisine.getText().toString())
                                 && !etIncidentsTags.getTagList().isEmpty()
                                 && !TextUtils.isEmpty(etPickLocation.getText().toString())
                                 && imgUri != null
@@ -770,9 +780,9 @@ public class AddFoodItemFragment extends Fragment implements
                 } else if (TextUtils.isEmpty(etDishName.getText().toString())) {
                     etDishName.setError("Dish Name is Empty  ");
                 } //else if (TextUtils.isEmpty(etCuisine.getText().toString())) {
-                    //etCuisine.setError("Cuisine Name is Empty  ");
+                //etCuisine.setError("Cuisine Name is Empty  ");
                 //} else
-                    if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
+                if (TextUtils.isEmpty(etPickLocation.getText().toString())) {
                     etPickLocation.setError("Pick Up Name is Empty  ");
                 } else if (etIncidentsTags.getTagList().isEmpty()) {
 

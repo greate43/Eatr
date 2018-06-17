@@ -45,7 +45,6 @@ public class NotificationFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<Notification> notifications;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ValueEventListener notificationValueListener;
 
 
     public NotificationFragment() {
@@ -136,7 +135,7 @@ public class NotificationFragment extends Fragment {
     }
 
     private void loadFirebaseData() {
-        notificationValueListener =  mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
+         mDatabaseReference.child(Constants.NOTIFICATION).orderByChild(Constants.TIME_STAMP).limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot);
