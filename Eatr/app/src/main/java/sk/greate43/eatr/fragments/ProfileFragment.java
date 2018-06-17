@@ -231,7 +231,7 @@ public class ProfileFragment extends Fragment {
         UploadTask uploadTask = storageRef.child(Constants.PHOTOS).child(userId).child(userId).putBytes(data);
 
         uploadTask.addOnSuccessListener(taskSnapshot -> {
-            String downloadUrl = String.valueOf(storageRef.getDownloadUrl());
+            Uri downloadUri = task.getResult();
 
             profile = new Profile();
             profile.setUserId(userId);
