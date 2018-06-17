@@ -639,7 +639,7 @@ public class AddFoodItemFragment extends Fragment implements
             //  getActivity().finish();
         }).addOnSuccessListener(taskSnapshot -> {
             // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-            String downloadUrl = String.valueOf(storageRef.getDownloadUrl());
+            Uri downloadUri = task.getResult();
             // Get a URL to the uploaded content
 
             food = new Food();
