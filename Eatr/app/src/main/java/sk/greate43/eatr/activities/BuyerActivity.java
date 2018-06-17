@@ -43,8 +43,7 @@ public class BuyerActivity extends AppCompatActivity {
     private StorageReference storageRef;
     private UpdateProfile updateProfile;
     private Search search;
-    private ValueEventListener profileValueListener;
-    private ValueEventListener reviewValueListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,6 @@ public class BuyerActivity extends AppCompatActivity {
 
         ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_BUYER);
 
-        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
 
         updateProfile = DrawerUtil.getInstance().getCallback();
 
@@ -72,7 +70,7 @@ public class BuyerActivity extends AppCompatActivity {
         storageRef = mStorage.getReference();
 
 
-        profileValueListener = mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+        mDatabaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -90,6 +88,11 @@ public class BuyerActivity extends AppCompatActivity {
 
 
         getMyOverallReview(user.getUid());
+
+
+
+
+        AcceptAndCompleteOrderUtils.getOurInstance().checkIfOrderIsCompletedAndShowOrderCompleteDialog(this, Constants.TYPE_BUYER);
 
     }
 
@@ -183,7 +186,7 @@ public class BuyerActivity extends AppCompatActivity {
     private void getMyOverallReview(String userId) {
         this.userId = userId;
         if (userId != null) {
-            reviewValueListener = mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
+           mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 

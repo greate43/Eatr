@@ -121,8 +121,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     private int REQUEST_CHECK_SETTINGS = 2;
     private String userType;
     private String price;
-    private ValueEventListener foodValueListener;
-    private ValueEventListener liveLocationUpdateValueListener;
+
 
     public MapFragment() {
         // Required empty public constructor
@@ -184,7 +183,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
 
                 createLocationRequest();
-                foodValueListener =   mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener( new ValueEventListener() {
+            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -200,7 +199,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
                 break;
             case Constants.TYPE_SELLER:
-                liveLocationUpdateValueListener = mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+               mDatabaseReference.child(Constants.LIVE_LOCATION_UPDATE).orderByChild(Constants.SELLER_ID).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 

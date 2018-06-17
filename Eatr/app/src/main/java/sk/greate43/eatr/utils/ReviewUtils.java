@@ -29,8 +29,7 @@ public class ReviewUtils {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private String userType = "";
-    private ValueEventListener buyerReviewListener;
-    private ValueEventListener sellerReviewListener;
+
     public static final ReviewUtils ourInstance = new ReviewUtils();
 
     @Contract(pure = true)
@@ -51,7 +50,7 @@ public class ReviewUtils {
         userType = typeOfUser;
 
         if (activity instanceof SellerActivity) {
-            sellerReviewListener = mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);
@@ -63,7 +62,7 @@ public class ReviewUtils {
                 }
             });
         } else if (activity instanceof BuyerActivity) {
-            buyerReviewListener = mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+           mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     showData(dataSnapshot, activity);

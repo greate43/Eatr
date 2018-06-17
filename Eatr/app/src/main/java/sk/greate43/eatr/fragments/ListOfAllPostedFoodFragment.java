@@ -55,8 +55,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     private ProgressBar progressBar;
     LinearLayoutManager layoutManager;
     SwipeRefreshLayout swipeRefreshLayout;
-    private ValueEventListener foodValueListener;
-    private ValueEventListener foodValueListenerSearch;
+
 
     public ListOfAllPostedFoodFragment() {
         // Required empty public constructor
@@ -157,7 +156,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
         if (mDatabaseReference != null) {
 
             if (!searchKeyword.isEmpty()) {
-                foodValueListenerSearch = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener( new ValueEventListener() {
+              mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.DISH_NAME).startAt(searchKeyword).endAt(searchKeyword + Constants.MAX_UNI_CODE_LIMIT).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -172,7 +171,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
             } else {
                 DatabaseReference foodListRef = mDatabaseReference.child(Constants.FOOD);
                 Query query = foodListRef.limitToFirst(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
-                foodValueListener = query.orderByChild(Constants.EXPIRY_TIME).addValueEventListener( new ValueEventListener() {
+                 query.orderByChild(Constants.EXPIRY_TIME).addValueEventListener( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
