@@ -59,7 +59,7 @@ public class SellerActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         Util.ScheduleNotification(this);
-        //   Util.ScheduleExpireOrder(this);
+    //    Util.ScheduleExpireOrder(this);
 
         ReviewUtils.getOurInstance().reviewTheUser(this, Constants.TYPE_SELLER);
 
@@ -153,7 +153,7 @@ public class SellerActivity extends AppCompatActivity {
     private void getMyOverallReview(String userId) {
         this.userId = userId;
         if (userId != null) {
-           mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
+            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
