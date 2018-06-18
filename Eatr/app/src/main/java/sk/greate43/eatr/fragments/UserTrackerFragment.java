@@ -49,7 +49,6 @@ public class UserTrackerFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private StorageReference storageReference;
-    private ValueEventListener foodValueListener;
 
     public UserTrackerFragment() {
         // Required empty public constructor
@@ -106,7 +105,7 @@ public class UserTrackerFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         switch (userType) {
             case Constants.TYPE_SELLER:
-                foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+              mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -120,7 +119,7 @@ public class UserTrackerFragment extends Fragment {
                 });
                 break;
             case Constants.TYPE_BUYER:
-                foodValueListener =  mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+           mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
