@@ -40,7 +40,6 @@ public class AcceptAndCompleteOrderUtils {
     private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
-    private ValueEventListener mFoodValueListener;
     // private ValueEventListener notificationValueListener;
     private Notification notification;
     private Food food;
@@ -65,15 +64,15 @@ public class AcceptAndCompleteOrderUtils {
 
     public void checkIfOrderIsBookedAndShowOrderAcceptDialog(final Activity activity, String userType) {
         this.userType = userType;
-        mFoodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+         mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
                 showData(dataSnapshot, activity);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onCancelled( DatabaseError databaseError) {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
@@ -82,9 +81,9 @@ public class AcceptAndCompleteOrderUtils {
     public void checkIfOrderIsCompletedAndShowOrderCompleteDialog(final Activity activity, String userType) {
         this.userType = userType;
         Log.d(TAG, "checkIfOrderIsCompletedAndShowOrderCompleteDialog: " + this.userType);
-        mFoodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
+         mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 showData(dataSnapshot, activity);
             }
 
@@ -474,22 +473,22 @@ public class AcceptAndCompleteOrderUtils {
 
     }
 
-    public void removeListener() {
-//        if (mFoodValueListener != null) {
-//            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(mFoodValueListener);
-//        }
-
-//        if (notificationValueListener != null) {
-//            mDatabaseReference.child(Constants.NOTIFICATION)
-//                    .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).removeEventListener(notificationValueListener);
-//        }
-
-//        if (reviewValueListener != null) {
-//            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
-//        }
+//    public void removeListener() {
+////        if (mFoodValueListener != null) {
+////            mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(mFoodValueListener);
+////        }
 //
-//        if (profileValueListener != null) {
-//            mDatabaseReference.child(Constants.PROFILE).child(food.getPurchasedBy()).removeEventListener(profileValueListener);
-//        }
-    }
+////        if (notificationValueListener != null) {
+////            mDatabaseReference.child(Constants.NOTIFICATION)
+////                    .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).removeEventListener(notificationValueListener);
+////        }
+//
+////        if (reviewValueListener != null) {
+////            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).removeEventListener(reviewValueListener);
+////        }
+////
+////        if (profileValueListener != null) {
+////            mDatabaseReference.child(Constants.PROFILE).child(food.getPurchasedBy()).removeEventListener(profileValueListener);
+////        }
+//    }
 }

@@ -1,80 +1,73 @@
-
 const functions = require('firebase-functions')
+
 const admin = require('firebase-admin')
+
 admin.initializeApp(functions.config().firebase)
-const ref = admin.database().ref()
-var food
-  exports.checkIfTheOrderHasExpired = functions.https.onRequest((req, res) => {
+//create database ref
+var ref = admin.database().ref()
+//do a bunch of stuff
+exports.expireFood = functions.https.onRequest((req, res) => {
+       ref.child('Food').once('value')
+       .then(snap =>{
+         snap.forEach(childSnap =>{
+           const pushId = childSnap.val().pushId
 
-  ref.child('Food').once('value').then(function(snapshot) {
-     const currentTime = new Date().getTime()
+           //boolean checks
+           const checkIfFoodIsInDraftMode = childSnap.val().checkIfFoodIsInDraftMode
+           const checkIfOrderIsAccepted = childSnap.val().checkIfOrderIsAccepted
+           const checkIfOrderIsActive = childSnap.val().checkIfOrderIsActive
+           const checkIfOrderIsBooked = childSnap.val().checkIfOrderIsBooked
+           const checkIfOrderIsCompleted = childSnap.val().checkIfOrderIsCompleted
+           const checkIfOrderIsInProgress = childSnap.val().checkIfOrderIsInProgress
+           const checkIfOrderIsPurchased = childSnap.val().checkIfOrderIsPurchased
+ //
+           const timeStamp = childSnap.val().timeStamp
+           const expiryTime = childSnap.val().expiryTime
+            
+           if (checkIfOrderIsActive
+           && !checkIfOrderIsPurchased 
+           && !checkIfFoodIsInDraftMode
+           && !checkIfOrderIsBooked
+           && !checkIfOrderIsInProgress
+           && !checkIfOrderIsCompleted ){
+            console.log('Order is Active '+pushId)
 
-     food = snapshot.val()
+              if(isExpiryNeeded(timeStamp,expiryTime)){
 
-    const when = food.expiryTime
-    const now = food.timeStamp
-      if(currentTime >= now - when){
-        console.log('time ')
-      }
+                console.log('isExpiryNeeded is true ')
 
+                ref.child('Food').child(pushId).update({
+                  "checkIfOrderIsActive": false ,
+                  "checkIfOrderIsPurchased": false ,
+                  "checkIfFoodIsInDraftMode": false ,
+                  "checkIfOrderIsBooked": false ,
+                  "checkIfOrderIsInProgress": false ,
+                  "checkIfOrderIsCompleted": false 
+                })           
+              } else {
+                console.log('isExpiryNeeded is false ')
+               }
+        }
+         })
+        })
+      
+        console.log('end ')
 
-    }).catch(error => {
-       
-    this.errorMessage = 'Error - ' + error.message
-    res.status(450).send('error')
+        res.status(200).send('Status ok')
+      })
 
-  })
+      function isExpiryNeeded(added,  when) {
+        var now = Date.now()
+        console.log('now time '+now)
+         
+        var difference =  (1 * (when - added))
+        console.log('difference '+difference)
+        var calculateExpiry =  (added + difference)
+        console.log('calculateExpiry '+calculateExpiry)
+        
+        console.log('Is Order Expired '+now > calculateExpiry)
+         
+        
 
-
-  res.status(500).send('ok')
-
-})
-
-
-
-
-
-//exports.checkIfTheOrderHasExpired = functions.https.onRequest((req, res) => {
-   // .ref('/Food/{userId}/{pushId}')
-  //  .onUpdate(event => {
-      //  const food = event.data.val()
-        //if (food.isExpired) {
-          //  return 0
-        //}
-     
-   
-  
-     
-
-        //food.checkIfOrderIsActive = checkingIfOrderIsExpired(food.timeStamp, food.expiryTime)
-       // food.isExpired = true
-
-        //console.log('Status '+food.checkIfOrderIsActive)
-
-        //const promise = event.data.ref.set(food)
-
-        //return promise
-
-  //  })
-// function getUsers(userIds = []){
-//     return rp(options).then(resp => {
-//         if (!resp.users) {
-//           return userIds;
-//         }
-//            });
-
-// }
-
-// function checkingIfOrderIsExpired(now, when) {
-
-//     var currentTime = new Date().getTime()
-//     var isOrderExpired = true
-//     if (currentTime >= now - when) {
-//         isOrderExpired = false
-//         console.log('Expired')
-
-//      }
-
-
-//     return isOrderExpired
-// }
+         return now >= calculateExpiry
+       }

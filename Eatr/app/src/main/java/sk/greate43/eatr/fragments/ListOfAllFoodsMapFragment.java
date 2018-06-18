@@ -74,7 +74,6 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
     private StorageReference storageReference;
     ArrayList<Food> foods;
     private ReplaceFragment replaceFragment;
-    private ValueEventListener foodValueListener;
 
 
     public ListOfAllFoodsMapFragment() {
@@ -120,7 +119,7 @@ public class ListOfAllFoodsMapFragment extends Fragment implements GoogleApiClie
                         .build();
         }
 
-        foodValueListener = mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(new ValueEventListener() {
+    mDatabaseReference.child(Constants.FOOD).orderByChild(Constants.EXPIRY_TIME).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 

@@ -55,7 +55,7 @@ public class AuthenticationFragment extends Fragment {
     private ProgressDialog mProgressDialog;
     private SignInButton btnAuthGoogle;
     private GoogleSignInClient mGoogleSignInClient;
-    private ValueEventListener authenticationValueListener;
+  //  private ValueEventListener authenticationValueListener;
 
     public AuthenticationFragment() {
         // Required empty public constructor
@@ -93,7 +93,7 @@ public class AuthenticationFragment extends Fragment {
         showProgressDialog();
         hideAllUiWidgets();
         if (user != null) {
-            authenticationValueListener = databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+           databaseReference.child(Constants.PROFILE).child(user.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -284,10 +284,10 @@ public class AuthenticationFragment extends Fragment {
         super.onDetach();
         mListener = null;
         mGoogleSignInClient = null;
-        if (authenticationValueListener != null) {
-            databaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(authenticationValueListener);
-
-        }
+//        if (authenticationValueListener != null) {
+//            databaseReference.child(Constants.PROFILE).child(user.getUid()).removeEventListener(authenticationValueListener);
+//
+//        }
         btnAuthPhoneNo.setOnClickListener(null);
         btnAuthGoogle.setOnClickListener(null);
     }
