@@ -288,6 +288,9 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
             food.setCheckIfOrderIsCompleted((boolean) value.get(Constants.CHECK_IF_ORDER_IS_COMPLETED));
         }
 
+        if (value.get(Constants.EXPIRY_CONSTANT_VALUE) != null) {
+            food.setExpiryConstantValue((long) value.get(Constants.EXPIRY_CONSTANT_VALUE));
+        }
         switch (orderState) {
             case Constants.ALL_ORDERS:
                 foods.add(food);
