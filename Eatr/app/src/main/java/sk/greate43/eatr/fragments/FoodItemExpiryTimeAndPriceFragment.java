@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -30,6 +31,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.internal.operators.completable.CompletableOnErrorComplete;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
 import sk.greate43.eatr.interfaces.ReplaceFragment;
@@ -39,6 +41,11 @@ import sk.greate43.eatr.utils.Constants;
 public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "FoodItemExpiryTimeAndPr";
+    public static final int EXPIRY_TIME_NOT_SET = -1;
+    public static final int ONE_HOUR = 1;
+    public static final int FOUR_HOURS = 4;
+    public static final int EIGHT_HOURS = 8;
+    public static final int SIXTEEN_HOURS = 16;
     TextInputEditText etPrice;
     TextInputEditText etNumberOfServings;
     TextInputEditText etExpiryTime;
@@ -49,7 +56,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     Button btnExpiryTimeFourHour;
     Button btnExpiryTimeEightHour;
     Button btnExpiryTimeSixteenHour;
-    long expiryTime = -1;
+    long expiryTime = EXPIRY_TIME_NOT_SET;
     long numberOfServings;
     StorageReference storageRef;
     private Food food;
@@ -59,6 +66,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
     private FirebaseUser user;
     private ReplaceFragment replaceFragment;
     private ProgressDialog mProgressDialog;
+    private long expiryConstantValue;
 
     public static FoodItemExpiryTimeAndPriceFragment newInstance(Food food) {
 
@@ -107,8 +115,45 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         if (food != null) {
             etPrice.setText(String.valueOf(food.getPrice()));
             etNumberOfServings.setText(String.valueOf(food.getNumberOfServings()));
-            etExpiryTime.setText(String.valueOf(food.getExpiryTime()));
-            expiryTime = food.getExpiryTime();
+            expiryConstantValue = food.getExpiryConstantValue();
+
+            switch ((int) expiryConstantValue) {
+                case ONE_HOUR:
+                    btnExpiryTimeOneHour.setSelected(true);
+                    btnExpiryTimeFourHour.setSelected(false);
+                    btnExpiryTimeEightHour.setSelected(false);
+                    btnExpiryTimeSixteenHour.setSelected(false);
+
+                    break;
+                case FOUR_HOURS:
+                    btnExpiryTimeOneHour.setSelected(false);
+                    btnExpiryTimeFourHour.setSelected(true);
+                    btnExpiryTimeEightHour.setSelected(false);
+                    btnExpiryTimeSixteenHour.setSelected(false);
+
+                    break;
+                case EIGHT_HOURS:
+                    btnExpiryTimeOneHour.setSelected(false);
+                    btnExpiryTimeFourHour.setSelected(false);
+                    btnExpiryTimeEightHour.setSelected(true);
+                    btnExpiryTimeSixteenHour.setSelected(false);
+
+                    break;
+                case SIXTEEN_HOURS:
+                    btnExpiryTimeOneHour.setSelected(false);
+                    btnExpiryTimeFourHour.setSelected(false);
+                    btnExpiryTimeEightHour.setSelected(false);
+                    btnExpiryTimeSixteenHour.setSelected(true);
+
+                    break;
+
+                default:
+                    etExpiryTime.setText(String.valueOf(expiryConstantValue));
+
+                    break;
+            }
+            expiryTime = getTimeHrsFromNow((int) expiryConstantValue);
+            showExpiryTime(expiryTime);
         }
 
         etExpiryTime.addTextChangedListener(new TextWatcher() {
@@ -127,9 +172,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
 
                     try {
                         expiryTime = getTimeHrsFromNow(Integer.parseInt(String.valueOf(s)));
-
-                    } catch (NumberFormatException ignored) {
-
+                        expiryConstantValue = Integer.parseInt(String.valueOf(s));
+                    } catch (NumberFormatException ex) {
+                        Snackbar.make(view, ex.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
                     }
                     showExpiryTime(expiryTime);
 
@@ -151,23 +196,24 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
         return view;
     }
 
-    private void writeSellerData(final String pushId, final long price, final long expiryTime, final long numberOfServings) {
+    private void writeSellerData(final String pushId, final long price, final long expiryTime, final long numberOfServings, long expiryConstantValue) {
         showProgressDialog();
-        mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(pushId, price, numberOfServings, expiryTime));
+        mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(toMap(pushId, price, numberOfServings, expiryTime, expiryConstantValue));
         hideProgressDialog();
 
 
     }
 
-    public Map<String, Object> toMap(String pushId, long price, long numberOfServings, long expiryTime) {
+    public Map<String, Object> toMap(String pushId, long price, long numberOfServings, long expiryTime, long expiryConstantValue) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.PUSH_ID, pushId);
         result.put(Constants.PRICE, price);
         result.put(Constants.NO_OF_SERVINGS, numberOfServings);
         result.put(Constants.EXPIRY_TIME, expiryTime);
         result.put(Constants.CHECK_IF_ORDER_IS_ACTIVE, true);
-        result.put(Constants.TIME_STAMP,ServerValue.TIMESTAMP);
+        result.put(Constants.TIME_STAMP, ServerValue.TIMESTAMP);
         result.put(Constants.CHECK_IF_FOOD_IS_IN_DRAFT_MODE, false);
+        result.put(Constants.EXPIRY_CONSTANT_VALUE, expiryConstantValue);
         return result;
     }
 
@@ -181,8 +227,8 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(false);
                 btnExpiryTimeEightHour.setSelected(false);
                 btnExpiryTimeSixteenHour.setSelected(false);
-                expiryTime = getTimeHrsFromNow(1);
-
+                expiryTime = getTimeHrsFromNow(ONE_HOUR);
+                expiryConstantValue = ONE_HOUR;
                 showExpiryTime(expiryTime);
 
                 break;
@@ -193,7 +239,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(true);
                 btnExpiryTimeEightHour.setSelected(false);
                 btnExpiryTimeSixteenHour.setSelected(false);
-                expiryTime = getTimeHrsFromNow(4);
+                expiryTime = getTimeHrsFromNow(FOUR_HOURS);
+                expiryConstantValue = FOUR_HOURS;
+
                 showExpiryTime(expiryTime);
 
                 break;
@@ -204,7 +252,9 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(false);
                 btnExpiryTimeEightHour.setSelected(true);
                 btnExpiryTimeSixteenHour.setSelected(false);
-                expiryTime = getTimeHrsFromNow(8);
+                expiryTime = getTimeHrsFromNow(EIGHT_HOURS);
+                expiryConstantValue = EIGHT_HOURS;
+
                 showExpiryTime(expiryTime);
 
                 break;
@@ -215,44 +265,46 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                 btnExpiryTimeFourHour.setSelected(false);
                 btnExpiryTimeEightHour.setSelected(false);
                 btnExpiryTimeSixteenHour.setSelected(true);
-                expiryTime = getTimeHrsFromNow(16);
+                expiryTime = getTimeHrsFromNow(SIXTEEN_HOURS);
+                expiryConstantValue = SIXTEEN_HOURS;
+
                 showExpiryTime(expiryTime);
 
                 break;
-            case R.id.fragment_food_item_expiry_time_and_price_button_show_preview:
-
-                if (replaceFragment != null) {
-
-                    showPreview(
-                            food.getPushId(),
-                            food.getDishName(),
-                            food.getCuisine(),
-                            food.getIngredientsTags(),
-                            food.getPickUpLocation(),
-                            food.getImageUri(),
-                            ServerValue.TIMESTAMP,
-                            expiryTime,
-                            etPrice.getText().toString(),
-                            etNumberOfServings.getText().toString(),
-                            food.getLongitude(),
-                            food.getLatitude(),
-                            food.getImage()
-                    );
-                    replaceFragment.onFragmentReplaced(ShowPreviewFragment.newInstance(food));
-
-
-                }
-                break;
+//            case R.id.fragment_food_item_expiry_time_and_price_button_show_preview:
+//
+//                if (replaceFragment != null) {
+//
+//                    showPreview(
+//                            food.getPushId(),
+//                            food.getDishName(),
+//                            food.getCuisine(),
+//                            food.getIngredientsTags(),
+//                            food.getPickUpLocation(),
+//                            food.getImageUri(),
+//                            ServerValue.TIMESTAMP,
+//                            expiryTime,
+//                            etPrice.getText().toString(),
+//                            etNumberOfServings.getText().toString(),
+//                            food.getLongitude(),
+//                            food.getLatitude(),
+//                            food.getImage()
+//                    );
+//                    replaceFragment.onFragmentReplaced(ShowPreviewFragment.newInstance(food));
+//
+//
+//                }
+//                break;
             case R.id.fragment_food_item_expiry_time_and_price_button_post_food:
                 if (food != null) {
-                    if (!etExpiryTime.getText().toString().isEmpty()) {
-                        expiryTime = Long.parseLong(etExpiryTime.getText().toString());
-                    }
+//                    if (!etExpiryTime.getText().toString().isEmpty()) {
+//                        expiryTime = Long.parseLong(etExpiryTime.getText().toString());
+//                    }
 
                     if (
                             !TextUtils.isEmpty(etNumberOfServings.getText())
                                     && !TextUtils.isEmpty(etPrice.getText())
-                                    && expiryTime != -1
+                                    && expiryTime != EXPIRY_TIME_NOT_SET
                                     && !TextUtils.equals(etNumberOfServings.getText(), "0")
                                     && !TextUtils.equals(etExpiryTime.getText(), "0")
                             ) {
@@ -261,6 +313,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                                 , Long.parseLong(etPrice.getText().toString())
                                 , expiryTime
                                 , Long.parseLong(etNumberOfServings.getText().toString())
+                                , expiryConstantValue
                         );
 
                         if (getActivity() != null) {
@@ -273,7 +326,7 @@ public class FoodItemExpiryTimeAndPriceFragment extends Fragment implements View
                     } else if (TextUtils.equals(etNumberOfServings.getText(), "0")) {
                         etNumberOfServings.setError("No of Servings  Cant be 0");
 
-                    } else if (expiryTime == -1) {
+                    } else if (expiryTime == EXPIRY_TIME_NOT_SET) {
                         etExpiryTime.setError("Expiry time Should be Set");
                     } else if (TextUtils.equals(etExpiryTime.getText(), "0")) {
                         etExpiryTime.setError("Expiry time Should be Set");

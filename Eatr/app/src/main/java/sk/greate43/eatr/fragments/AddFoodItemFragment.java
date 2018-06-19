@@ -116,6 +116,7 @@ public class AddFoodItemFragment extends Fragment implements
     private long expiryTime = 0;
     private boolean checkIfOrderIsActive = false;
     private boolean checkIfFoodIsInDraftMode = true;
+    private long expiryConstantValue;
 
     @NonNull
     public static AddFoodItemFragment newInstance() {
@@ -262,6 +263,8 @@ public class AddFoodItemFragment extends Fragment implements
             expiryTime = food.getExpiryTime();
             checkIfFoodIsInDraftMode = food.getCheckIfFoodIsInDraftMode();
             checkIfOrderIsActive = food.getCheckIfOrderIsActive();
+            expiryConstantValue = food.getExpiryConstantValue();
+
 
         } else {
             pushId = String.valueOf(mDatabaseReference.push().getKey());
@@ -583,7 +586,7 @@ public class AddFoodItemFragment extends Fragment implements
                                  final String cuisine, final String ingredientsTags, final String pickUpLocation,
                                  final Uri imgUri, final double longitude, final double latitude, final long price,
                                  final long numberOfServings, final long expiryTime, final boolean checkIfFoodIsInDraftMode,
-                                 final boolean checkIfOrderIsActive) {
+                                 final boolean checkIfOrderIsActive, long expiryConstantValue) {
 
         dialogUploadingImage.setMessage("Uploading Image........");
         dialogUploadingImage.show();
@@ -635,6 +638,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsBooked(false);
                 food.setCheckIfOrderIsCompleted(false);
                 food.setCheckIfMapShouldBeClosed(false);
+                food.setExpiryConstantValue(expiryConstantValue);
 
 
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
@@ -677,6 +681,7 @@ public class AddFoodItemFragment extends Fragment implements
                 food.setCheckIfOrderIsBooked(false);
                 food.setCheckIfOrderIsCompleted(false);
                 food.setCheckIfMapShouldBeClosed(false);
+                food.setExpiryConstantValue(expiryConstantValue);
 
                 mDatabaseReference.child(Constants.FOOD).child(pushId).setValue(food);
                 if (dialogUploadingImage.isShowing()) {
@@ -770,6 +775,7 @@ public class AddFoodItemFragment extends Fragment implements
                             , expiryTime
                             , checkIfFoodIsInDraftMode
                             , checkIfOrderIsActive
+                            ,expiryConstantValue
 
                     );
 
