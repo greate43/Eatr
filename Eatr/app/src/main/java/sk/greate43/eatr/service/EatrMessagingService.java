@@ -84,7 +84,7 @@ public class EatrMessagingService extends FirebaseMessagingService {
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                // Set the intent that will fire when the user taps the notification
+                .setSmallIcon(R.drawable.logo)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
 

@@ -10,7 +10,7 @@
 
     <string name="title_activity_seller">SellerActivity</string>
     <string name="title_home">Sell Food</string>
-    <string name="title_history">History</string>
+    <string name="title_history">Orders</string>
     <string name="title_settings">Settings</string>
 
 
@@ -37,7 +37,7 @@
      navigation buyer
      -->
     <string name="navigation_buyer_buy">Buy</string>
-    <string name="navigation_buyer_history">History</string>
+    <string name="navigation_buyer_history">Orders</string>
     <string name="navigation_buyer_settings">Settings</string>
     <!--
         navigation buyer
