@@ -47,7 +47,7 @@ public class TrackUserRecyclerViewAdaptor extends RecyclerView.Adapter<TrackUser
     public void onBindViewHolder(@NonNull TrackUserViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
-            holder.tvDishName.setText("No Order In Progress");
+            holder.tvDishName.setText("No Orders In Progress!");
             holder.tvQuestion.setVisibility(View.GONE);
             holder.btnTrackNow.setVisibility(View.GONE);
 

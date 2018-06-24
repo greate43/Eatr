@@ -64,7 +64,7 @@ public class NotificationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null)
-            getActivity().setTitle("Notification Fragment");
+            getActivity().setTitle("Notifications");
         if (getArguments() != null) {
 
         }

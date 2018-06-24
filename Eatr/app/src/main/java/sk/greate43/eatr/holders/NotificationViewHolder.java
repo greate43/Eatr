@@ -280,7 +280,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         } else {
             Log.d(TAG, "populate: ");
             Picasso.with(context)
-                    .load(R.drawable.ic_launcher_round)
+                    .load(R.drawable.logo)
                     .fit()
                     .centerCrop()
                     .into(img, new Callback() {

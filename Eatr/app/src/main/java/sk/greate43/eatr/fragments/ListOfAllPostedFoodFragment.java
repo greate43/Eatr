@@ -72,7 +72,7 @@ public class ListOfAllPostedFoodFragment extends Fragment implements RecyclerIte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null)
-            getActivity().setTitle("Posted Food Fragment");
+            getActivity().setTitle("Posted Foods");
         if (getArguments() != null) {
 
         }

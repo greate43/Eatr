@@ -163,6 +163,7 @@ public class NotificationJobService extends JobService {
                 .setSound(uri)
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
+                .setSmallIcon(R.drawable.logo)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
