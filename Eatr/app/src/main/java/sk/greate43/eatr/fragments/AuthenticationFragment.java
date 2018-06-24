@@ -71,7 +71,7 @@ public class AuthenticationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (getActivity() != null)
-            getActivity().setTitle("Authentication Fragment");
+            getActivity().setTitle("Eatr");
         super.onCreate(savedInstanceState);
 
     }

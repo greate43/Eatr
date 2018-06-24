@@ -67,7 +67,7 @@ public class HistoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null)
-            getActivity().setTitle("History Fragment");
+            getActivity().setTitle("Orders History");
         if (getArguments() != null) {
             userType = getArguments().getString(Constants.USER_TYPE);
             Log.d(TAG, "onCreate: " + userType);

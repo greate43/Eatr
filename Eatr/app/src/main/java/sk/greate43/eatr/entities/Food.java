@@ -18,6 +18,7 @@ public class Food implements Serializable {
     private String pickUpLocation;
     private String imageUri;
     private Map<String, String> timeStamp;
+    private long expiryConstantValue;
     private long time;
     private boolean checkIfOrderIsActive;
     private long expiryTime;
@@ -44,7 +45,13 @@ public class Food implements Serializable {
         // Default constructor required for calls to DataSnapshot.getValue(Food.class)
     }
 
+    public long getExpiryConstantValue() {
+        return expiryConstantValue;
+    }
 
+    public void setExpiryConstantValue(long expiryConstantValue) {
+        this.expiryConstantValue = expiryConstantValue;
+    }
 
     public long getNumberOfServingsPurchased() {
         return numberOfServingsPurchased;
