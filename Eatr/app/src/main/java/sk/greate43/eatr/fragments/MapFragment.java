@@ -139,8 +139,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() != null)
-            getActivity().setTitle("Map Fragment");
+        if (getActivity() instanceof SellerActivity) {
+            getActivity().setTitle("Track Buyer Location ");
+        } else if (getActivity() instanceof BuyerActivity) {
+            getActivity().setTitle("Pickup Location");
+
+        }
 
 
         if (getArguments() != null) {
@@ -289,8 +293,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Enter The amount you were paid");
-            builder.setPositiveButton("Complete Order", null);
-            builder.setNegativeButton("cancel", null);
+            builder.setPositiveButton("Submit", null);
+            builder.setNegativeButton("Cancel", null);
             builder.setView(input);
 
 
@@ -315,10 +319,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleA
                                 mAlertDialog.dismiss();
 
                             } else if (!TextUtils.isEmpty(input.getText()) && Double.parseDouble(input.getText().toString()) <= food.getPrice() * food.getNumberOfServingsPurchased()) {
-                                input.setError("Price Cant be less then PKR " + food.getPrice() * food.getNumberOfServingsPurchased());
+                                input.setError("Price Can't be less then PKR " + food.getPrice() * food.getNumberOfServingsPurchased());
 
                             } else if (TextUtils.isEmpty(input.getText())) {
-                                input.setError("It cant be empty");
+                                input.setError("Please enter the amount");
 
                             }
                         }

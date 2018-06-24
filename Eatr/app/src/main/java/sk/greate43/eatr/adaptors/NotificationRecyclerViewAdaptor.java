@@ -45,7 +45,7 @@ public class NotificationRecyclerViewAdaptor extends RecyclerView.Adapter<Notifi
     public void onBindViewHolder(@NonNull NotificationViewHolder holder, int position) {
         if (notifications == null || notifications.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
-            holder.tvTitle.setText("No Notification Available");
+            holder.tvTitle.setText("No new Updates!");
             holder.tvMessage.setVisibility(View.GONE);
             holder.no.setVisibility(View.GONE);
             holder.yes.setVisibility(View.GONE);

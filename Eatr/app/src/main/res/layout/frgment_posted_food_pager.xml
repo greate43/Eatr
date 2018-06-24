@@ -11,10 +11,14 @@
         android:id="@+id/fixture_tabs"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tabMode="scrollable" />
+        app:tabIndicatorColor="@android:color/white"
+        app:tabMode="scrollable"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextColor="@color/cardview_light_background" />
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/main_content"
