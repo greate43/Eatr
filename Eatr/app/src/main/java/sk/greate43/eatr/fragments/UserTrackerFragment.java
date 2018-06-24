@@ -68,9 +68,9 @@ public class UserTrackerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
             if (getActivity() instanceof SellerActivity) {
-                getActivity().setTitle("Track Buyer Fragment");
+                getActivity().setTitle("Track Buyer Location ");
             } else if (getActivity() instanceof BuyerActivity) {
-                getActivity().setTitle("Pick Up Point Fragment");
+                getActivity().setTitle("Pickup Location");
 
             }
         }

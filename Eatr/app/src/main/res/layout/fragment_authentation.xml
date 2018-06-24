@@ -29,13 +29,20 @@
 
     <Button
         android:id="@+id/fragment_authentication_button_open_phone_auth"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="Phone No Authentication"
+        android:layout_marginTop="36dp"
+        android:background="@color/md_dark_primary_text"
+        android:drawableStart="@drawable/ic_smartphone"
+        android:padding="12dp"
+        android:text="Sign In"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.471"
         app:layout_constraintStart_toStartOf="@+id/fragment_authemtation_app_logo"
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
@@ -44,8 +51,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Google Authentication"
         app:layout_constraintEnd_toEndOf="@+id/fragment_authentication_button_open_phone_auth"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/fragment_authentication_button_open_phone_auth"
         app:layout_constraintTop_toBottomOf="@+id/fragment_authentication_button_open_phone_auth" />
 </android.support.constraint.ConstraintLayout>
