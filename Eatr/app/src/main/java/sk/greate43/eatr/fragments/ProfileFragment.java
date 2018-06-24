@@ -117,6 +117,15 @@ public class ProfileFragment extends Fragment {
             allowToCheckUserType = getArguments().getBoolean(ALLOW_TO_CHECK_USER_TYPE);
             profile = (Profile) getArguments().getSerializable(Constants.ARGS_PROFILE);
         }
+
+        if (getActivity() != null) {
+            if (allowToCheckUserType)
+                getActivity().setTitle("Profile");
+            else {
+                getActivity().setTitle("Update Profile");
+            }
+        }
+
     }
 
     @Override
@@ -142,7 +151,14 @@ public class ProfileFragment extends Fragment {
         mStorage = FirebaseStorage.getInstance();
         mDatabaseReference = database.getReference();
         storageRef = mStorage.getReference();
+        if (profile == null)
+            if (user != null) {
+                if (user.getEmail() != null) {
+                    etEmail.setText(user.getEmail());
+                }
 
+
+            }
 
         imgProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override

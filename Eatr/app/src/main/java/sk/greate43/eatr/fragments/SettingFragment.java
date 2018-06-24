@@ -5,6 +5,8 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Objects;
+
 import sk.greate43.eatr.R;
 
 
@@ -23,7 +25,12 @@ public class SettingFragment extends PreferenceFragmentCompat {
     }
 
 
-
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Objects.requireNonNull(getActivity()).setTitle("Settings");
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

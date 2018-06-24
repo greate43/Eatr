@@ -2,7 +2,7 @@
 <android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <android.support.v7.preference.PreferenceCategory
-        android:key="pref_video"
+        android:key="pref_poayment"
         android:title="@string/pref_payment_method_title">
 
         <android.support.v7.preference.ListPreference
@@ -17,6 +17,10 @@
         <!--android:entryValues="@array/pref_entries_payment_method"-->
         <!--android:key="pref_payment_method"-->
         <!--android:title="@string/pref_payment_method_title" />-->
+    </android.support.v7.preference.PreferenceCategory>
+    <android.support.v7.preference.PreferenceCategory android:title="Help">
+        >
+
     </android.support.v7.preference.PreferenceCategory>
 
 

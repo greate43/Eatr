@@ -38,7 +38,7 @@ public interface Constants {
     String CHECK_IF_MAP_SHOULD_BE_CLOSED = "checkIfMapShouldBeClosed";
     String CHECK_IF_ORDER_IS_COMPLETED = "checkIfOrderIsCompleted";
     String NO_OF_SERVINGS_PURCHASED = "numberOfServingsPurchased";
-
+    String EXPIRY_CONSTANT_VALUE = "expiryConstantValue";
 
     //Food Constants
 

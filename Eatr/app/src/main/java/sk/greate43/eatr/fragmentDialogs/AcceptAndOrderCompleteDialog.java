@@ -117,9 +117,9 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
 
             ratingBar.setRating(avgRating);
             if (userType.equalsIgnoreCase(Constants.TYPE_BUYER)){
-                tvQuestion.setText("Seller Has Requested You To Mark Complete this Order ?");
+                tvQuestion.setText("Have you received the food?");
             } else  if (userType.equalsIgnoreCase(Constants.TYPE_SELLER)){
-                tvQuestion.setText("Buyer Has Requested You To Accept This Order ?");
+                tvQuestion.setText("Do you want to accept this Order?");
             }
 
             if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
