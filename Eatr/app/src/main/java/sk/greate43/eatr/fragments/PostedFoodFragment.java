@@ -35,7 +35,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Map;
 
-import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
@@ -150,7 +149,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
         recyclerView.setHasFixedSize(true);
 
-        FloatingTextButton addFoodItem = view.findViewById(R.id.fragment_posted_food_add_food_item_btn);
+        FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_posted_food_add_food_item_btn);
         addFoodItem.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
             startActivity(intent);
