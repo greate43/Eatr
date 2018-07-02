@@ -79,7 +79,7 @@ public class PhoneNoVerificationFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null)
-            getActivity().setTitle("Phone No Verification Fragment");
+            getActivity().setTitle("Mobile No. Verification");
         if (getArguments() != null) {
             mPhoneNo = getArguments().getString(ARG_PHONE_NO);
             Log.d(TAG, "onCreate: " + mPhoneNo);
@@ -131,10 +131,10 @@ public class PhoneNoVerificationFragment extends Fragment {
             }
 
             public void onFinish() {
-                tvTimer.setText("Resend in : 0");
+                tvTimer.setText("Resend in: 0");
 
                 tvTimer.setTextColor(Color.BLUE);
-                tvTimer.setText("Resend Verification Code ");
+                tvTimer.setText("Resend Verification Code");
                 tvTimer.setEnabled(true);
                 tvTimer.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -350,7 +350,7 @@ public class PhoneNoVerificationFragment extends Fragment {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The verification code entered was invalid
                                 if (getActivity() != null) {
-                                    Toast.makeText(getActivity().getApplicationContext(), "The verification code entered was invalid", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity().getApplicationContext(), "The verification code entered is invalid", Toast.LENGTH_LONG).show();
                                 }
                             }
                         }

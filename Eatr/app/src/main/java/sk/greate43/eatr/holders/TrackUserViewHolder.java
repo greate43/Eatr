@@ -35,9 +35,9 @@ public class TrackUserViewHolder extends RecyclerView.ViewHolder {
     public void populate(final AppCompatActivity activity, final Food food) {
         tvDishName.setText(food.getDishName());
         if (activity instanceof BuyerActivity) {
-            tvQuestion.setText("Go to Food pick Up point  ");
+            tvQuestion.setText("Go to Food pick Up location");
 
-            btnTrackNow.setText("Pick Up ");
+            btnTrackNow.setText("Pick Up");
             btnTrackNow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -48,8 +48,8 @@ public class TrackUserViewHolder extends RecyclerView.ViewHolder {
 
         } else if (activity instanceof SellerActivity) {
 
-            btnTrackNow.setText("Track Buyer ");
-            tvQuestion.setText("Track where the user is right now ");
+            btnTrackNow.setText("Track Buyer");
+            tvQuestion.setText("Track where the user is right now");
 
             btnTrackNow.setOnClickListener(new View.OnClickListener() {
                 @Override
