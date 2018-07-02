@@ -196,7 +196,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Your Order Has Been Accepted and You you can get the Order from your Pick Up Place");
+                    notificationReply.setMessage("Your Order has Been acceptedby seller, you can get the Order from Pick Up location");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -216,7 +216,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Your Order Has Been Rejected");
+                    notificationReply.setMessage("Your Order has been rejected");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -238,7 +238,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Buyer has also marked the order Complete ");
+                    notificationReply.setMessage("Buyer has also marked order as Complete ");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -258,7 +258,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Buyer has marked the Incomplete");
+                    notificationReply.setMessage("Buyer has marked order as incomplete");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());

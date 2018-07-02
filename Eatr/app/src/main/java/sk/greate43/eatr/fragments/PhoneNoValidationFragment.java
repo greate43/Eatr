@@ -38,7 +38,7 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (getActivity() != null)
-            getActivity().setTitle("Phone No Validation Fragment");
+            getActivity().setTitle("Mobile No. Verification");
         super.onCreate(savedInstanceState);
 
     }
@@ -60,7 +60,7 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
                     mListener.onFragmentReplaced(PhoneNoVerificationFragment.newInstance(ccp.getFullNumberWithPlus()));
                 }
             } else {
-                etPhoneNo.setError("Phone No is Invalid");
+                etPhoneNo.setError("Mobile No. is invalid");
             }
 
         });

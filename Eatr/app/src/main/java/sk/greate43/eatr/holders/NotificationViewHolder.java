@@ -115,7 +115,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Your Order Has Been Accepted and You you can get the Order from your Pick Up Place");
+                    notificationReply.setMessage("Your order has Been accepted by seller, you can get the Order from Pick Up location");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -135,7 +135,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Your Order Has Been Rejected");
+                    notificationReply.setMessage("Your Order has been rejected by seller");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -157,7 +157,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Buyer has also marked the order Complete ");
+                    notificationReply.setMessage("Buyer has also marked the order as Complete");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -177,7 +177,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Buyer has marked the Incomplete");
+                    notificationReply.setMessage("Buyer has marked order as incomplete");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -249,9 +249,9 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
         if (isAccepted) {
-            result.put(Constants.MESSAGE, "You Have accepted this order");
+            result.put(Constants.MESSAGE, "You have accepted this order");
         } else {
-            result.put(Constants.MESSAGE, "You Have rejected this order");
+            result.put(Constants.MESSAGE, "You have rejected this order");
 
         }
         result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
