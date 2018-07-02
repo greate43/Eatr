@@ -66,7 +66,6 @@ public interface Constants {
      */
     String ARGS_FOOD = "ARGS_FOOD";
 
-    // Add Food Fragment
 
     String ALL_ORDERS = "ALL_ORDERS";
     String ORDER_STATE = "ORDER_STATE";
@@ -74,6 +73,9 @@ public interface Constants {
     String ORDER_DRAFT = "ORDER_DRAFT";
     String ORDER_PURCHASED = "ORDER_PURCHASED";
     String ORDERED_BOOKED = "ORDERED_BOOKED";
+    String ORDERED_IN_PROGRESS = "ORDERED_IN_PROGRESS";
+    String ORDERED_EXPIRED= "ORDERED_EXPIRED";
+
     //FoodItemExpiryTimeAndPriceFragment
 
     /**

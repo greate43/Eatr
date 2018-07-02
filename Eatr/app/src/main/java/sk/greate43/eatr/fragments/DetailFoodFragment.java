@@ -23,9 +23,12 @@ import com.google.firebase.database.ServerValue;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import sk.greate43.eatr.R;
@@ -80,7 +83,7 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
         TextView tvPickUpLocation = view.findViewById(R.id.fragment_detail_food_no_of_pick_up_location);
         TextView tvTags = view.findViewById(R.id.fragment_detail_food_tags);
         TextView tvDishName = view.findViewById(R.id.fragment_detail_food_dish_name);
-
+        TextView tvExpiryTime = view.findViewById(R.id.fragment_detail_food_expiry);
 
         spNoOfServings.setOnItemSelectedListener(this);
 
@@ -157,6 +160,9 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
 
                 }
             });
+
+            SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.US);
+            tvExpiryTime.setText(sfd.format(new Date(food.getExpiryTime())));
 
         }
 
