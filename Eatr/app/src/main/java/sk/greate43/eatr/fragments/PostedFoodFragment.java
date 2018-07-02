@@ -1,6 +1,7 @@
 package sk.greate43.eatr.fragments;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -108,11 +109,21 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
                         break;
                     case Constants.ORDERED_BOOKED:
-                    
+
 
                         states = "No food booked!Looks like no one is hungry!";
 
                         break;
+                    case Constants.ORDERED_IN_PROGRESS:
+                        states = "Looks like no orders in progress yet!!";
+
+                        break;
+                    case Constants.ORDERED_EXPIRED:
+                        states = "Yay! no orders expired yet!!";
+
+                        break;
+
+
                     default:
                         break;
                 }
@@ -357,6 +368,31 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
                             ) {
                         foods.add(food);
+                    }
+                    break;
+                case Constants.ORDERED_IN_PROGRESS:
+                    if (!food.getCheckIfOrderIsActive()
+                            && !food.getCheckIfOrderIsPurchased()
+                            && !food.getCheckIfFoodIsInDraftMode()
+                            && !food.getCheckIfOrderIsBooked()
+                            && food.getCheckIfOrderIsInProgress()
+                            && !food.getCheckIfOrderIsCompleted()
+                            ) {
+                        foods.add(food);
+
+                    }
+                    break;
+                case Constants.ORDERED_EXPIRED:
+                    if (!food.getCheckIfOrderIsActive()
+                            && !food.getCheckIfOrderIsPurchased()
+                            && !food.getCheckIfFoodIsInDraftMode()
+                            && !food.getCheckIfOrderIsBooked()
+                            && !food.getCheckIfOrderIsInProgress()
+                            && !food.getCheckIfOrderIsCompleted()
+                            ) {
+                        foods.add(food);
+
+
                     }
                     break;
                 default:

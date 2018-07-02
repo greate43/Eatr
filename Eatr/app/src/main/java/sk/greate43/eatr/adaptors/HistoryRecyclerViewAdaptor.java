@@ -45,6 +45,7 @@ public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryView
     public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
         if (foods == null || foods.size() == 0) {
             // holder.imgFoodItem.setImageResource(R.drawable.ic_launcher_background);
+            holder.tvPurchasedDate.setTextSize(18);
             holder.tvPurchasedDate.setText("Order History Not Avialable ");
             holder.tvOrderId.setVisibility(View.GONE);
             holder.tvSellerName.setVisibility(View.GONE);
@@ -56,6 +57,8 @@ public class HistoryRecyclerViewAdaptor extends RecyclerView.Adapter<HistoryView
             holder.tvBuyerIdLbl.setVisibility(View.GONE);
             holder.tvSellerIdLbl.setVisibility(View.GONE);
         } else {
+            holder.tvPurchasedDate.setTextSize(14);
+
             holder.tvPurchasedDate.setVisibility(View.VISIBLE);
 
             holder.tvOrderId.setVisibility(View.VISIBLE);
