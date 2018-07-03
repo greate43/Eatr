@@ -251,9 +251,9 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_NOTIFICATION_ALERT_SHOULD_BE_SHOWN, isShow);
         if (isAccepted) {
-            result.put(Constants.MESSAGE, "You Have accepted this order");
+            result.put(Constants.MESSAGE, "You have accepted this order");
         } else {
-            result.put(Constants.MESSAGE, "You Have rejected this order");
+            result.put(Constants.MESSAGE, "You have rejected this order");
 
         }
         result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);

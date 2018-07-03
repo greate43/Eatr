@@ -61,7 +61,7 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
                     mListener.onFragmentReplaced(PhoneNoVerificationFragment.newInstance(ccp.getFullNumberWithPlus()));
                 }
             } else {
-                etPhoneNo.setError("Phone No is Invalid");
+                etPhoneNo.setError("Mobile No. is invalid");
             }
 
         });
