@@ -195,6 +195,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
+
                     notificationReply.setMessage("Your Order has Been accepted by seller, you can get the Order from Pick Up location");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
