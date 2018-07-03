@@ -130,6 +130,7 @@ public class PhoneNoVerificationFragment extends Fragment {
                 //here you can have your logic to set text to edittext
             }
 
+
             public void onFinish() {
                 tvTimer.setText("Resend in: 0");
 
@@ -352,6 +353,7 @@ public class PhoneNoVerificationFragment extends Fragment {
                                 if (getActivity() != null) {
                                     Toast.makeText(getActivity().getApplicationContext(), "The verification code entered is invalid", Toast.LENGTH_LONG).show();
                                 }
+
                             }
                         }
                         hideProgressDialog();

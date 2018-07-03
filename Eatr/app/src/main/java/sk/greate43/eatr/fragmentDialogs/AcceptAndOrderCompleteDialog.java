@@ -187,7 +187,6 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
 
         return view;
     }
-
     private void sendNotification(Boolean isOrderAccepted) {
         String notificationId = mDatabaseReference.push().getKey();
         Notification notificationReply = null;
@@ -196,7 +195,8 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Your Order has Been acceptedby seller, you can get the Order from Pick Up location");
+
+                    notificationReply.setMessage("Your Order has Been accepted by seller, you can get the Order from Pick Up location");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -282,6 +282,8 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
             mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
         }
     }
+
+
 
     private Map<String, Object> updateNotificationAlert(boolean isShow, boolean isAccepted) {
         HashMap<String, Object> result = new HashMap<>();
