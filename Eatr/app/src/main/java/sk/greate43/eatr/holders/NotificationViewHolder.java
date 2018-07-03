@@ -200,6 +200,8 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
     }
 
+
+
     private Map<String, Object> updateUpdateProgress(boolean progress, boolean booked, boolean isActive, boolean isPurchase, boolean isCompeted, boolean isAccepted) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(Constants.CHECK_IF_ORDER_IS_IN_PROGRESS, progress);
