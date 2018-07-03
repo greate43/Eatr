@@ -38,7 +38,8 @@ public class PhoneNoValidationFragment extends Fragment implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         if (getActivity() != null)
-            getActivity().setTitle("Phone No Validation Fragment");
+            getActivity().setTitle("Mobile No. Verification");
+
         super.onCreate(savedInstanceState);
 
     }
