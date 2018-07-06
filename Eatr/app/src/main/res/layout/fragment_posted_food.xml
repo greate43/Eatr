@@ -46,18 +46,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <android.support.design.widget.FloatingActionButton
+    <ru.dimorinny.floatingtextbutton.FloatingTextButton
+
         android:id="@+id/fragment_posted_food_add_food_item_btn"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/add_entry_btn"
-        app:backgroundTint="@color/primary"
+        app:floating_background_color="@color/colorPrimary"
+
+        app:floating_left_icon="@drawable/ic_add_box_black_24dp"
+        app:floating_title="Post Food"
+        app:floating_title_color="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
 </android.support.constraint.ConstraintLayout>

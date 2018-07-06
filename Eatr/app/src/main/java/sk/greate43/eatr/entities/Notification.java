@@ -8,9 +8,7 @@ import java.util.Map;
  */
 
 public class Notification implements Serializable {
-    private boolean checkIfButtonShouldBeEnabled;
-    private boolean checkIfNotificationAlertShouldBeSent;
-    private boolean checkIfNotificationAlertShouldBeShown;
+
     private String notificationImage;
     private String message;
     private String title;
@@ -21,8 +19,22 @@ public class Notification implements Serializable {
     private String notificationType;
     private Map<String, String> timeStamp;
 
+    private boolean checkIfButtonShouldBeEnabled;
+    private boolean checkIfNotificationAlertShouldBeSent;
+    private boolean checkIfNotificationAlertShouldBeShown;
+    private boolean checkIfDialogShouldBeShown;
+
+
     public Notification() {
 
+    }
+
+    public boolean getCheckIfDialogShouldBeShown() {
+        return checkIfDialogShouldBeShown;
+    }
+
+    public void setCheckIfDialogShouldBeShown(boolean checkIfDialogShouldBeShown) {
+        this.checkIfDialogShouldBeShown = checkIfDialogShouldBeShown;
     }
 
     public Map<String, String> getTimeStamp() {
@@ -56,6 +68,8 @@ public class Notification implements Serializable {
     public void setCheckIfNotificationAlertShouldBeShown(boolean checkIfNotificationAlertShouldBeShown) {
         this.checkIfNotificationAlertShouldBeShown = checkIfNotificationAlertShouldBeShown;
     }
+
+
 
     public boolean getCheckIfNotificationAlertShouldBeSent() {
         return checkIfNotificationAlertShouldBeSent;

@@ -223,7 +223,7 @@ public class AcceptAndCompleteOrderUtils {
                     emitter.onComplete();
                 });
 
-                mDatabaseReference.child(Constants.PROFILE).child(food.getPostedBy()).addListenerForSingleValueEvent(new ValueEventListener() {
+                mDatabaseReference.child(Constants.PROFILE).child(food.getPostedBy()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -240,7 +240,7 @@ public class AcceptAndCompleteOrderUtils {
 
 
                 mDatabaseReference.child(Constants.NOTIFICATION)
-                        .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        .orderByChild(Constants.ORDER_ID).equalTo(food.getPushId()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
@@ -293,7 +293,7 @@ public class AcceptAndCompleteOrderUtils {
         if (userId != null) {
 
 
-            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            mDatabaseReference.child(Constants.REVIEW).orderByChild(Constants.USER_ID).equalTo(userId).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -368,32 +368,36 @@ public class AcceptAndCompleteOrderUtils {
                 }
 
                 if (userType.equalsIgnoreCase(Constants.TYPE_SELLER) && activity instanceof SellerActivity) {
-                    AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg, userType);
+                    if (notification.getReceiverId().equals(user.getUid()) &&notification.getCheckIfDialogShouldBeShown()) {
+                        AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg, userType);
 
-                    FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
+                        FragmentTransaction ft = ((SellerActivity) activity).getSupportFragmentManager().beginTransaction();
 
-                    Fragment prev = ((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(acceptOrderDialogFragment.TAG_FRAGMENT);
-                    if (prev != null) {
-                        ft.remove(prev);
+                        Fragment prev = ((SellerActivity) activity).getSupportFragmentManager().findFragmentByTag(acceptOrderDialogFragment.TAG_FRAGMENT);
+                        if (prev != null) {
+                            ft.remove(prev);
+                        }
+                        ft.addToBackStack(null);
+
+
+                        ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
                     }
-                    ft.addToBackStack(null);
-
-
-                    ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
                 } else if (userType.equalsIgnoreCase(Constants.TYPE_BUYER) && activity instanceof BuyerActivity) {
+                    if (notification.getReceiverId().equals(user.getUid())&&notification.getCheckIfDialogShouldBeShown()) {
 
-                    AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg, userType);
+                        AcceptAndOrderCompleteDialog acceptOrderDialogFragment = AcceptAndOrderCompleteDialog.newInstance(food, notification, profile, ratingAvg, userType);
 
-                    FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
+                        FragmentTransaction ft = ((BuyerActivity) activity).getSupportFragmentManager().beginTransaction();
 
-                    Fragment prev = ((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(acceptOrderDialogFragment.TAG_FRAGMENT);
-                    if (prev != null) {
-                        ft.remove(prev);
+                        Fragment prev = ((BuyerActivity) activity).getSupportFragmentManager().findFragmentByTag(acceptOrderDialogFragment.TAG_FRAGMENT);
+                        if (prev != null) {
+                            ft.remove(prev);
+                        }
+                        ft.addToBackStack(null);
+
+
+                        ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
                     }
-                    ft.addToBackStack(null);
-
-
-                    ft.add(acceptOrderDialogFragment, acceptOrderDialogFragment.TAG_FRAGMENT).commitAllowingStateLoss();
                 }
             }
 
@@ -463,6 +467,8 @@ public class AcceptAndCompleteOrderUtils {
         notification.setSenderId(String.valueOf(value.get(Constants.SENDER_ID)));
         notification.setReceiverId(String.valueOf(value.get(Constants.RECEIVER_ID)));
         notification.setNotificationType(String.valueOf(value.get(Constants.NOTIFICATION_TYPE)));
+
+        notification.setCheckIfDialogShouldBeShown(Boolean.parseBoolean(String.valueOf(value.get(Constants.CHECK_IF_DIALOG_SHOULD_BE_SHOWN))));
 
         if (notification.getReceiverId().equals(user.getUid()) && notification.getCheckIfNotificationAlertShouldBeShown()) {
             notificationObservable = Observable.create(emitter -> {

@@ -206,7 +206,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
-
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
                             .updateChildren(updateUpdateProgress(true, false, false, false, false, false));
@@ -226,6 +226,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
@@ -247,6 +248,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                     notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
 
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
 
@@ -268,6 +270,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
@@ -295,6 +298,7 @@ public class AcceptAndOrderCompleteDialog extends DialogFragment {
 
         }
         result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
+        result.put(Constants.CHECK_IF_DIALOG_SHOULD_BE_SHOWN, false);
 
         return result;
     }

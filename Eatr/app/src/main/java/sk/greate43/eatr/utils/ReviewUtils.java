@@ -149,13 +149,13 @@ public class ReviewUtils {
         }
     }
 
-    public void removeListener() {
-//        if (buyerReviewListener != null) {
-//            mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(buyerReviewListener);
-//        }
-//        if (sellerReviewListener != null) {
-//            mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(sellerReviewListener);
-//        }
-    }
+//    public void removeListener() {
+////        if (buyerReviewListener != null) {
+////            mDatabaseReference.child(Constants.BUYER_REVIEW).orderByChild(Constants.PURCHASED_BY).equalTo(user.getUid()).removeEventListener(buyerReviewListener);
+////        }
+////        if (sellerReviewListener != null) {
+////            mDatabaseReference.child(Constants.SELLER_REVIEW).orderByChild(Constants.POSTED_BY).equalTo(user.getUid()).removeEventListener(sellerReviewListener);
+////        }
+//    }
 }
 

@@ -136,7 +136,7 @@ public class AddFoodItemFragment extends Fragment implements
         super.onCreate(savedInstanceState);
 
         if (getActivity() != null)
-            getActivity().setTitle("Add Food Item Fragment");
+            getActivity().setTitle("Step-1 Description");
 
         if (getArguments() != null) {
             food = (Food) getArguments().getSerializable(Constants.ARGS_FOOD);
