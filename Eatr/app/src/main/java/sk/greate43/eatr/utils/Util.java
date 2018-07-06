@@ -29,8 +29,8 @@ public class Util {
                 .setRecurring(true)
                 // don't persist forever
                 .setLifetime(Lifetime.FOREVER)
-                // start between 0 and 15 seconds from now
-                .setTrigger(Trigger.executionWindow(0, 15))
+                // start between 0 and 5 seconds from now
+                .setTrigger(Trigger.executionWindow(0, 5))
                 // don't overwrite an existing job with the same tag
                 .setReplaceCurrent(false)
                 // retry with exponential backoff

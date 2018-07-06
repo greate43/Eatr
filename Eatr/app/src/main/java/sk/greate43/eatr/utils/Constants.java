@@ -61,6 +61,12 @@ public interface Constants {
     String NOTIFICATION_TYPE = "notificationType";
     String TYPE_NOTIFICATION_ORDER_REQUEST = "ORDER_REQUEST";
     String TYEPE_NOTIFICATION_ORDER_COMPLETED = "ORDER_COMPLETED";
+    String CHECK_IF_DIALOG_SHOULD_BE_SHOWN = "checkIfDialogShouldBeShown";
+
+
+
+
+
     /**
      * {@link sk.greate43.eatr.fragments.AddFoodItemFragment}
      */

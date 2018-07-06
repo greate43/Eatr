@@ -115,7 +115,8 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Your order has Been accepted by seller, you can get the Order from Pick Up location");
+
+                    notificationReply.setMessage("Your Order has Been accepted by seller, you can get the Order from Pick Up location");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -125,7 +126,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
-
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
                             .updateChildren(updateUpdateProgress(true, false, false, false, false, false));
@@ -135,7 +136,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Your Order has been rejected by seller");
+                    notificationReply.setMessage("Your Order has been rejected");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -145,6 +146,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
@@ -157,7 +159,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                 if (notification != null) {
                     notificationReply = new Notification();
                     notificationReply.setTitle(notification.getTitle());
-                    notificationReply.setMessage("Buyer has also marked the order as Complete");
+                    notificationReply.setMessage("Buyer has also marked order as Complete ");
                     notificationReply.setSenderId(user.getUid());
                     notificationReply.setReceiverId(notification.getSenderId());
                     notificationReply.setOrderId(notification.getOrderId());
@@ -166,6 +168,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setCheckIfNotificationAlertShouldBeSent(true);
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
 
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
 
@@ -187,6 +190,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                     notificationReply.setNotificationId(notificationId);
                     notificationReply.setNotificationType(Constants.TYEPE_NOTIFICATION_ORDER_COMPLETED);
                     notificationReply.setTimeStamp(ServerValue.TIMESTAMP);
+                    notificationReply.setCheckIfDialogShouldBeShown(false);
 
                     mDatabaseReference.child(Constants.FOOD)
                             .child(notification.getOrderId())
@@ -197,8 +201,11 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
         }
 
 
-        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
+        if (notificationId != null) {
+            mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notificationReply);
+        }
     }
+
 
 
 
@@ -257,6 +264,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
 
         }
         result.put(Constants.CHECK_IF_BUTTON_SHOULD_BE_ENABLED, false);
+        result.put(Constants.CHECK_IF_DIALOG_SHOULD_BE_SHOWN, false);
 
         return result;
     }

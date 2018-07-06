@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.entities.Food;
@@ -146,19 +147,16 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
             tvTags.setText(String.valueOf(food.getIngredientsTags()));
             tvPrice.setText(String.valueOf("Rs : " + food.getPrice() * Long.parseLong(spNoOfServings.getSelectedItem().toString())));
 
-            btnOrder.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String pushId = "";
+            btnOrder.setOnClickListener(v -> {
+                String pushId = "";
 
 
-                    if (food.getPushId() != null) {
-                        pushId = food.getPushId();
-                    }
-
-                    writeData(pushId);
-
+                if (food.getPushId() != null) {
+                    pushId = food.getPushId();
                 }
+
+                writeData(pushId);
+
             });
 
             SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.US);
@@ -183,19 +181,19 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
         notification.setCheckIfButtonShouldBeEnabled(true);
         notification.setCheckIfNotificationAlertShouldBeShown(true);
         notification.setCheckIfNotificationAlertShouldBeSent(true);
+        notification.setCheckIfDialogShouldBeShown(true);
+
         notification.setNotificationId(notificationId);
         notification.setNotificationType(Constants.TYPE_NOTIFICATION_ORDER_REQUEST);
-
-
         notification.setTimeStamp(ServerValue.TIMESTAMP);
 
         if (food.getNumberOfServings() - Long.parseLong(spNoOfServings.getSelectedItem().toString()) > 0) {
             String pushFoodId = mDatabaseReference.push().getKey();
-            mDatabaseReference.child(Constants.FOOD).child(pushFoodId).updateChildren(createFood(pushFoodId));
+            mDatabaseReference.child(Constants.FOOD).child(Objects.requireNonNull(pushFoodId)).updateChildren(createFood(pushFoodId));
 
         }
         mDatabaseReference.child(Constants.FOOD).child(pushId).updateChildren(updateFood(user.getUid()));
-        mDatabaseReference.child(Constants.NOTIFICATION).child(notificationId).setValue(notification);
+        mDatabaseReference.child(Constants.NOTIFICATION).child(Objects.requireNonNull(notificationId)).setValue(notification);
 
 
         if (getActivity() != null) {
