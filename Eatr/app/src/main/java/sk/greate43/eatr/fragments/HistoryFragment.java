@@ -153,9 +153,7 @@ public class HistoryFragment extends Fragment {
 
     private void showData(DataSnapshot dataSnapshot) {
 
-        if (dataSnapshot.getValue() == null) {
-            return;
-        }
+
 
         if (adaptor != null) {
             adaptor.clear();
