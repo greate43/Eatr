@@ -792,7 +792,7 @@ public class AddFoodItemFragment extends Fragment implements
                     etPickLocation.setError("Pick Up Name is Empty  ");
                 } else if (etIncidentsTags.getTagList().isEmpty()) {
 
-                    tilIncidentsTags.setError("There Should be at Lest 1 Tag");
+                    tilIncidentsTags.setError("There should be at Least 1 ingredient");
                 }
 
                 break;
