@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     tools:context="sk.greate43.eatr.fragments.FoodItemExpiryTimeAndPriceFragment">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
         >
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/fragment_food_item_expiry_time_and_price_edit_text_price"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -32,10 +32,10 @@
                 android:inputType="number"
                 android:singleLine="true" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price_servings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
             app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price"
             app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/fragment_food_item_expiry_time_and_price_edit_text_servings"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -54,7 +54,7 @@
                 android:inputType="number"
                 android:singleLine="true" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_time"
@@ -111,7 +111,7 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/fragment_food_item_expiry_time_and_price_button_8_hour"
             app:layout_constraintStart_toEndOf="@+id/fragment_food_item_expiry_time_and_price_button_8_hour" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_custom_hours"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
             app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_text_input_layout_price_servings"
             app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_button_4_hour">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/fragment_food_item_expiry_time_and_price_edit_text_custom_hours"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -129,7 +129,7 @@
                 android:inputType="number"
                 android:singleLine="true" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/fragment_food_item_expiry_time_and_price_text_view_expiry_results"
@@ -164,5 +164,5 @@
             app:layout_constraintEnd_toEndOf="@+id/fragment_food_item_expiry_time_and_price_button_show_preview"
             app:layout_constraintStart_toStartOf="@+id/fragment_food_item_expiry_time_and_price_button_show_preview"
             app:layout_constraintTop_toBottomOf="@+id/fragment_food_item_expiry_time_and_price_button_show_preview" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

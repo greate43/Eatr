@@ -1,7 +1,7 @@
 package sk.greate43.eatr.holders;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,21 +31,11 @@ public class PostedFoodHeaderHolder extends RecyclerView.ViewHolder {
     public void populate(Context context, Profile profile) {
         itemView.setTag(profile);
         if (profile.getProfilePhotoUri() != null && !profile.getProfilePhotoUri().isEmpty()) {
-            Picasso.with(context)
+            Picasso.get()
                     .load(profile.getProfilePhotoUri())
                     .fit()
                     .centerCrop()
-                    .into(imgProfilePic, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
+                    .into(imgProfilePic);
         }
 
         tvName.setText(profile.getFirstName() + " " + profile.getLastName());
