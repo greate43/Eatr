@@ -1,16 +1,7 @@
 package sk.greate43.eatr.fragments;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Map;
 
-import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 import sk.greate43.eatr.R;
 import sk.greate43.eatr.activities.FoodItemContainerActivity;
 import sk.greate43.eatr.activities.SellerActivity;
@@ -150,7 +147,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
         recyclerView.setHasFixedSize(true);
 
-        FloatingTextButton addFoodItem = view.findViewById(R.id.fragment_posted_food_add_food_item_btn);
+        FloatingActionButton addFoodItem = view.findViewById(R.id.fragment_posted_food_add_food_item_btn);
         addFoodItem.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), FoodItemContainerActivity.class);
             startActivity(intent);
@@ -163,7 +160,7 @@ public class PostedFoodFragment extends Fragment implements PostedFoodViewHolder
 
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        layoutManager.setOrientation(RecyclerView.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adaptor);
 

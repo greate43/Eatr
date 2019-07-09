@@ -3,7 +3,6 @@ package sk.greate43.eatr.fragments;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -13,12 +12,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.NonNull;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,17 +28,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
@@ -471,21 +465,11 @@ public class ProfileFragment extends Fragment {
 
 
     private void setProfileImage(Uri imgUri) {
-        Picasso.with(getActivity())
+        Picasso.get()
                 .load(imgUri)
                 .fit()
                 .centerCrop()
-                .into(imgProfilePicture, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(TAG, "onSuccess: ");
-                    }
-
-                    @Override
-                    public void onError() {
-
-                    }
-                });
+                .into(imgProfilePicture);
     }
 
     public void showProgressDialog() {
