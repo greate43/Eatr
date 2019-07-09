@@ -2,8 +2,8 @@ package sk.greate43.eatr.fragmentDialogs;
 
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -291,21 +291,11 @@ public class ReviewDialogFragment extends DialogFragment {
 
 
         if (profile.getProfilePhotoUri() != null && !profile.getProfilePhotoUri().isEmpty()) {
-            Picasso.with(getActivity())
+            Picasso.get()
                     .load(profile.getProfilePhotoUri())
                     .fit()
                     .centerCrop()
-                    .into(imgUserPic, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
+                    .into(imgUserPic);
         }
 
 

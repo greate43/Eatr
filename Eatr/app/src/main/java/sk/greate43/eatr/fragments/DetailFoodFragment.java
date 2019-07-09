@@ -2,8 +2,8 @@ package sk.greate43.eatr.fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -100,21 +100,11 @@ public class DetailFoodFragment extends Fragment implements AdapterView.OnItemSe
 
         if (food != null) {
             if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
-                Picasso.with(getActivity())
+                Picasso.get()
                         .load(food.getImageUri())
                         .fit()
                         .centerCrop()
-                        .into(imgDishPic, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d(TAG, "onSuccess: ");
-                            }
-
-                            @Override
-                            public void onError() {
-
-                            }
-                        });
+                        .into(imgDishPic);
             }
             tvDishName.setText(String.valueOf(food.getDishName()));
 
