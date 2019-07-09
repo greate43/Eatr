@@ -1,8 +1,8 @@
 package sk.greate43.eatr.holders;
 
 import android.content.Context;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.RecyclerView;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -54,7 +54,7 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
                         mDatabaseReference.child(Constants.NOTIFICATION).child(notification.getNotificationId()).removeValue();
 
 
-                        Snackbar.make(view, "Deleted " + notification.getNotificationId(), Toast.LENGTH_SHORT).show();
+                        Snackbar.make(view, "Deleted " + notification.getNotificationId(), Snackbar.LENGTH_LONG).show();
 
 
                         break;
@@ -272,38 +272,18 @@ public class NotificationViewHolder extends RecyclerView.ViewHolder implements V
     public void populate(Notification notification, Context context) {
         this.notification = notification;
         if (notification.getNotificationImage() != null && !notification.getNotificationImage().isEmpty()) {
-            Picasso.with(context)
+            Picasso.get()
                     .load(notification.getNotificationImage())
                     .fit()
                     .centerCrop()
-                    .into(img, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
+                    .into(img);
         } else {
             Log.d(TAG, "populate: ");
-            Picasso.with(context)
+            Picasso.get()
                     .load(R.drawable.logo)
                     .fit()
                     .centerCrop()
-                    .into(img, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
+                    .into(img);
         }
         tvMessage.setText(notification.getMessage());
         tvTitle.setText(notification.getTitle());

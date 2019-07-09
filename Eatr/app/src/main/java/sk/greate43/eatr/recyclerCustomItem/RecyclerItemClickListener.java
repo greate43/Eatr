@@ -1,9 +1,9 @@
 package sk.greate43.eatr.recyclerCustomItem;
 
 import android.content.Context;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.SimpleOnItemTouchListener;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;

@@ -3,7 +3,7 @@ package sk.greate43.eatr.holders;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
@@ -82,23 +82,11 @@ public class ListOfAllPostedFoodViewHolder extends RecyclerView.ViewHolder {
         itemView.setTag(food);
 
         if (food.getImageUri() != null && !food.getImageUri().isEmpty()) {
-            Picasso.with(context)
+            Picasso.get()
                     .load(food.getImageUri())
                     .fit()
                     .centerCrop()
-                    .into(imgFoodItem, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "onSuccess: ");
-                            progressBar.setVisibility(View.GONE);
-
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
+                    .into(imgFoodItem);
         }
 
         tvTimeStamp.setText(DateUtils

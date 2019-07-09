@@ -8,11 +8,10 @@ package sk.greate43.eatr.utils;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 
@@ -27,7 +26,6 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.squareup.picasso.Picasso;
@@ -104,12 +102,12 @@ public class DrawerUtil implements UpdateProfile {
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
             @Override
             public void set(ImageView imageView, Uri uri, Drawable placeholder) {
-                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).fit().centerCrop().into(imageView);
+                Picasso.get().load(uri).placeholder(placeholder).fit().centerCrop().into(imageView);
             }
 
             @Override
             public void cancel(ImageView imageView) {
-                Picasso.with(imageView.getContext()).cancelRequest(imageView);
+                Picasso.get().cancelRequest(imageView);
             }
 
     /*
