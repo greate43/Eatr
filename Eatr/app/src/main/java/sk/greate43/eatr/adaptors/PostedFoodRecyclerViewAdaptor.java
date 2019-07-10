@@ -67,7 +67,7 @@ public class PostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter<PostedFo
             holder.ratingBar.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.GONE);
         } else {
-            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.progressBar.setVisibility(View.GONE);
             holder.tvPostedbyName.setVisibility(View.VISIBLE);
             holder.tvRatingBarLbl.setVisibility(View.VISIBLE);
             holder.tvPostedbyName.setVisibility(View.VISIBLE);

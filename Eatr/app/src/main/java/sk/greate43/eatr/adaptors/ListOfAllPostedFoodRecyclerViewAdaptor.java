@@ -59,7 +59,7 @@ public class ListOfAllPostedFoodRecyclerViewAdaptor extends RecyclerView.Adapter
 
 
         } else {
-            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.progressBar.setVisibility(View.GONE);
             holder.tvPostedbyName.setVisibility(View.VISIBLE);
             holder.tvRatingBarLbl.setVisibility(View.VISIBLE);
             holder.tvPostedbyName.setVisibility(View.VISIBLE);
